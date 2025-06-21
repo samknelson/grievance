@@ -1,5 +1,8 @@
 <?php
 
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_tfa') . '/sirius_tfa.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_tfa') . '/sirius_tfa.permission.inc';
+
 /**
  * Implements hook_init
  * 
@@ -11,20 +14,92 @@
  * 
  */
 
-/*
 function sirius_tfa_init() {
 	// Only relevant if there's an authenticated user
 	global $user;
 	if (!$user) { return; }
+  $uid = $user->uid;
+  $current_path = current_path();
+  $user_full = user_load($user->uid);
 
 	// Only relevant if the user has one of the required roles.
-	if (!in_array('sirius tfa required', $user->roles)) { return; }
+  $required_rids = array_filter(array_values(variable_get('sirius_tfa_required_roles', array())));
+  $my_rids = $user->roles;
+  if (!$my_rids) { $my_rids = array(); }
+  $my_rids = array_filter(array_keys($my_rids));
+	if (!array_intersect($required_rids, $my_rids)) { return; }
 
-  $tfa = tfa_get_process($user);
+  // We can see anything under "/user/[uid]".
+  if (preg_match("/^user\/$uid/", $current_path)) { return; }
+  if (preg_match("/^user\/logout/", $current_path)) { return; }
+  if (preg_match("/^system\/tfa/", $current_path)) { return; }
+
+  // Only relevant if we haven't set up TFA. 
+  // For some reason, tfa_get_process() throws really obscure errors unless we mess around a bit.
+  if (!isset($_SESSION['tfa'][$user->uid]['uid'])) { tfa_start_context($user_full); }    
+  $tfa = tfa_get_process($user_full);
   if ($tfa->ready()) { return; }
-  drupal_set_message("Ready: " . $tfa->ready());
 
-  $item = menu_get_item();
-  dpm($item);
+  // Display the "TFA Required" message
+  $msg = variable_get('sirius_tfa_required_msg', "Before accessing the site, please <a href=\"/user/$uid/sirius-tfa\">configure two-factor authentication</a>.");
+  drupal_set_message($msg, 'warning');
+
+  // Redirecting immediately upon login screws with TFA's session handling. So we have to let them see the first
+  // page after they sign in. Let's give them 60 seconds before redirecting.
+  $elapsed = time() - $user->login;
+  if ($elapsed > 30) { drupal_goto("user/$uid/sirius-tfa"); }
 }
-*/
+
+function sirius_tfa_reauthenticate() {
+  $ts_now = time();
+  $ts_last = sirius_tfa_reauthenticate_last();
+  $window = sirius_domain_variable_get('sirius_tfa_reauthentication_window', 60*10);
+
+  if ($ts_now - $ts_last > $window) {
+    drupal_goto('sirius/tfa/reauthenticate', array('query'=>array('destination' => current_path())));
+  }
+
+  sirius_tfa_reauthenticate_last($ts_now);
+}
+
+function sirius_tfa_reauthenticate_last($ts = NULL) {
+  if ($ts) { $_SESSION['sirius']['tfa']['reauthenticate']['ts'] = $ts; }
+  return $_SESSION['sirius']['tfa']['reauthenticate']['ts'];
+}
+
+/**
+ * If we just logged in, don't need to re-authenticate
+ */
+
+function sirius_tfa_user_login(&$edit, $account) {
+  sirius_tfa_reauthenticate_last(time());
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter()
+ * 
+ * Modify the user profile form:
+ * - Add a call to "sirius_tfa_reauthenticate()"
+ * - Remove the "current password" validation requirement
+ */
+
+function sirius_tfa_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
+  // To edit your own account page, you must re-authenticate.
+  global $user;
+  if ($form['#user'] && $form['#user']->uid && ($form['#user']->uid == $user->uid)) {
+    sirius_tfa_reauthenticate();
+  }
+
+  // Remove the "current password" field elements and validator.
+  $form['account']['current_pass_required_values'] = array('#type' => 'value', '#value' => array());
+  unset($form['account']['current_pass']);
+  $form['#validate'] = array_splice($form['#validate'], array_search('user_validate_current_pass', $form['#validate']), 1);
+}
+
+/**
+ * Implements hook_sirius_config_links_alter
+ */
+
+function sirius_tfa_sirius_config_links_alter(&$links) {
+  $links['users']['links']['admin/config/people/tfa'] = array('title' => 'TFA', 'description' => 'Two-factor authentication settings.');
+}

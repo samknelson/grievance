@@ -57,7 +57,7 @@ function sirius_hour_cache_set($payperiod_node) {
 	if (!$hour_type_names) { $hour_type_names = sirius_taxonomy_load('sirius_hour_type', 'tid', 'name'); }
 
 	if ($json['totals']['hours']['by_day']) {
-		$payperiod_ts = sirius_fieldval($payperiod_node, 'field_sirius_datetime', 'ts');
+		$payperiod_ts = sirius_fieldval($payperiod_node, 'field_sirius_date_start', 'ts');
 		$month = gmdate('n', $payperiod_ts);
 		$year = gmdate('Y', $payperiod_ts);
 		foreach ($json['totals']['hours']['by_day'] as $day => $by_day) {

@@ -9,8 +9,12 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/siriu
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.badge.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.feed_hours_check.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.feed_hours_check2.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.banner.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.server_switch.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.edls.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.apprentice_fetch.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.m12.inc';
 
 /**
  * Implements hook_node_access()
@@ -92,6 +96,7 @@ function sirius_teamsters631_sirius_wizard_info() {
 
   // $items += sirius_ledger_feed_charges_info();
   $items += sirius_teamsters631_feed_hours_check_info();
+  $items += sirius_teamsters631_feed_hours_check2_info();
 
   return $items;
 }
@@ -144,3 +149,60 @@ function sirius_teamsters631_sirius_worker_nextid_alter(&$id) {
 		$id = max($id, $id2);
 	}
 }
+
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+function sirius_teamsters631_report_cache_info() {
+  $items = array();
+  sirius_require('sirius_teamsters631', 'sirius_teamsters631.report_edls_compliance.inc');
+  Sirius_Teamsters631_Report_Edls_Compliance::getInstance()->setInfo($items);
+  return $items;
+}
+
+/**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_teamsters631_sirius_cron_scan_info() {
+  $items['teamsters631_edls_apprentice_fetch'] = array(
+    'title' => 'Teamsters631 EDLS Apprentice Fetch',
+    'description' => 'Fetch apprentice workers from the Training Center and enter them as outsource workers in the EDLS system.',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_teamsters631_edls_apprentice_fetch',
+    'multidomain' => FALSE,
+    'component' => 'edls',
+  );
+
+  $items['teamsters631_apprentice_fetch'] = array(
+    'title' => 'Teamsters631 Apprentice Fetch',
+    'description' => 'Fetch apprentice workers from the Training Center and enter them as log entries..',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_teamsters631_apprentice_fetch',
+    'multidomain' => FALSE,
+    'component' => 'edls',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_sirius_backlinks_from_node_alter
+ */
+
+function sirius_teamsters631_sirius_backlinks_from_node_alter(&$links, $node) {
+  if ($node->type == 'sirius_log' && $node->field_sirius_category['und'][0]['value'] == 'teamsters631:m12') {
+  	$employer_node = sirius_log_handler($node, 'grievance_shop');
+  	if ($employer_node) {
+  		unset($links['node/' . $employer_node->nid . '/grievance_shop_log']);
+	    $links['node/' . $employer_node->nid . '/grievance_shop_teamsters631_m12'] = array('name' => 'Employer');
+
+	    $m12_json = sirius_json_get($node);
+	    $year = $m12_json['teamsters631_m12']['year'];
+	    $month = $m12_json['teamsters631_m12']['month'];
+	    $links["sirius/teamsters631/m12/$year-$month/active"] = array('name' => 'All Reports');
+	  }
+  }
+}
+

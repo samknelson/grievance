@@ -18,19 +18,13 @@ function sirius_do_not_disturb_tz() {
 	return $tz;
 }
 
-function sirius_page_do_not_disurb_config() { return drupal_get_form('sirius_page_do_not_disurb_config_form'); }
+function sirius_page_do_not_disturb_config() { return drupal_get_form('sirius_page_do_not_disturb_config_form'); }
 
-function sirius_page_do_not_disurb_config_form($form, &$form_state) {
-	$orig_tz = date_default_timezone_get();
-	$tz = sirius_do_not_disturb_tz();
-	date_default_timezone_set($tz);
-	$current_time = date("h:i A");
-	date_default_timezone_set($orig_tz);
-	$form['current_time'] = array(
-		'#markup' => '<div class="sirius_form_intro">' . "<strong>All settings will use the domain's time zone, $tz. Current time $current_time.</strong><br /><br />" . '</div>'
-	);
+function sirius_page_do_not_disturb_config_form($form, &$form_state) {
+	$form['current_time'] = array('#markup' => sirius_tz_indicator(sirius_do_not_disturb_tz()));
 
-	$json = json_decode(sirius_domain_variable_get('sirius_do_not_disturb', ''), TRUE);
+	$json = sirius_do_not_disturb_json();
+
   $days = array(
   	1 => 'Monday',
   	2 => 'Tuesday',
@@ -53,7 +47,7 @@ function sirius_page_do_not_disurb_config_form($form, &$form_state) {
 		$count = 2;
 	}
 	for ($i=0; $i<$count; ++$i) {
-		$title = "Secheudle #" . ($i+1);
+		$title = t("Schedule #") . ($i+1);
 		if ($json['schedules'][$i]['title']) { $title = $json['schedules'][$i]['title']; }
 		if ($json['schedules'][$i]['id']) { $title .= ' (' . $json['schedules'][$i]['id'] . ')'; }
 
@@ -145,7 +139,7 @@ function sirius_page_do_not_disurb_config_form($form, &$form_state) {
 	return $form;
 }
 
-function sirius_page_do_not_disurb_config_form_submit($form, &$form_state) {
+function sirius_page_do_not_disturb_config_form_submit($form, &$form_state) {
 	// Need to clear any empty schedules, otherwise we'll add two each time.
 	$values = $form_state['values']['do_not_disturb'];
 	foreach ($values['schedules'] as $delta => $record) {
@@ -158,17 +152,10 @@ function sirius_page_do_not_disurb_config_form_submit($form, &$form_state) {
 }
 
 
-function sirius_page_do_not_disurb_test() { return drupal_get_form('sirius_page_do_not_disurb_test_form'); }
+function sirius_page_do_not_disturb_test() { return drupal_get_form('sirius_page_do_not_disturb_test_form'); }
 
-function sirius_page_do_not_disurb_test_form($form, &$form_state) {
-	$orig_tz = date_default_timezone_get();
-	$tz = sirius_do_not_disturb_tz();
-	date_default_timezone_set($tz);
-	$current_time = date("h:i A");
-	date_default_timezone_set($orig_tz);
-	$form['current_time'] = array(
-		'#markup' => '<div class="sirius_form_intro">' . "<strong>All settings will use the domain's time zone, $tz. Current time $current_time.</strong><br /><br />" . '</div>'
-	);
+function sirius_page_do_not_disturb_test_form($form, &$form_state) {
+	$form['current_time'] = array('#markup' => sirius_tz_indicator(sirius_do_not_disturb_tz()));
 
 	$options = sirius_do_not_disturb_list();
 	$form['id'] = array(
@@ -185,7 +172,7 @@ function sirius_page_do_not_disurb_test_form($form, &$form_state) {
 	return $form;
 }
 
-function sirius_page_do_not_disurb_test_form_submit($form, &$form_state) {
+function sirius_page_do_not_disturb_test_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 
 	$result = sirius_do_not_disturb_check($form_state['values']['id']);
@@ -197,7 +184,8 @@ function sirius_page_do_not_disurb_test_form_submit($form, &$form_state) {
 }
 
 function sirius_do_not_disturb_list() {
-	$json = json_decode(sirius_domain_variable_get('sirius_do_not_disturb', ''), TRUE);
+	$json = sirius_do_not_disturb_json();
+
 	if (!$json['schedules']) { return array(); }
 	$options = array();
 	foreach ($json['schedules'] as $delta => $record) {
@@ -213,7 +201,8 @@ function sirius_do_not_disturb_list() {
 function sirius_do_not_disturb_check($id = 'default', $ts = NULL) {
 	if (!$ts) { $ts = time(); }
 
-	$json = json_decode(sirius_domain_variable_get('sirius_do_not_disturb', ''), TRUE);
+	$json = sirius_do_not_disturb_json();
+
 	if (!$json['schedules']) { return array('success' => FALSE, 'msg' => 'No Do Not Disturb schedules have been configured.'); }
 
 	$found = FALSE;
@@ -254,8 +243,9 @@ function sirius_do_not_disturb_check($id = 'default', $ts = NULL) {
 	return array('success' => TRUE);
 }
 
-function sirius_do_not_disurb_render($id = 'default') {
-	$json = json_decode(sirius_domain_variable_get('sirius_do_not_disturb', ''), TRUE);
+function sirius_do_not_disturb_render($id = 'default') {
+	$json = sirius_do_not_disturb_json();
+
 	if (!$json['schedules']) { return '<div class="sirius_do_not_disturb_render">No Do Not Disturb schedules have been configured.</div>'; }
 
 	$found = FALSE;
@@ -263,12 +253,6 @@ function sirius_do_not_disurb_render($id = 'default') {
 		if ($id == $schedule['id']) { $found = TRUE; break; }
 	}
 	if (!$found) { return '<div class="sirius_do_not_disturb_render">No Do Not Disturb schedules with id [' . $id . '] was not found.</div>'; }
-
-	$orig_tz = date_default_timezone_get();
-	$tz = sirius_do_not_disturb_tz();
-	date_default_timezone_set($tz);
-	$current_time = date("h:i A");
-	date_default_timezone_set($orig_tz);
 
   $days = array(
   	1 => 'Monday',
@@ -285,6 +269,7 @@ function sirius_do_not_disurb_render($id = 'default') {
 	$html .= $schedule['title'];
 	$html .= ' (' . $schedule['id'] . ')';
 	$html .= '</h2>';
+	$html .= sirius_tz_indicator(sirius_do_not_disturb_tz());
 	$html .= '<table>';
 	$html .= '<tr>';
 	$html .= '<th>Day</th>';
@@ -304,8 +289,17 @@ function sirius_do_not_disurb_render($id = 'default') {
 	if (drupal_valid_path('sirius/admin/do_not_disturb')) {
 		$html .= l("Manage Do Not Disturb Settings", 'sirius/admin/do_not_disturb', array('attributes' => array('class' => array('tool-button'))));
 	}
-	$html .= "Using timezone $tz, current time $current_time.";
 	$html .= '</div>';
 
 	return $html;
+}
+
+function sirius_do_not_disturb_json() {
+	$json = json_decode(sirius_domain_variable_get('sirius_do_not_disturb', ''), TRUE);
+	if (!$json) { $json = sirius_do_not_disturb_default(); }
+	return $json;
+}
+
+function sirius_do_not_disturb_default() {
+	return json_decode('{"schedules":[{"title":"default","id":"default","days":{"1":{"enable":"Yes","start_hour":"9","start_minute":"0","stop_hour":"20","stop_minute":"0"},"2":{"enable":"Yes","start_hour":"9","start_minute":"0","stop_hour":"20","stop_minute":"0"},"3":{"enable":"Yes","start_hour":"9","start_minute":"0","stop_hour":"20","stop_minute":"0"},"4":{"enable":"Yes","start_hour":"9","start_minute":"0","stop_hour":"20","stop_minute":"0"},"5":{"enable":"Yes","start_hour":"9","start_minute":"0","stop_hour":"20","stop_minute":"0"},"6":{"enable":"Yes","start_hour":"9","start_minute":"0","stop_hour":"20","stop_minute":"0"},"7":{"enable":"Yes","start_hour":"9","start_minute":"0","stop_hour":"20","stop_minute":"0"}}},{"title":"Send Any Time (NO RESTRICTIONS)","id":"send_always","days":{"1":{"enable":"Yes","start_hour":"0","start_minute":"0","stop_hour":"24","stop_minute":"59"},"2":{"enable":"Yes","start_hour":"0","start_minute":"0","stop_hour":"24","stop_minute":"59"},"3":{"enable":"Yes","start_hour":"0","start_minute":"0","stop_hour":"24","stop_minute":"59"},"4":{"enable":"Yes","start_hour":"0","start_minute":"0","stop_hour":"24","stop_minute":"59"},"5":{"enable":"Yes","start_hour":"0","start_minute":"0","stop_hour":"24","stop_minute":"59"},"6":{"enable":"Yes","start_hour":"0","start_minute":"0","stop_hour":"24","stop_minute":"59"},"7":{"enable":"Yes","start_hour":"0","start_minute":"0","stop_hour":"24","stop_minute":"59"}}},{"title":"Send Never","id":"send_never","days":{"1":{"enable":"No","start_hour":"0","start_minute":"0","stop_hour":"0","stop_minute":"0"},"2":{"enable":"No","start_hour":"0","start_minute":"0","stop_hour":"0","stop_minute":"0"},"3":{"enable":"No","start_hour":"0","start_minute":"0","stop_hour":"0","stop_minute":"0"},"4":{"enable":"No","start_hour":"0","start_minute":"0","stop_hour":"0","stop_minute":"0"},"5":{"enable":"No","start_hour":"0","start_minute":"0","stop_hour":"0","stop_minute":"0"},"6":{"enable":"No","start_hour":"0","start_minute":"0","stop_hour":"0","stop_minute":"0"},"7":{"enable":"No","start_hour":"0","start_minute":"0","stop_hour":"0","stop_minute":"0"}}},{"title":"Business Hours","id":"business","days":{"1":{"enable":"Yes","start_hour":"9","start_minute":"0","stop_hour":"17","stop_minute":"0"},"2":{"enable":"Yes","start_hour":"9","start_minute":"0","stop_hour":"17","stop_minute":"0"},"3":{"enable":"Yes","start_hour":"9","start_minute":"0","stop_hour":"17","stop_minute":"0"},"4":{"enable":"Yes","start_hour":"9","start_minute":"0","stop_hour":"17","stop_minute":"0"},"5":{"enable":"Yes","start_hour":"9","start_minute":"0","stop_hour":"17","stop_minute":"0"},"6":{"enable":"No","start_hour":"0","start_minute":"0","stop_hour":"0","stop_minute":"0"},"7":{"enable":"Yes","start_hour":"0","start_minute":"0","stop_hour":"0","stop_minute":"0"}}}]}', TRUE);
 }

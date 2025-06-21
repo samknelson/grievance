@@ -18,6 +18,7 @@ function sirius_bulk_node_tab_recipients_contacts_form($form, &$form_state, $bul
 	$json_forms = array();
 	$json_forms['sirius_contact'] = array('default' => $contact_definition_form);
 	$json_forms['sirius_worker'] = array('default' => array());
+	$json_forms['grievance_shop_contact'] = array('default' => array());
 
 	sirius_mightysearch_form_prepare(
 		$form, 

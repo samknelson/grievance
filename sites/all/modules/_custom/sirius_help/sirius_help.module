@@ -1,33 +1,15 @@
 <?php
 
-// I hate notice errors
-ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_help/sirius_help.menu.inc';
 
 /**
- * Implements hook_menu
+ * Implements hook_sirius_config_links_alter()
  */
 
-function sirius_help_menu() {
-  $items['sirius/modal/help-text-view/%node'] = array(
-    'title' => 'Full Help Text',
-    'page callback'    => 'sirius_help_modal_view',
-    'page arguments'   => array(3),
-    'access callback'  => 'sirius_help_modal_view_access',
-    'access arguments' => array(3),
-    'type'             => MENU_LOCAL_ACTION,
-    'context'          => MENU_CONTEXT_INLINE,
-    'modal'            => TRUE,
-  );
-
-  $items['sirius/help/publish'] = array(
-    'title' => 'Publish Help to Sirius Code',
-    'page callback'    => 'sirius_help_publish',
-    'page arguments'   => array(),
-    'access arguments' => array('sirius admin'),
-    'type'             => MENU_NORMAL_ITEM,
-  );
-
-  return $items;
+function sirius_help_sirius_config_links_alter(&$links) {
+  $links['help'] = array('title' => 'Help');
+  $links['help']['links']['sirius/admin/help']                = array('title' => 'Help Text', 'description' => 'Put explanatory text on any page on the site.');
+  $links['help']['links']['sirius/help/config']               = array('title' => 'Settings', 'description' => 'Settings for the Help system');
 }
 
 function sirius_help_publish() {
@@ -133,13 +115,9 @@ function sirius_help_block_info() {
   return $blocks;
 }
 
-/** 
- * Implements hook_block_view
- */
-
-function sirius_help_block_view($delta = '') {
-  if ($delta == 'sirius_help') { 
-
+function sirius_help_paths($new_path = NULL) {
+  $paths = &drupal_static(__FUNCTION__);
+  if (!isset($paths)) {
     // 
     // We look for thre paths: 
     // - "current_path()"
@@ -159,20 +137,53 @@ function sirius_help_block_view($delta = '') {
         if ($node) { $paths[] = 'node/%|' . $node->type; }
       }
     }
+    $paths = array_unique($paths);
+  }
+
+  if ($new_path) {
+    $paths[] = $new_path;
+    $paths = array_unique($paths);
+  }
+
+  return $paths;
+}
+
+/** 
+ * Implements hook_block_view
+ */
+
+function sirius_help_block_view($delta = '') {
+  if ($delta == 'sirius_help') { 
+    $paths = sirius_help_paths();
 
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node');
     $query->entityCondition('bundle', 'sirius_help');
     $query->fieldCondition('field_sirius_paths', 'value', $paths, 'in');
     $stmt = $query->execute(); 
-    if (!$stmt['node']) { return NULL; }
-
-    $help_nodes = node_load_multiple(array_keys($stmt['node']));
+    if ($stmt['node']) {
+      $help_nodes = node_load_multiple(array_keys($stmt['node']));
+    } else {
+      $help_nodes = array();
+    }
 
     $html = '';
 
     foreach ($help_nodes as $help_node) {
       $html .= sirius_help_render($help_node);
+    }
+
+    if (!$html && (variable_get('sirius_help_show_create_links', 'No') == 'Yes') && user_access('sirius help admin')) {
+      $html = '<div class="sirius_help sirius_noprint"><div class="inner">';
+      $html .= '<strong>' . t('Create Help Text:') . '</strong> ';
+      foreach ($paths as $path) {
+        $link_path = "node/add/sirius-help";
+        $query = array();
+        $query['destination'] = current_path();
+        $query['sirius_paths'] = $path;
+        $html .= l($path, $link_path, array('attributes' => array('class' => array('tool-button')), 'query' => $query));
+      }
+      $html .= '</div></div>';
     }
 
     $block = array();

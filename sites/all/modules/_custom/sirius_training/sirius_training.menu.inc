@@ -9,6 +9,7 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_employer',
     'permissions' => array('sirius employer user manager'),
     'weight' => 1,
+    'component' => 'training',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_tc'] = array(
@@ -17,6 +18,7 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_worker',
     'permissions' => array('sirius'),
     'weight' => 1,
+    'component' => 'training',
   );
 
   /*
@@ -35,6 +37,7 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_worker_level',
     'permissions' => array('sirius'),
     'weight' => 2,
+    'component' => 'training',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_tc/customfields'] = array(
@@ -43,14 +46,16 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_worker_customfields',
     'permissions' => array('sirius'),
     'weight' => 3,
+    'component' => 'training',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_tc/certifications'] = array(
     'title' => 'Certifications',
     'description' => '',
     'callback' => 'sirius_training_node_tab_worker_certifications',
-    'permissions' => array('sirius training admin'),
+    'permissions' => array('sirius training certification view'),
     'weight' => 3,
+    'component' => 'training',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_tc/evaluations'] = array(
@@ -59,6 +64,7 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_worker_evaluations',
     'permissions' => array('sirius training admin'),
     'weight' => 4,
+    'component' => 'training',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_tc/evaluations_request'] = array(
@@ -67,6 +73,7 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_worker_evaluations_request',
     'permissions' => array('sirius'),
     'weight' => 5,
+    'component' => 'training',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_tc/classes'] = array(
@@ -75,8 +82,18 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_worker_classes',
     'permissions' => array('sirius training admin'),
     'weight' => 6,
+    'component' => 'training',
   );
 
+  /*
+  $node_tabs['sirius_worker']['sirius_worker_tc/log'] = array(
+    'title' => 'Log',
+    'description' => '',
+    'callback' => 'sirius_training_node_tab_worker_log',
+    'permissions' => array('sirius training admin'),
+    'weight' => 10,
+  );
+  */
 
   $node_tabs['sirius_log']['sirius_log_tc/evaluation_edit'] = array(
     'title' => 'Evaluation',
@@ -84,6 +101,7 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_evaluation_edit',
     'permissions' => array('sirius training admin'),
     'weight' => 10,
+    'component' => 'training',
   );
 
   $node_tabs['sirius_log']['sirius_log_tc/certification_view'] = array(
@@ -92,6 +110,7 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_certification_view',
     'permissions' => array('sirius'),
     'weight' => 10,
+    'component' => 'training',
   );
 
   $node_tabs['sirius_log']['sirius_log_tc/certification_edit'] = array(
@@ -100,6 +119,7 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_certification_edit',
     'permissions' => array('sirius'),
     'weight' => 11,
+    'component' => 'training',
   );
 
   $node_tabs['sirius_log']['sirius_log_tc/certification_signatures'] = array(
@@ -108,6 +128,17 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_certification_signatures',
     'permissions' => array('sirius'),
     'weight' => 12,
+    'component' => 'training',
+  );
+
+  $node_tabs['sirius_log']['sirius_log_tc/certification_attachments'] = array(
+    'title' => 'Certification Attachments',
+    'description' => '',
+    'callback' => 'sirius_training_node_tab_certification_attachments',
+    'permissions' => array('sirius'),
+    'weight' => 13,
+    'file' => 'sirius_training.page_certification_attachments.inc',
+    'component' => 'training',
   );
 
   $node_tabs['sirius_log']['sirius_log_tc/certification_grant'] = array(
@@ -116,6 +147,7 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_certification_grant',
     'permissions' => array('sirius'),
     'weight' => 13,
+    'component' => 'training',
   );
 
   $node_tabs['sirius_json_definition']['certification_definition_skills'] = array(
@@ -124,8 +156,10 @@ function sirius_training_node_tabs() {
     'callback' => 'sirius_training_node_tab_certification_definition_skills',
     'permissions' => array('sirius training admin'),
     'weight' => 11,
+    'component' => 'training',
   );
 
+  sirius_node_tab_set_module('sirius_training', $node_tabs);
 
   return $node_tabs;
 }
@@ -138,6 +172,7 @@ function sirius_training_term_tabs() {
     'description' => '',
     'callback' => 'sirius_training_term_tab_ms',
     'permissions' => array('sirius training admin'),
+    'component' => 'training',
   );
 
   return $term_tabs;
@@ -292,18 +327,18 @@ function sirius_training_menu() {
 
   $items['sirius/training/certification/%/%'] = array(
     'title' => 'Submit a Certification',
-    'page callback' => 'sirius_training_certification_add',
+    'page callback' => 'sirius_training_certification_page_add',
     'page arguments' => array(3,4),
-    'access callback' => 'sirius_training_certification_add_access',
+    'access callback' => 'sirius_training_certification_page_add_access',
     'access arguments' => array(3,4),
     'type' => MENU_NORMAL_ITEM,
   );
 
   $items['sirius/training/certification/%/%/%'] = array(
     'title' => 'Submit a Certification',
-    'page callback' => 'sirius_training_certification_add',
+    'page callback' => 'sirius_training_certification_page_add',
     'page arguments' => array(3,4,5),
-    'access callback' => 'sirius_training_certification_add_access',
+    'access callback' => 'sirius_training_certification_page_add_access',
     'access arguments' => array(3,4,5),
     'type' => MENU_NORMAL_ITEM,
   );

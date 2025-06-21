@@ -121,8 +121,6 @@ function sirius_employer_page_labproj_all_form_submit($form, &$form_state) {
 	$data_by_day = array();
 	$data_by_employermonth = array();
 	while ($year < $end_year || ($year == $end_year && $month <= $end_month)) {
-		$delinquent = sirius_employer_labproj_delinquent($year, $month);
-
 		$count_yes = 0;
 		$count_no = 0;
 		$count = 0;
@@ -164,6 +162,10 @@ function sirius_employer_page_labproj_all_form_submit($form, &$form_state) {
 
 		$month++;
 		if ($month > 12) { $month = 1; $year++; }
+	}
+
+	foreach ($data_by_day as $key => $records) {
+		ksort($data_by_day[$key]);
 	}
 
 	$rows = array();

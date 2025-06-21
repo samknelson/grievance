@@ -6,6 +6,10 @@
 
 function sirius_worker_permission() {
   return array(
+    'sirius worker' => array(
+      'title' => t('Sirius Worker'),
+      'description' => t('Access the system as a worker'),
+    ),
     'sirius worker view' => array(
       'title' => t('Sirius Worker View'), 
       'description' => t('Permission to view any worker.'),
@@ -17,6 +21,10 @@ function sirius_worker_permission() {
     'sirius worker admin' => array(
       'title' => t('Sirius Worker Admin'), 
       'description' => t('Permission to perform any action on workers: add, edit, delete.'),
+    ),
+    'sirius worker create' => array(
+      'title' => t('Sirius Worker Create'), 
+      'description' => t('Permission to create new workers.'),
     ),
   );
 }

@@ -31,6 +31,24 @@ function sirius_service_page_config_server_form($form, &$form_state) {
 		'#description' => t('Enter the user name that remote commands should run as.'),
   );
 
+  $name_restrict = 'sirius_service_server_ips_restrict';
+  $form[$name_restrict] = array(
+  	'#title' => t('Restrict Access by IP?'),
+  	'#type' => 'select',
+    '#default_value' => sirius_domain_variable_get($name_restrict, 'No'),
+    '#options' => array(
+    	NULL => t('-- Select --'),
+    	'Yes' => t('Yes'),
+    	'No' => t('No'),
+    ),
+    '#id' => $name_restrict,
+		'#states' => array(
+			'visible' => array(
+				array(':input[id="' . $name_active . '"]' => array('value' => 'Yes')),
+			)
+		),
+  );
+
   $name = 'sirius_service_server_ips';
   $form[$name] = array(
   	'#title' => t('Server IP Allowlist'),
@@ -39,7 +57,10 @@ function sirius_service_page_config_server_form($form, &$form_state) {
     '#field_prefix' => '<p>' . sirius_ip_rawrange_helptext(sirius_domain_variable_get($name)) . '</p>',
 		'#states' => array(
 			'visible' => array(
-				array(':input[id="' . $name_active . '"]' => array('value' => 'Yes')),
+				array(
+					':input[id="' . $name_active . '"]' => array('value' => 'Yes'),
+					':input[id="' . $name_restrict . '"]' => array('value' => 'Yes')
+				),
 			)
 		),
   );
@@ -116,7 +137,7 @@ function sirius_service_page_config_server_form_validate($form, &$form_state) {
 }
 
 function sirius_service_page_config_server_form_submit($form, &$form_state) {
-	foreach (array('sirius_service_server_active', 'sirius_service_server_ips', 'sirius_service_user_name') as $name) {
+	foreach (array('sirius_service_server_active', 'sirius_service_server_ips', 'sirius_service_server_ips_restrict', 'sirius_service_user_name') as $name) {
 		sirius_domain_variable_set($name, $form_state['values'][$name]);
 	}
 

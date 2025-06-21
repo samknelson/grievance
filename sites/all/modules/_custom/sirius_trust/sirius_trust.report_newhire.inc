@@ -40,6 +40,12 @@ class Sirius_Trust_Report_Newhire extends Report_Cache_Report_Generator {
           'hours_total',
           'hours_at_tirggering_employer',
         ),
+        'preview_links' => TRUE,
+      ),
+      'operations' => array(
+        'contact' => array(
+          'field_contact_nid' => 'contact_nid',
+        ),
       ),
     );
 
@@ -99,6 +105,7 @@ class Sirius_Trust_Report_Newhire extends Report_Cache_Report_Generator {
   public function fields() {
     $fields = array();
     $fields['pk'] = 'PK';
+    $fields['contact_nid'] = 'Contact NID';
     $fields['worker_nid'] = 'Worker NID';
     $fields['worker_id'] = 'Worker ID';
     $fields['worker_name'] = 'Worker Name';
@@ -233,6 +240,7 @@ class Sirius_Trust_Report_Newhire extends Report_Cache_Report_Generator {
       $row = array();
       $row['pk'] = $pk;
       $row['worker_nid'] = $worker_nid;
+      $row['contact_nid'] = $worker_node->field_sirius_contact['und'][0]['target_id'];
       $row['worker_id'] = $worker_node->field_sirius_id['und'][0]['value'];
       $row['worker_name'] = $worker_node->title;
       $row['worker_phone'] = $worker_node->field_sirius_phone['und'][0]['value'];

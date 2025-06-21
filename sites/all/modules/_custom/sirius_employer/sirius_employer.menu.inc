@@ -30,6 +30,8 @@ function sirius_employer_node_tabs() {
     'callback' => 'sirius_employer_node_tab_labproj_list',
     'permissions' => array('sirius employer labor projection manager'),
     'file' => 'sirius_employer.page_labproj_list.inc',
+    'component' => 'employer:labproj',
+    'skip_node_view_check' => TRUE,
   );
 
 
@@ -40,6 +42,8 @@ function sirius_employer_node_tabs() {
     'permissions' => array('sirius employer labor projection manager'),
     'file' => 'sirius_employer.page_labproj_view.inc',
     'weight' => 5,
+    'component' => 'employer:labproj',
+    'skip_node_view_check' => TRUE,
   );
 
   $node_tabs['sirius_log']['employer_labproj_status'] = array(
@@ -49,6 +53,8 @@ function sirius_employer_node_tabs() {
     'permissions' => array('sirius employer labor projection manager'),
     'file' => 'sirius_employer.page_labproj_status.inc',
     'weight' => 6,
+    'component' => 'employer:labproj',
+    'skip_node_view_check' => TRUE,
   );
 
   $node_tabs['sirius_log']['employer_labproj_edit'] = array(
@@ -58,6 +64,8 @@ function sirius_employer_node_tabs() {
     'permissions' => array('sirius employer labor projection manager'),
     'file' => 'sirius_employer.page_labproj_edit.inc',
     'weight' => 7,
+    'component' => 'employer:labproj',
+    'skip_node_view_check' => TRUE,
   );
 
 
@@ -121,6 +129,15 @@ function sirius_employer_menu() {
     'access arguments' => array('sirius employer admin'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
+  );
+
+  $items['sirius/employer/labproj/rawdata'] = array(
+    'title' => 'Raw Data Export',
+    'page callback' => 'sirius_employer_page_labproj_rawdata',
+    'file' => 'sirius_employer.page_labproj_rawdata.inc',
+    'access arguments' => array('sirius employer admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
   );
 
 	return $items;

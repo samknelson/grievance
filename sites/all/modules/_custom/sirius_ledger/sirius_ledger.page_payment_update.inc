@@ -1,111 +1,27 @@
 <?php
 
-function sirius_ledger_node_tab_payment_update($payment_node) {
-	return drupal_get_form('sirius_ledger_node_tab_payment_addedit_form', $payment_node);
-}
 
-function sirius_ledger_node_tab_payment_addedit_form($form, &$form_state, $payment_node = NULL) {
-	if ($payment_node) {
-		$form_state['payment_nid'] = $payment_node->nid;
-	}
+function sirius_ledger_node_tab_payment_update_form($form, &$form_state, $payment_node) {
+	$ea = Sirius_Ledger_EA::getInstance();
+
+	$form_state['payment_nid'] = $payment_node->nid;
 
 	$form['#tree'] = TRUE;
 
-	$payer_node = node_load($payment_node->field_sirius_payer['und'][0]['target_id']);
-	$worker_node = sirius_worker_get_by_contact_nid($payer_node->nid);
-	$employers = sirius_employer_list(FALSE);
-	$form['payment']['payer_type'] = array(
-		'#title' => t('Payment From'),
-		'#type' => 'radios',
-		'#options' => array(
-			'worker' => 'Worker',
-			'employer' => 'Employer',
-		),
-		'#required' => TRUE,
-		'#default_value' => sirius_ledger_payer_type($payer_node->type),
-	);
-	$form['payment']['payer_employer'] = array(
-		'#type' => 'select',
-		'#title' => t('Employer'),
-		'#options' => $employers,
-		'#default_value' => $payer_node->nid,
-		'#states' => array(
-			'visible' => array(
-				":input[name=\"payment[payer_type]\"]" => array('value' => 'employer')
-			),
-		),
-	);
-	$form['payment']['payer_worker'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Worker ID'),
-		'#default_value' => $worker_node->field_sirius_id['und'][0]['value'],
-		'#states' => array(
-			'visible' => array(
-				":input[name=\"payment[payer_type]\"]" => array('value' => 'worker')
-			),
-		),
-	);
-
-	if (!$payment_node) {
-		$default_payer_worker = $_REQUEST['payer_worker'];
-		if ($default_payer_worker) {
-			$form['payment']['payer_type']['#default_value'] = 'worker';
-			$form['payment']['payer_worker']['#default_value'] = $default_payer_worker;
-		}
-
-		$default_payer_employer = $_REQUEST['payer_employer'];
-		if ($default_payer_employer) {
-			$form['payment']['payer_type']['#default_value'] = 'employer';
-			$form['payment']['payer_employer']['#default_value'] = $default_payer_employer;
-		}
-	}
-
-	$accounts = sirius_ledger_account_list();
-	$form['payment']['ledger_account'] = array(
-		'#title' => t('To'),
-		'#type' => 'select',
-		'#required' => TRUE,
-		'#options' => $accounts,
-		'#default_value' => $payment_node->field_sirius_ledger_account['und'][0]['target_id'],
-	);
-
 	$payment_types = sirius_taxonomy_load('sirius_payment_type', 'tid', 'name');
-  $form['payment']['payment_type'] = array(
-    '#title' => t('Type'),
-		'#type' => 'select',
-		'#options' => $payment_types,
-		'#required' => TRUE,
-		'#default_value' => $payment_node->field_sirius_payment_type['und'][0]['tid'],
-		'#ajax' => array(
-			'callback' => 'sirius_ledger_page_payment_addedit_form_ajax_change_payment_type',
-			'wrapper' => 'sirius_ledger_page_payment_addedits_form_ajax_dollar_amt',
-			'method' => 'replace',
-		),
-  );
+  $payment_type_tid = $payment_node->field_sirius_payment_type['und'][0]['tid'];
+  $payment_type_term = taxonomy_term_load($payment_type_tid);
 
-  $description = '';
-  $payment_type_tid = $form_state['values']['payment']['payment_type'];
-  if (!$payment_type_tid) { $payment_type_tid = $payment_node->field_sirius_payment_type['und'][0]['tid']; }
-  if ($payment_type_tid) {
-  	$descriptions = array(
-			'payment' => t('Entering a payment. The value must be negative.'),
-			'charge' => t('Entering a charge. The value must be positive.'),
-			'adjustment' => t('Entering an adjustment. The value may be positive (a charge, or credit to the fund) or negative (a payment, or credit to the payer).'),
-		);
-  	$payment_type_term = taxonomy_term_load($payment_type_tid);
-  	$payment_type_json = sirius_jsonfield_util_term_json_get($payment_type_term);
-  	$sign = $payment_type_json["payment_settings"]["sign"];
-  	$description = $descriptions[$sign];
-  }
+  $amt = $payment_node->field_sirius_dollar_amt['und'][0]['value'];
+  $display_amt = $amt;
+  if ($display_amt < 0) { $display_amt *= -1; }
 
-  $form['payment']['dollar_amt'] = array(
+  $form['payment']['display_amt'] = array(
     '#title' => t('Amount'),
 		'#type' => 'textfield',
 		'#required' => TRUE,
 		'#size' => 5,
-		'#default_value' => $payment_node->field_sirius_dollar_amt['und'][0]['value'],
-		'#prefix' => '<div id="sirius_ledger_page_payment_addedit_form_ajax_dollar_amt">',
-		'#suffix' => '</div>',
+		'#default_value' => $display_amt,
 		'#description' => $description,
   );
 
@@ -148,11 +64,9 @@ function sirius_ledger_node_tab_payment_addedit_form($form, &$form_state, $payme
 		$form['payment']['allocate']['#default_value'] = 'Yes';
 	}
 
-
   $form['payment']['datetime_created'] = array(
     '#title' => t('Received'),
 		'#type' => 'date_popup',
-		'#required' => TRUE,
 		'#default_value' => NULL,
 		'#attributes' => array('autocomplete' => 'off'),
   );
@@ -181,41 +95,53 @@ function sirius_ledger_node_tab_payment_addedit_form($form, &$form_state, $payme
 	return $form;
 }
 
-function sirius_ledger_node_tab_payment_addedit_form_validate($form, &$form_state) {
-  $payment_type_tid = $form_state['values']['payment']['payment_type'];
+function sirius_ledger_node_tab_payment_update_form_validate($form, &$form_state) {
+	$payment_node = node_load($form_state['payment_nid']);
+  $payment_type_tid = $payment_node->field_sirius_payment_type['und'][0]['tid'];
 	$payment_type_term = taxonomy_term_load($payment_type_tid);
 	$payment_type_json = sirius_jsonfield_util_term_json_get($payment_type_term);
 	$sign = $payment_type_json["payment_settings"]["sign"];
 	$max = $payment_type_json["payment_settings"]["max"];
 	$min = $payment_type_json["payment_settings"]["min"];
 
-	$amt = $form_state['values']['payment']['dollar_amt'];
-	if ($sign == 'payment' && $amt > 0) {
-		form_set_error('payment][dollar_amt', 'Payments must be negative.');
-	}
-	if ($sign == 'charge' && $amt < 0) {
-		form_set_error('payment][dollar_amt', 'Charges must be positive.');
+	$display_amt = $form_state['values']['payment']['display_amt'];
+	if (!is_numeric($display_amt)) {
+		form_set_error('payment][display_amt', 'Please enter a number.');
+		return;
 	}
 
-	if ($max && ($amt > $max)) { 
-		form_set_error('payment][dollar_amt', 'Entries of type ' . $payment_type_term->name . ' must have a value less than ' . number_format($max, 2));
+	if ($display_amt < 0) {
+		form_set_error('payment][display_amt', 'Amount should always be positive.');
+		return;
 	}
-	if ($min && ($amt < $min)) { 
-		form_set_error('payment][dollar_amt', 'Entries of type ' . $payment_type_term->name . ' must have a value greater than ' . number_format($min, 2));
+	if ($max && ($display_amt > $max)) { 
+		form_set_error('payment][display_amt', 'Entries of type ' . $payment_type_term->name . ' must have a value less than ' . number_format($max, 2));
+		return;
+	}
+	if ($min && ($display_amt < $min)) { 
+		form_set_error('payment][display_amt', 'Entries of type ' . $payment_type_term->name . ' must have a value greater than ' . number_format($min, 2));
+		return;
 	}
 }
 
-function sirius_ledger_node_tab_payment_addedit_form_submit($form, &$form_state) {
-	$result = sirius_ledger_payment_save($form_state);
+function sirius_ledger_node_tab_payment_update_form_submit($form, &$form_state) {
+	$payment_node = node_load($form_state['payment_nid']);
+
+	$payment_node = node_load($form_state['payment_nid']);
+  $payment_type_tid = $payment_node->field_sirius_payment_type['und'][0]['tid'];
+	$payment_type_term = taxonomy_term_load($payment_type_tid);
+	$payment_type_json = sirius_json_get($payment_type_term);
+	$sign = $payment_type_json["payment_settings"]["sign"];
+
+	$form_state['values']['payment']['dollar_amt'] = $form_state['values']['payment']['display_amt'];
+	if ($sign == 'payment' && $form_state['values']['payment']['dollar_amt'] > 0) {
+		$form_state['values']['payment']['dollar_amt'] *= -1;
+	}
+
+	$result = sirius_ledger_payment_update($payment_node, $form_state['values']['payment']);
 	if ($result['success']) {
 		drupal_set_message($result['msg']);
 	} else {
 		drupal_set_message($result['msg'], 'error');
 	}
-}
-
-function sirius_ledger_page_payment_addedit_form_ajax_change_payment_type($form, $form_state) {
-	$commands = array();
-  $commands[] = ajax_command_replace("#sirius_ledger_page_payment_addedit_form_ajax_dollar_amt", render($form['payment']['dollar_amt']));
-	return array('#type' => 'ajax', '#commands' => $commands);
 }

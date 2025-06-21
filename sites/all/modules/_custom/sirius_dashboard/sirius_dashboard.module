@@ -8,6 +8,20 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_dashboard/sirius_d
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_dashboard/sirius_dashboard.plugins.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_dashboard/sirius_dashboard.items.inc";
 
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_dashboard_sirius_domain_component_info() {
+  return array(
+    'dashboard:worker' => array(
+      'title' => 'Dashboard - Worker',
+      'description' => 'Show a "dashboard" tab for workers',
+    ),
+  );
+}
+
+
 function sirius_dashboard_priority_options() {
 	return array(
 		0 => 'No Action',
@@ -24,5 +38,88 @@ function sirius_dashboard_priority_render($priority) {
 	$html = '<span class="sirius_dashboard_priority sirius_dashboard_priority_' . $priority . '">';
 	$html .= $priority_options[$priority];
 	$html .= '</span>';
+	return $html;
+}
+
+function sirius_dashboard_content($options = array()) {
+	global $user;
+
+	// Get the list of all items
+	$roles = $user->roles;
+	if (!$roles) { return array(); }
+
+	$items = array();
+	foreach ($roles as $rid => $role) {
+		$json = sirius_dashboard_items_by_role($rid);
+		$tmp = $json['item_list'];
+		if (!$tmp) { continue; }
+
+		foreach ($tmp as $uuid => $item) {
+			$tmp[$uuid]['records'] = sirius_dashboard_item_data($json, $uuid);
+		}
+		$items += $tmp;
+	}
+
+	uksort($items, function($a, $b) use ($items) { return $items[$a]['weight'] <=> $items[$b]['weight']; });
+
+	return $items;
+}
+
+function sirius_dashboard_render($items) {
+  drupal_add_css(drupal_get_path('module', 'sirius_dashboard') . '/css/dashboard.css', 'file');
+
+	$html = '';
+	$html .= '<div class="sirius_dashboard_items">';
+	foreach ($items as $uuid => $item) {
+		$html .= sirius_dashboard_render_item($item);
+	}
+	$html .= '</div>';
+
+	return $html;
+}
+
+function sirius_dashboard_render_item($item) {
+	if (!$item['records']) { return ''; }
+
+	$html = '';
+	foreach ($item['records'] as $record) {
+
+		$priority = $item['priority'];
+		if (isset($record['priority'])) { $priority = $record['priority']; }
+
+		$title = $item['title'];
+		if (isset($record['title'])) { $title = $record['title']; }
+
+		$class = 'sirius_dashboard_item';
+		$class .= " sirius_dashboard_priority_$priority";
+
+		$html .= "<div class=\"$class\">";
+
+		$html .= '<div class="sirius_dashboard_item_title">';
+		$html .= $title;
+		$html .= '</div>';
+
+		if (isset($record['count'])) {
+			$html .= '<div class="sirius_dashboard_item_count">';
+			$html .= 'Count: ';
+			$html .= $record['count'];
+			$html .= '</div>';
+		}
+
+		if ($record['details']) {
+			$html .= '<div class="sirius_dashboard_item_details">';
+			$html .= $record['details'];
+			$html .= '</div>';
+		}
+
+		if ($record['tools']) {
+			$html .= '<div class="sirius_dashboard_item_tools">';
+			$html .= $record['tools'];
+			$html .= '</div>';
+		}
+
+		$html .= '</div>';
+	}
+
 	return $html;
 }

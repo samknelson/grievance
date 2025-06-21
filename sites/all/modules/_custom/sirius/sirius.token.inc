@@ -100,3 +100,36 @@ function sirius_tokens_alter(array &$replacements, array $context) {
   }
 }
 
+/**
+ * Support for token failures. 
+ * 
+ * When a token "fails", the wrapper should also fail. 
+ * 
+ * This is a fairly vauge feature, and I'm not sure that I like it. The token replacement tool does not have a way to 
+ * implement the logic: "If a token is missing, then don't send the message at all." That should be handled
+ * by the wrapper, but we don't know, in advance, which tokens will appear in the message. So this is sort of a
+ * shoddy ad-hoc exception management tool, implemented for a specific purpose.
+ * 
+ * - For example, if you are sending a bulk message, and the phone number is missing, that's not a failure, just an 
+ * empty value. 
+ * 
+ * - But if you ask for a COBRA rate, and the rate fails to generate, then that's a failure, and you shouldn't 
+ * send the messaage.
+ */
+
+function sirius_token_failures($action = 'fetch', $name = NULL, $value = NULL) {
+  static $failures;
+  if (!isset($failures)) { $failures = array(); }
+
+  if ($action == 'fetch') { return $failures; }
+  if ($action == 'clear') { $failures = array(); }
+  if ($action == 'set') { $failures[$name] = $value; }
+
+  return $failures;
+}
+
+function sirius_token_failures_clear() { return sirius_token_failures('clear'); }
+
+function sirius_token_failures_fetch() { return sirius_token_failures('fetch'); }
+
+function sirius_token_failures_set($name, $value) { return sirius_token_failures('set', $name, $value); }

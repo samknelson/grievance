@@ -19,7 +19,7 @@ function sirius_trust_node_tab_worker_eligibility_form($form, &$form_state, $wor
 			$relationship_type_term = taxonomy_term_load($relationship_type_tid);
 			$dependent_contact_nid = $relationship_node->field_sirius_contact_alt['und'][0]['target_id'];
 			$dependent_worker_node = sirius_worker_get_by_contact_nid($dependent_contact_nid);
-			$dependent_options[$relationship_nid] = '(' . $relationship_type_term->name . ' to) ' . $dependent_worker_node->title;
+			$dependent_options[$relationship_nid] = $dependent_worker_node->title . ' (' . $relationship_type_term->field_sirius_name_alt['und'][0]['value'] . ')';
 		}
 
 		$form['relationship_nid'] = array(
@@ -39,6 +39,14 @@ function sirius_trust_node_tab_worker_eligibility_form($form, &$form_state, $wor
 		'#required' => TRUE,
 	);
 
+	$benefits = sirius_trust_benefit_options();
+
+	$form['benefit_nid'] = array(
+	  '#title' => t('Benefit'),
+		'#type' => 'select',
+		'#options' => array(NULL => t('-- All Benefits --')) + $benefits,
+	);
+
 	$form['date'] = array(
 	  '#title' => t('As Of'),
 		'#type' => 'date_popup',
@@ -48,6 +56,16 @@ function sirius_trust_node_tab_worker_eligibility_form($form, &$form_state, $wor
 		'#required' => TRUE,
 		'#date_format' => 'Y-m-d',
 		'#default_value' => date('Y-m-d'),
+	);
+
+	$form['scan_type'] = array(
+		'#type' => 'select',
+		'#title' => t('Scan Type'),
+		'#options' => array(
+			NULL => t('-- All Scan Types --'),
+			'benefit_start' => t('Benefit Start'),
+			'benefit_continue' => t('Benefit Continue'),
+		),
 	);
 
 	$form['submit'] = array(
@@ -80,14 +98,27 @@ function sirius_trust_node_tab_worker_eligibility_form_submit($form, &$form_stat
 		$dependent_worker_node = $worker_node;
 	}
 
-	$benefits = sirius_trust_benefits();
+	$benefit_nid = $form_state['values']['benefit_nid'];
+	if ($benefit_nid) {
+		$benefits = array($benefit_nid => node_load($benefit_nid));
+	} else {
+		$benefits = sirius_trust_benefits();
+	}
 	$results = array();
 
 	$rows = array();
 	foreach ($benefits as $benefit_nid => $benefit_node) {
-		$eligibility_plugins = sirius_trust_eligibility_plugins_enabled($policy_node, $benefit_node);
+		$params = array();
+		$params['policy_node'] = $policy_node;
+		$params['benefit_node'] = $benefit_node;
+		$params['subscriber_worker_node'] = $worker_node;
+		$params['relationship_node'] = $relationship_node;
+		$params['ts'] = $ts;
+		$params['shortcut'] = FALSE;
+		$params['scan_type'] = $form_state['values']['scan_type'];
+		$result = sirius_trust_eligibility_plugin_check_all($params);
 
-		if (!$eligibility_plugins) {
+		if (!$result['plugins']) {
 			$paths = array(
 				"node/$policy_nid/sirius_trust_policy_benefits/$benefit_nid" => 'Eligibility Settings',
 			);
@@ -107,12 +138,12 @@ function sirius_trust_node_tab_worker_eligibility_form_submit($form, &$form_stat
 			$row[] = join('', $tools);
 			$rows[] = array('data' => $row, 'class' => array($class, 'summary'));
 			continue;
-		}
+		} 
 
 		$subrows = array();
 		$summary_eligible = TRUE;
 		$summary_failed = array();
-		foreach ($eligibility_plugins as $plugin_key) {
+		foreach ($result['plugins'] as $plugin_key => $sub_result) {
 			$plugin_info = sirius_trust_eligibility_plugin_info($plugin_key);
 
 			$paths = array();
@@ -126,11 +157,10 @@ function sirius_trust_node_tab_worker_eligibility_form_submit($form, &$form_stat
 			}
 
 			$class = 'eligible';
-			$result = sirius_trust_eligibility_plugin_check($policy_node, $benefit_node, $worker_node, $relationship_node, $ts, $plugin_key);
 
-			$msg = $result['msg'];
-			if ($result['success']) {
-				if ($result['warning']) {
+			$msg = $sub_result['msg'];
+			if ($sub_result['success']) {
+				if ($sub_result['warning']) {
 					$class = 'warning';
 					$eligible = 'Warning';
 					$summary_warning = TRUE;
@@ -142,16 +172,16 @@ function sirius_trust_node_tab_worker_eligibility_form_submit($form, &$form_stat
 				$class = 'red';
 				$eligible = 'No';
 				$summary_eligible = FALSE;
-				$summary_failed[] = $plugin_info['title'];
+				$summary_failed[] = $plugin_info['name'];
 			}
-			if ($result['tools']) { $tools = array_merge($tools, $result['tools']); }
+			if ($sub_result['tools']) { $tools = array_merge($tools, $sub_result['tools']); }
 
 			$row = array();
 			$row[] = '';
 			$row[] = '';
-			$row[] = $plugin_info['title'];
+			$row[] = $plugin_info['name'];
 			$row[] = $eligible;
-			$row[] = $result['msg'];
+			$row[] = $sub_result['msg'];
 			$row[] = join('', $tools);
 			$subrows[] = array('data' => $row, 'class' => array($class));
 		}

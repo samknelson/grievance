@@ -950,16 +950,6 @@ function sirius_event_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['sirius/event/bullpens'] = array(
-    'title' => 'Event List',
-    'description' => '',
-    'page callback' => 'sirius_event_page_list_bullpens',
-    'page arguments' => array(),
-    'access callback' => array('sirius_event_page_list_bullpens_access'),
-    'access arguments' => array(),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
   $items['sirius/event/classes'] = array(
     'title' => 'Class List',
     'description' => '',
@@ -1146,7 +1136,7 @@ function sirius_event_menu() {
 
   $items['sirius/event/catalog/list'] = array(
     'title' => 'Catalogs',
-    'access arguments' => array('sirius'),
+    'access arguments' => array('sirius event admin'),
     'page callback' => 'sirius_event_page_catalog_list',
     'page arguments' => array('sirius event admin'),
     'file' => 'sirius_event.page_catalog_list.inc',

@@ -13,10 +13,10 @@ function sirius_dispatch_report_prior_employed_list_form($form, &$form_state, $r
     '#required' => TRUE,
   );
 
-  $form['job_type_tid'] = array(
-    '#type' => 'select',
-    '#options' => array(NULL => t('-- Select --')) + $job_types,
-    '#title' => t('Job Type'),
+  $form['job_type_tids'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $job_types,
+    '#title' => t('Job Types'),
   );
 
   $form['date'] = array(
@@ -50,6 +50,8 @@ function sirius_dispatch_report_prior_employed_list_fields() {
 }
 
 function sirius_dispatch_report_prior_employed_list_pks(&$form_state) {
+  $job_type_tids = $form_state['values']['job_type_tids'];
+  if ($job_type_tids) { $job_type_tids = array_filter(array_values($job_type_tids)); }
   $sql_args = array();
   $sql_args[':shop_nid'] = $form_state['values']['employer'];
   $sql_args[':ts'] = strtotime($form_state['values']['date']);
@@ -60,9 +62,9 @@ function sirius_dispatch_report_prior_employed_list_pks(&$form_state) {
   $sql .= "where node.type = 'sirius_dispatch' ";
   $sql .= "and field_grievance_shop_target_id = :shop_nid ";
   $sql .= "and created <= :ts ";
-  if ($form_state['values']['job_type_tid']) {
-    $sql .= "and field_sirius_dispatch_job_type_tid = :job_type_tid ";
-    $sql_args[':job_type_tid'] = $form_state['values']['job_type_tid'];
+  if ($job_type_tids) {
+    $sql .= "and field_sirius_dispatch_job_type_tid in (:job_type_tids) ";
+    $sql_args[':job_type_tids'] = $job_type_tids;
   }
   $sql .= "order by nid desc ";
   // $sql .= "limit 300 ";

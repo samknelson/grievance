@@ -120,13 +120,17 @@ function sirius_dispatch_eba_remove_expired_dates_worker($worker_nid, $mode = 't
  * This is obsolete now because EBA jobs have end dates, and workers are laid off after the job ends.
  */
 
+function sirius_dispatch_eba_layoff_expired_dispatches($mode = 'test') {
+	sirius_minilog("No longer needed.");
+	return array('success' => TRUE);
+}
 /*
 function sirius_dispatch_eba_layoff_expired_dispatches($mode = 'test') {
 	// Find any EBA dates in the past
-	$date = date('Y-m-d 00:00:00', strtotime('-1 days'));
+	$date = date('Y-m-d 00:00:00');
 
-	// $mode = "test";
-	// sirius_minilog("[This feature is still under development, so forcing mode = $mode]");
+	$mode = "test";
+	sirius_minilog("[This feature is still under development, so forcing mode = $mode]");
 
 	$sql = "select distinct node.nid from node ";
 	$sql .= "left join field_data_field_sirius_dispatch_status on field_data_field_sirius_dispatch_status.entity_type = 'node' and field_data_field_sirius_dispatch_status.entity_id = node.nid ";
@@ -146,11 +150,11 @@ function sirius_dispatch_eba_layoff_expired_dispatches($mode = 'test') {
 	// We have no dates after our cutoff
 	$sql .= "and (";
 	$sql .= "  select count(*) from field_data_field_sirius_dispatch_eba_dates ";
-	$sql .= "  where entity_type = 'node' and entity_id = job_node.nid and field_sirius_dispatch_eba_value >= :date";
-	$sql .= ") > 0 ";
+	$sql .= "  where entity_type = 'node' and entity_id = job_node.nid and field_sirius_dispatch_eba_dates_value >= :date";
+	$sql .= ") = 0 ";
 
-	$sql .= "order by node.nid desc limit 1000 ";
-	$stmt = db_query($sql, array(':date' => $date));
+	$sql .= "order by job_node.nid desc, node.nid desc limit 1000 ";
+	$stmt = sirius_sql_query($sql, array(':date' => $date));
 	$dispatch_nids = array();
 	while ($hr = $stmt->fetchAssoc()) {
 		$dispatch_nids[] = $hr['nid'];
@@ -160,13 +164,24 @@ function sirius_dispatch_eba_layoff_expired_dispatches($mode = 'test') {
 	foreach ($dispatch_nids as $dispatch_nid) {
 		++$count;
 		$dispatch_node = node_load($dispatch_nid);
-		sirius_minilog("Laying off: <a href=\"/node/$dispatch_nid\">Dispatch #$dispatch_nid</a>");
+		$worker_nid = $dispatch_node->field_sirius_worker['und'][0]['target_id'];
+		$job_nid = $dispatch_node->field_sirius_dispatch_job['und'][0]['target_id'];
+		$job_node = node_load($job_nid);
+
+		$msg = "Laying off " . $job_node->title . " :: " . sirius_node_title($worker_nid) . ' :: ';
+		$msg .= "<a href=\"/node/$dispatch_nid\">Dispatch</a> :: ";
+		$msg .= "<a href=\"/node/$worker_nid/sirius_worker_dispatches/eba\">Worker</a> :: ";
+		$msg .= "<a href=\"/node/$job_nid\">Job</a> / ";
+		$msg .= " Report date " . date('Y-m-d', strtotime($job_node->field_sirius_datetime['und'][0]['value']));
+		sirius_minilog($msg);
 
 		if ($mode == 'live') {
+			/*
 			$result = sirius_dispatch_terminate(
 				$dispatch_node, 
 				'This was an EBA dispatch and the last scheduled work date has passed, so the dispatch is being automatically terminated.'
 			);
+			$result = array('success' => FALSE, 'msg' => "I'm not ready to terminate anybody yet.");
 			if ($result['success']) {
 				++$count_success;
 				sirius_minilog("-- Layoff succeeded");

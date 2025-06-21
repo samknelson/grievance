@@ -30,3 +30,21 @@ function sirius_lang_node_view(&$node) {
   $renderable = field_view_field('node', $source_node, 'field_sirius_lang', 'full');
   $node->content['langs'][0]['#markup'] = render($renderable);
 }
+
+function sirius_contact_lang_primary($contact_node) {
+	$lang = $contact_node->field_sirius_lang['und'][0]['value'];
+	if (!$lang) { $lang = 'en'; }
+	return $lang;
+}
+
+function sirius_contact_lang_all($contact_node) {
+	if (!$contact_node->field_sirius_lang['und'][0]['value']) { return array('en'); }
+
+	$result = array();
+	foreach ($contact_node->field_sirius_lang['und'] as $tmp ) {
+		if ($tmp['value']) {
+			$result[] = $tmp['value'];
+		}
+	}
+	return $result;
+}

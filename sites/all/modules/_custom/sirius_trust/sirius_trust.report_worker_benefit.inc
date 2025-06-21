@@ -130,7 +130,7 @@ function sirius_trust_report_worker_benefit_batch($wb_nids, $values, $report_id,
 
     $row['employer_nid'] = $wb_node->field_grievance_shop['und'][0]['target_id'];
     $row['employer_name'] = $employer_names[$row['employer_nid']];
-    $rows['rows'][] = $row;
+    $rows['rows'][$wb_nid] = $row;
 
     $context['results']['dashboard']['count']++;
     $context['results']['dashboard']['summary']['count_by_benefit'][$row['benefit_nid']]++;

@@ -43,6 +43,92 @@ function sirius_contact_sync_from_worker($worker_node) {
 	return $contact_node;
 }
 
+function sirius_contact_sync_from_grievance_shop_contact($sc_node) {
+	$need_save = FALSE;
+	$contact_nid = $sc_node->field_sirius_contact['und'][0]['target_id'];
+	if ($contact_nid) {
+		$contact_node = node_load($contact_nid);
+	}
+
+	if (!$contact_node) {
+		$contact_node = new stdClass();
+		$contact_node->type = 'sirius_contact';
+		$contact_node->no_recurse = TRUE;
+		$contact_node->language = $sc_node->language;
+		$contact_node->uid = $sc_node->uid;
+		$contact_node->status = 1;
+		$contact_node->promote = 0;
+		$contact_node->comment = 0;
+		$contact_node->title = $sc_node->title;
+		$need_save = TRUE;
+	}
+
+	// @todo: Hideous legacy code, when the grievance shop contacts should have the same fields as the contacts.
+	//        Doing this because we built "shop contacts" with fields like "grievance_co_email" instead of "sirius_email"
+
+
+	$parts = preg_split('/\s+/', $sc_node->title);
+	$given = array_shift($parts);
+	$middle = array_shift($parts);
+	$family = join(' ', $parts);
+	if (!$family) { $family = $middle; $middle = ''; }
+
+	$sc_node->field_sirius_name['und'][0] = array('given' => $given, 'family' => $family, 'middle' => $middle);
+
+	$sc_node->field_sirius_email['und'][0]['value'] = $sc_node->field_grievance_co_email['und'][0]['email'];
+	$sc_node->field_sirius_phone['und'][0]['value'] = $sc_node->field_grievance_co_phone['und'][0]['value'];
+	$sc_node->field_sirius_phone_alt['und'][0]['value'] = $sc_node->field_grievance_co_phone_2['und'][0]['value'];
+
+	$sc_node->field_sirius_address['und'][0] = array(
+		'thoroughfare' => $sc_node->field_grievance_co_address['und'][0]['value'],
+		'premise' => $sc_node->field_grievance_co_address_2['und'][0]['value'],
+		'locality' => $sc_node->field_grievance_co_city['und'][0]['value'],
+		'administrative_area' => $sc_node->field_grievance_co_state['und'][0]['value'],
+		'postal_code' => $sc_node->field_grievance_co_zip['und'][0]['value'],
+		'country' => 'US',
+	);
+
+	$field_names = array('field_sirius_name', 'field_sirius_email', 'field_sirius_phone', 'field_sirius_address', 'field_sirius_phone_alt', 'field_sirius_phone_fax', 'field_sirius_domain');
+	foreach ($field_names as $field_name) {
+		if (sirius_field_changed($sc_node, $contact_node, $field_name)) {
+			$contact_node->{$field_name} = $sc_node->{$field_name};
+			$need_save = TRUE;
+		}
+	}
+
+	if ($need_save) {
+		node_object_prepare($contact_node);
+		$contact_node = node_submit($contact_node);
+		node_save($contact_node);
+	}
+
+	if ($sc_node->field_sirius_contact['und'][0]['target_id'] != $contact_node->nid) { $sc_node->field_sirius_contact['und'][0]['target_id'] = $contact_node->nid; }
+
+	return $contact_node;
+}
+
+
+function sirius_shop_contact_get_by_contact_nid($contact_nid, $nid_only = FALSE) {
+  if (!$contact_nid) { return NULL; }
+
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_shop_contact');
+  $query->fieldCondition('field_sirius_contact', 'target_id', $contact_nid);
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+  $query->propertyOrderBy('nid', 'desc');
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return NULL; }
+
+  $worker_nid = array_keys($stmt['node'])[0];
+  if ($nid_only) { return $worker_nid; }
+  return node_load($worker_nid);
+}
+
+
+
+
 function sirius_contact_sync_from_user($account) {
 	if ($account->field_sirius_worker['und'][0]['target_id']) {
 		// If the user references a worker, then that worker and the user have the same contact.
@@ -169,16 +255,18 @@ function sirius_contact_tags_get($contact_node) {
 	return sirius_fieldvals($contact_node, 'field_sirius_contact_tags', 'tid');
 }
 
-function sirius_contact_tag_add($contact_node, $tid) {
+function sirius_contact_tag_add(&$contact_node, $tid, $save_later = FALSE) {
+	if (!$contact_node) { return array('success' => FALSE, 'msg' => 'No contact node.'); }
+	
 	$current_tids = sirius_fieldvals($contact_node, 'field_sirius_contact_tags', 'tid');
 	if (in_array($tid, $current_tids)) { return array('success' => TRUE, 'msg' => 'Contact already had the tag.'); }
 
 	$contact_node->field_sirius_contact_tags['und'][] = array('tid' => $tid); 
-	node_save($contact_node);
-	return array('success' => TRUE, 'msg' => 'Contact saved.');
+	if (!$save_later) { node_save($contact_node); drupal_set_message("Adding $tid"); }
+	return array('success' => TRUE, 'msg' => 'Contact saved.', 'changed' => TRUE);
 }
 
-function sirius_contact_tag_remove($contact_node, $tid) {
+function sirius_contact_tag_remove(&$contact_node, $tid, $save_later = FALSE) {
 	$current_tids = sirius_fieldvals($contact_node, 'field_sirius_contact_tags', 'tid');
 	if (!in_array($tid, $current_tids)) { return array('success' => TRUE, 'msg' => 'Contact already did not have the tag.'); }
 
@@ -190,8 +278,8 @@ function sirius_contact_tag_remove($contact_node, $tid) {
 
 	if ($new_value) 	{ $contact_node->field_sirius_contact_tags['und'] = $new_value; } 
 	else 							{ unset($contact_node->field_sirius_contact_tags['und']); } 
-	node_save($contact_node);
-	return array('success' => TRUE, 'msg' => 'Contact saved.');
+	if (!$save_later) { node_save($contact_node); drupal_set_message("Removing $tid"); }
+	return array('success' => TRUE, 'msg' => 'Contact saved.', 'changed' => TRUE);
 }
 
 /**

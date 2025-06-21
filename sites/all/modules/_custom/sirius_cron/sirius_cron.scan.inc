@@ -23,11 +23,34 @@ function sirius_cron_scan_info($key) {
 function sirius_cron_scan_info_all() {
   $info_all = &drupal_static(__FUNCTION__);
   if (!isset($info_all)) {
-  	$info_all = module_invoke_all('sirius_cron_scan_info');
+  	
+		// We want to do this:
+		// $info_all = module_invoke_all('sirius_cron_scan_info');
+		// But we want to add information about the module that defines it. So we call each function manually.
+
+		$info_all = array();
+		$hook = 'sirius_cron_scan_info';
+		foreach (module_implements($hook) as $module) {
+			$function = $module . '_' . $hook;
+    	if (function_exists($function)) {
+      	$result = call_user_func_array($function, array());
+      	if (isset($result) && is_array($result)) {
+        	$info_all = array_merge_recursive($info_all, $result);
+      		// Add the module to the results, so we know which module provides which report.
+      		foreach ($result as $key => $info) {
+      			$info_all[$key]['module'] = $module;
+      			$info_all[$key]['module_name'] = sirius_module_friendly_name($module);
+      		}
+      	} elseif (isset($result)) {
+        	$info_all[] = $result;
+      	}
+    	}
+    }
+
+	  foreach ($info_all as $key => $info) {
+	  	$info_all[$key]['key'] = $key;
+	  }
 		ksort($info_all);
-  }
-  foreach ($info_all as $key => $info) {
-  	$info_all[$key]['key'] = $key;
   }
 	return $info_all;
 }
@@ -64,12 +87,14 @@ function sirius_cron_scan_all($force = FALSE, $mode = 'live') {
 	$info_all = sirius_cron_scan_info_all();
 	foreach ($info_all as $key => $info) {
 		$result = sirius_cron_scan($key, $force, $mode);
-		if (!$result['success']) { return $result;}
+		if (!$result['success']) { 
+			// return $result;
+		}
 	}
 	return array('success' => TRUE);
 }
 
-function sirius_cron_scan($key, $force = FALSE, $mode = 'live') {
+function sirius_cron_scan($key, $force = FALSE, $mode = 'live', $options = array()) {
 	sirius_minilog_reset();
 
 	$info = sirius_cron_scan_info($key);
@@ -77,6 +102,15 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live') {
 		$msg = "Info not found: $key";
 		sirius_minilog($msg, 'error');
 		return array('success' => FALSE, 'msg' => $msg);
+	}
+
+	// Disabled?
+	$scan_node = sirius_cron_scan_get($key, TRUE);
+	$scan_json = sirius_json_get($scan_node);
+	if (!$force && ($scan_json['cron']['disable'] == 'Yes')) {
+		$msg = "Cron scan: $info[title]: This cron scan is disabled.";
+		sirius_minilog($msg);
+		return array('success' => TRUE, 'msg' => $msg);
 	}
 
 	// Too soon to run?
@@ -92,13 +126,21 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live') {
 	}
 	variable_set("sirius_cron_scan_${key}_last_run", $today);
 
-	$scan_node = sirius_cron_scan_get($key, TRUE);
-	$scan_json = sirius_json_get($scan_node);
 	$scan_json['cron']['start_ts'] = time();
 	sirius_minilog("Cron scan: $info[title]: Starting.");
 
+	if ($mode == 'live') {
+		if ($scan_json['cron']['settings']['disabled'] == 'Yes') {
+			sirius_minilog("This cron job is disabled.");
+			return array('success' => TRUE, 'msg' => 'Cron job is disabled.');
+		}
+	}
+
 	if ($info['multidomain']) {
 		$domains = sirius_domain_tree_render_as_select();
+		if ($info['multidomain_include_root']) {
+			$domains[-1] = 'Root';
+		}
 		$component = $info['component'];
 
 		$count = 0;
@@ -116,10 +158,9 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live') {
 				continue; 
 			}
 
-			$old_domain_nid = sirius_domain_nid();
-			sirius_domain($domain_nid);
-			$sub_result = $info['callback']($mode);
-			sirius_domain($old_domain_nid);
+			sirius_domain_push($domain_nid);
+			$sub_result = $info['callback']($mode, $force, $options);
+			sirius_domain_pop();
 
 			++$count;
 			if ($sub_result['success']) { 
@@ -132,7 +173,7 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live') {
 		}
 		$result = array('success' => TRUE, 'msg' => "Scanned $count domains, with $count_success success and $count_failure failures.");
 	} else {
-		$result = $info['callback']($mode);
+		$result = $info['callback']($mode, $force, $options);
 	}
 
 	if (!$result['success']) {
@@ -206,6 +247,6 @@ function sirius_cron_scan_get($key, $create = FALSE) {
 
 function sirius_cron_sirius_backlinks_from_node_alter(&$links, $node) {
 	if ($node->type == 'sirius_json_definition' && sirius_cron_scan_key($node)) {
-		$links['sirius/cron/list'] = array('name' => 'All Scans');
+		$links['sirius/cron'] = array('name' => 'All Scans');
 	}
 }

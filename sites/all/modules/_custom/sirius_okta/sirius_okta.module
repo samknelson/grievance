@@ -1,0 +1,61 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_okta') . '/sirius_okta.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_okta') . '/sirius_okta.permission.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_okta') . '/sirius_okta.okta.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_okta') . '/sirius_okta.access.inc';
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+
+function sirius_okta_sirius_domain_component_info() {
+  // Okta is not domain-specific
+  return array();
+  /*
+  return array(
+    'okta' => array(
+      'title' => 'Okta',
+      'description' => 'Enable Okta functionality',
+    ),
+  );
+  */
+}
+
+/**
+ * Implements hook_sirius_config_links_alter
+ */
+
+function sirius_okta_sirius_config_links_alter(&$links) {
+  $links['okta'] = array('title' => 'Okta');
+  $links['okta']['links']['sirius/okta'] = array('title' => 'Config');
+  $links['okta']['links']['admin/config/people/saml'] = array('title' => 'SAML Login Config');
+}
+
+/** 
+ * Implements hook_sirius_access_info
+ */
+
+function sirius_okta_sirius_access_info() {
+  $infos = array();
+  Sirius_Okta_Access::getInstance()->setInfo($infos);
+  return $infos;
+}
+
+/**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_okta_sirius_cron_scan_info() {
+
+  $items['okta_token_refresh'] = array(
+    'title' => 'Okta Token Refresh',
+    'description' => 'Refresh the Okta token so that it doesn\'t expire',
+    'schedule' => 'daily',
+    'callback' => 'sirius_okta_token_refresh',
+    'multidomain' => FALSE,
+  );
+
+  return $items;
+}

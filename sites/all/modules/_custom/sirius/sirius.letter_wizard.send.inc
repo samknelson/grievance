@@ -50,7 +50,7 @@ function sirius_letter_wizard_send_form($form, &$form_state, $info, $data, $lett
 
 	if ($data['format'] == 'pdf') { $submit_label = t('Download PDF'); }
 	else if ($data['format'] == 'sms') { $submit_label = t('Send SMS Now'); }
-	else if ($data['format'] == 'fax') { $submit_label = t('Send Fax Now'); }
+	else if ($data['format'] == 'postal') { $submit_label = t('Send Postal Letter Now'); }
 	else { $submit_label = t("Submit"); }
 
 	$form['submit'] = array(
@@ -75,7 +75,7 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 	$format = $data['format'];
 
 	// Generate PDF if necessary
-	if ($format == 'pdf' || $format == 'email' || $format == 'fax') {
+	if ($format == 'pdf' || $format == 'email') {
 		$pdf_basename = sirius_letter_pdf_basename($letter_node);
 		$pdf_contents = sirius_letter_pdf_contents($letter_node);
 	}
@@ -98,8 +98,8 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		if ($data['recipients']) {
 			foreach ($data['recipients'] as $recipient) {
 				if ($recipient['disposition'] == 'skip') { continue; }
-				if (preg_match('/\@/', $recipient_email)) {
-					$log_body .= $recipient['disposition'] . ': ' . sirius_email_rfc822_format($recipient['name'], $recipient['email']) . "\n";
+				if (preg_match('/\@/', $recipient['email'])) {
+					$log_body .= $recipient['disposition'] . ': ' . $recipient['name'] . ' [' . $recipient['email'] . ']' . "\n";
 				} else {
 					$log_body .= $recipient['disposition'] . ': ' . $recipient['name'] . ' ' . sirius_phone_format($recipient['phone']) . "\n";
 				}
@@ -111,10 +111,6 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		if ($data['body']) {
 			$log_body .= "Message: " . drupal_html_to_text($data['body']) . "\n";
 		}
-
-
-
-
 
 		if ($letter_node->field_sirius_attachments) {
 			foreach ($letter_node->field_sirius_attachments['und'] as $delta => $record) {
@@ -179,46 +175,6 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		$data['sent_ts'] = time();
 		sirius_letter_set_title($letter_node, 'sent', $data['sent_ts']);
 		sirius_wizard_data_set($info, $letter_node, $data);
-	}
-
-	// If format is "fax", send a fax
-	if ($format == 'fax') {
-		$fax_number = $data['recipients'][0]['phone'];
-
-		require_once DRUPAL_ROOT . '/sites/all/libraries/phaxio/lib/Phaxio/PhaxioException.php';
-		require_once DRUPAL_ROOT . '/sites/all/libraries/phaxio/lib/Phaxio/PhaxioOperationResult.php';
-		require_once DRUPAL_ROOT . '/sites/all/libraries/phaxio/lib/Phaxio/Phaxio.php';
-		// use Phaxio\Phaxio;
-		$phaxio = new \Phaxio\Phaxio(
-			sirius_domain_variable_get('grievance_phaxio_api_key', ''), 
-			sirius_domain_variable_get('grievance_phaxio_api_secret', ''), 
-			sirius_domain_variable_get('grievance_phaxio_api_host', 'https://api.phaxio.com/v1/')
-		);
-
-		$path = '/tmp/' . $pdf_basename . '.pdf';
-		file_put_contents($path, $pdf_contents);
-		$callback_url = 'https://';
-		$callback_url .= $_SERVER['SERVER_NAME'];
-		$callback_url .= '/grievances/phaxio/callback-sent';
-		$callback_url .= '/' . variable_get('grievance_phaxio_callback_token', '');
-		$fax_result = $phaxio->sendFax(
-			$fax_number, 
-			array($path), 
-			array('callback_url' => $callback_url)
-		);
-		unlink($path);
-
-		if (!$fax_result->succeeded()) {
-			drupal_set_message("Fax failed: " . $fax_result->getMessage(), 'error');
-		} else {
-			$fax_id = $fax_result->getData()['faxId'];
-			drupal_set_message("Fax sent to " . $fax_number);
-		}
-
-		if ($log_node) {
-			$log_node->field_grievance_external_id['und'][0]['value'] = 'phaxio_id_sent_' . $fax_id;
-			node_save($log_node);
-		}
 	}
 
 	// If format is "email", send
@@ -386,6 +342,38 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 			} else {
 				drupal_set_message("SMS delivery to $recipient[phone] successful: " . $result['msg']);
 			}
+		}
+
+		if ($failure_count) { 
+			drupal_set_message("Delivery failed to $failure_count recipients.", 'warning');
+			$status = 'error';
+		} else {
+			$status = 'sent';
+		}
+	}
+
+	// If format is "sms", send
+	if ($format == 'postal') {
+		if (!sirius_domain_component_enabled('postal')) { drupal_set('Postal module is not enabled.', 'error'); return; }
+		$instance = sirius_postal_client_instance();
+		if (!$instance) { drupal_set('No postal client has been configured.', 'error'); return; }
+
+		$params = array();
+
+		$params['to'] = $data['recipients'][0]['addr'];
+		$params['from'] = $data['recipients'][1]['addr'];
+		$params['body'] = $data['body'];
+		$params['options'] = $data['postal_options'];
+		// $params['id'] = $letter_node->nid;
+		$params['handler_nids'] = array($letter_node->nid);
+		$result = $instance->send($params);
+
+		$failure_count = 0;
+		if (!$result['success']) {
+			drupal_set_message("Postal delivery failed: " . $result['msg'] . ': ' . $result['details'], 'warning');
+			$failure_count++;
+		} else {
+			drupal_set_message("Postal delivery successful.");
 		}
 
 		if ($failure_count) { 

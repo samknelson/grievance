@@ -11,6 +11,11 @@ function sirius_node_tab_wizard($node, $wizard_name) {
 	$steps = sirius_wizard_steps($info, $data, $node);
 	$current_step = sirius_wizard_current_step($steps);
 
+	// Add a help text path, so that we can target the current step
+	$path = current_path();
+	$path = preg_replace('/\/\d+\//', '/%/', $path);
+	sirius_help_paths("$path|$current_step");
+
 	$html = sirius_wizard_render_steps($steps, $current_step);
 	$renderable = sirius_wizard_content($info, $data, $node, $current_step);
 	$html .= drupal_render($renderable);
@@ -261,6 +266,11 @@ function sirius_wizard_submit($info, $data, &$node, $current_step, $msg = NULL, 
 		if (!$found) { continue; }
 		if ($options['nonsequential']) { continue; }
 		$data['steps'][$step_name]['complete'] = FALSE;
+	}
+
+	// Handle some options
+	if ($options['feed_status']) {
+		$node->field_sirius_feed_status['und'][0]['value'] = $options['feed_status'];
 	}
 
 	// Save our data

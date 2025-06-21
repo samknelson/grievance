@@ -73,6 +73,20 @@ function sirius_mightysearch_form_prepare_valuefield_from_path($form_state, $jso
 					} else if ($field_name == 'current_employer') {
 						$ms_options = drupal_map_assoc(array_values(sirius_employer_list()));
 						$element = array('#type' => 'select', '#options' => $ms_options);
+					} else if ($field_name == 'field_sirius_denorm_benefits') {
+						$element = array('#type' => 'select', '#options' => sirius_trust_benefit_options());
+					} else {
+						$element = array('#type' => 'textfield');
+					}
+				} else {
+					$element = sirius_jsonfield_util_get_from_path($json_forms[$node_type][$which_form], $path);
+				}
+			} else if ($node_type == 'grievance_shop_contact') {
+				if ($which_form == 'core') {
+					list ($field_name, $column) = explode(':', $path);
+					if ($field_name == 'field_grievance_contact_types') {
+						$grievance_contact_type_options = drupal_map_assoc(array_values(sirius_taxonomy_load('grievance_contact_types', 'tid', 'name')));
+						$element = array('#type' => 'select', '#options' => $grievance_contact_type_options);
 					} else {
 						$element = array('#type' => 'textfield');
 					}
@@ -83,7 +97,7 @@ function sirius_mightysearch_form_prepare_valuefield_from_path($form_state, $jso
 				if ($which_form == 'core') {
 					list ($field_name, $column) = explode(':', $path);
 					if ($field_name == 'status') {
-						$element = array('#type' => 'select', '#options' => $bulk_statuses);
+						$element = array('#type' => 'select', '#options' => sirius_bulk_queue_statuses());
 					} else {
 						$element = array('#type' => 'textfield');
 					}
@@ -182,7 +196,20 @@ function sirius_mightysearch_paths($json_forms) {
   	unset($paths[':sirius_worker:core:field_sirius_phone:value']);
   	unset($paths[':sirius_worker:core:title:value']);
   	$paths[':sirius_worker:core:current_employer:title'] = ':sirius_worker:core:current_employer:title';
+
+  	// Trust-specific paths
+  	if (sirius_domain_component_enabled('trust')) {
+  		$paths[':sirius_worker:core:benefit_title'] = ':sirius_worker:core:benefit:name';
+  		$paths[':sirius_worker:core:field_sirius_denorm_benefits'] = ':sirius_worker:core:benefit:select';
+  	}
   }
+
+  if ($json_forms['grievance_shop_contact']) {
+  	$paths[':grievance_shop_contact:core:field_grievance_co_role:value'] = ':grievance_shop_contact:core:field_grievance_co_role:value';
+  	$paths[':grievance_shop_contact:core:field_grievance_contact_types'] = ':grievance_shop_contact:core:field_grievance_contact_types';
+  	$paths[':grievance_shop_contact:core:field_grievance_shops'] = ':grievance_shop_contact:core:field_grievance_shops';
+  }
+
   foreach ($paths as $key => $label) {
   	$label = preg_replace('/^\:sirius_/', '', $label);
   	$label = preg_replace('/:value/', '', $label);
@@ -775,14 +802,97 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 					$sql_parts['select_fields'] .= ", current_employer_node.title as current_employer_title ";
 				}
 				if ($criterion) { $where_name = 'current_employer_node.title'; }
-			} else if ($field_name == 'nid') {
-				if ($criterion) { $where_name = 'worker_node.nid'; }
+			} else if (in_array($field_name, array('field_sirius_denorm_benefits', 'benefit_title'))) {
+				if (!$sql_parts['joins_nodupe']["field_sirius_denorm_benefits"]) {
+					$sql_parts['joins'] .= "left join field_data_field_sirius_denorm_benefits worker_field_sirius_denorm_benefits on worker_field_sirius_denorm_benefits.entity_type = 'node' and worker_field_sirius_denorm_benefits.entity_id = worker_node.nid ";
+					$sql_parts['joins'] .= "left join node benefit_node on benefit_node.nid = worker_field_sirius_denorm_benefits.field_sirius_denorm_benefits_target_id ";
+					$sql_parts['joins_nodupe']["field_sirius_denorm_benefits"] = TRUE;
+				}
+				if (!$sql_parts['fields_nodupe']['field_sirius_denorm_benefits']) {
+					$sql_parts['fields_nodupe']['field_sirius_denorm_benefits'] = TRUE;
+					$sql_parts['select_fields'] .= ", group_concat(distinct benefit_node.title separator ' / ') as benefit_title ";
+				}
+				if ($criterion) { 
+					if ($field_name == 'field_sirius_denorm_benefits') {
+						$where_name = "worker_${field_name}.${field_name}_target_id";
+					} else if ($field_name == 'benefit_title') {
+						$where_name = 'benefit_node.title';
+					}
+				}
 			}
 		} else {
 			$path_for_query = '$.' . $which_form . '.results.' . preg_replace('/:/', '.', $path);
 			if ($criterion) { $where_name = "lower(json_unquote(json_extract(bulk_json.field_sirius_json_value, '$path_for_query'))) "; }
 		}
+	} else if ($node_type == 'grievance_shop_contact') {
+		//
+		// grievance_shop_contact fields
+		//
+		
+		if ($which_form == 'core') {
+			list ($field_name, $column) = explode(':', $path);
+
+			if (in_array($field_name, array('field_grievance_co_role'))) {
+				if (!$sql_parts['joins_nodupe']["grievance_shop_contact.$field_name"]) {
+					$sql_parts['joins_nodupe']["gsx.$field_name"] = TRUE;
+					$sql_parts['joins'] .= "left join field_data_${field_name} grievance_shop_contact_${field_name} on grievance_shop_contact_{$field_name}.entity_type = 'node' and grievance_shop_contact_${field_name}.entity_id = grievance_shop_contact_node.nid ";
+				}
+				if (!$sql_parts['fields_nodupe']["grievance_shop_contact.$field_name"]) {
+					$sql_parts['fields_nodupe']["grievance_shop_contact.$field_name"] = TRUE;
+					$sql_parts['select_fields'] .= ", grievance_shop_contact_${field_name}.${field_name}_value as grievance_shop_contact_$field_name ";
+				}
+				if ($criterion) { $where_name = "grievance_shop_contact_{$field_name}.${field_name}_value"; }
+
+			} else if ($field_name == 'field_grievance_contact_types') {
+				if (!$sql_parts['joins_nodupe'][$field_name]) {
+					$sql_parts['joins_nodupe'][$field_name] = TRUE;
+					$sql_parts['joins'] .= "left join field_data_field_grievance_contact_types on field_data_field_grievance_contact_types.entity_type = 'node' and field_data_field_grievance_contact_types.entity_id = grievance_shop_contact_node.nid ";
+					$sql_parts['joins'] .= "left join taxonomy_term_data grievance_contact_types_term on grievance_contact_types_term.tid = field_grievance_contact_types_tid ";
+				}
+				if (!$sql_parts['fields_nodupe']['field_grievance_contact_types']) {
+					$sql_parts['fields_nodupe']['field_grievance_contact_types'] = TRUE;
+					$sql_parts['select_fields'] .= ", field_grievance_contact_types_tid ";
+					$sql_parts['select_fields'] .= ", grievance_contact_types_term.name as grievance_shop_contact_types_name ";
+					$sql_parts['select_fields'] .= ", group_concat(distinct grievance_contact_types_term.name order by grievance_contact_types_term.name separator ', ') as grievance_shop_contact_types_names ";
+				}
+				if ($criterion) { $where_name = 'grievance_contact_types_term.name'; }
+			} else if ($field_name == 'field_grievance_shops') {
+				if (!$sql_parts['joins_nodupe'][$field_name]) {
+					$sql_parts['joins_nodupe'][$field_name] = TRUE;
+					$sql_parts['joins'] .= "left join field_data_field_grievance_shops on field_data_field_grievance_shops.entity_type = 'node' and field_data_field_grievance_shops.entity_id = grievance_shop_contact_node.nid ";
+					$sql_parts['joins'] .= "left join node grievance_shops_node on grievance_shops_node.nid = field_data_field_grievance_shops.field_grievance_shops_target_id ";
+				}
+				if (!$sql_parts['fields_nodupe']['field_grievance_shops']) {
+					$sql_parts['fields_nodupe']['field_grievance_shops'] = TRUE;
+					$sql_parts['select_fields'] .= ", grievance_shops_node.title as grievance_shops_title ";
+					$sql_parts['select_fields'] .= ", group_concat(distinct grievance_shops_node.title order by grievance_shops_node.title separator ', ') as grievance_shops_titles ";
+				}
+				if ($criterion) { $where_name = 'grievance_shops_node.title'; }
+			}
+		}
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	if ($criterion) {
@@ -902,9 +1012,15 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	}
 
 	if ($json_forms['sirius_worker']) {
-		$sql_parts['joins'] .= "left join field_data_field_sirius_contact worker_contact on worker_contact.entity_type = 'node' and field_sirius_contact_target_id = node.nid and worker_contact.bundle = 'sirius_worker' ";
+		$sql_parts['joins'] .= "left join field_data_field_sirius_contact worker_contact on worker_contact.entity_type = 'node' and worker_contact.field_sirius_contact_target_id = node.nid and worker_contact.bundle = 'sirius_worker' ";
 		$sql_parts['joins'] .= "left join node worker_node on worker_node.nid = worker_contact.entity_id ";
 		$sql_parts['select_fields'] .= ", worker_node.nid as worker_nid ";
+	}
+
+	if ($json_forms['grievance_shop_contact']) {
+		$sql_parts['joins'] .= "left join field_data_field_sirius_contact grievance_shop_contact_contact on grievance_shop_contact_contact.entity_type = 'node' and grievance_shop_contact_contact.field_sirius_contact_target_id = node.nid and grievance_shop_contact_contact.bundle = 'grievance_shop_contact' ";
+		$sql_parts['joins'] .= "left join node grievance_shop_contact_node on grievance_shop_contact_node.nid = grievance_shop_contact_contact.entity_id ";
+		$sql_parts['select_fields'] .= ", grievance_shop_contact_node.nid as grievance_shop_contact_nid ";
 	}
 
 	if ($json_forms['sirius_bulk']) {
@@ -1425,11 +1541,24 @@ function sirius_mightysearch_render_result($json_forms, $hr, $full_path ) {
 				return $hr['worker_nid'];
 			} else if ($field_name == 'current_employer') { 
 				return $hr['current_employer_title'];
+			} else if ($field_name == 'field_sirius_denorm_benefits') {
+				return $hr['benefit_title'];
 			}
 		} else {
 			$json_form = $json_forms[$node_type][$which_form];
 			$json_results = sirius_jsonfield_util_results_get($json, $which_form);
 			return sirius_jsonfield_util_render_values($json_form, $json_results, array($path), array('raw' => TRUE));
+		}
+	} else if ($node_type == 'grievance_shop_contact') {
+		if ($which_form == 'core') {
+			list ($field_name, $column) = explode(':', $path);
+			if ($field_name == 'field_grievance_contact_types') {
+				return $hr["grievance_shop_contact_types_names"];
+			} else if ($field_name == 'field_grievance_shops') {
+				return $hr['grievance_shops_titles'];
+			}else {
+				return $hr[$node_type . "_" . $field_name];
+			}
 		}
 	}
 }
@@ -1463,7 +1592,7 @@ function sirius_mightysearch_tools_info_all() {
 
 	$tools['bulk_view'] = array(
 		'title' => 'Bulk',
-		'path' => 'node/%',
+		'path' => 'node/%/sirius_bulk_recipient',
 		'variable' => 'bulk_nid',
 	);
 

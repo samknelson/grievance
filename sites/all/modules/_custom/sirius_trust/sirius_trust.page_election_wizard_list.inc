@@ -12,12 +12,6 @@ function sirius_trust_page_election_wizard_list_form($form, &$form_state) {
 		'#default_value' => 'submitted',
 	);
 
-	$form['ssn'] = array(
-		'#type' => 'textfield',
-		'#title' => 'SSN',
-		'#size' => 12,
-	);
-
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -30,19 +24,20 @@ function sirius_trust_page_election_wizard_list_form($form, &$form_state) {
 	} else {
 		$params['status'] = 'submitted';
 	}
-	$params['ssn'] = $form_state['values']['ssn'];
 
 	$records = sirius_trust_election_wizard_search($params);
 
 	if ($records) {
-		$header = array('SSN', 'Name', 'Status', 'Tools');
+		$header = array('Worker', 'Employer', 'Status', 'Tools');
 		$rows = array();
 		foreach ($records as $nid => $record) {
-			$ssn = $record['field_sirius_notes_value'];
 			$wizard_node = node_load($nid);
 			$worker_node = sirius_log_handler($wizard_node, 'sirius_worker');
-			if (!$worker_node) { $worker_node = sirius_worker_get_by_ssn($ssn); }
 			$election_node = sirius_log_handler($wizard_node, 'sirius_trust_worker_election');
+
+			$wizard_json = sirius_json_get($wizard_node);
+			$wizard_data = $wizard_json['wizard']['trust_election'];
+			$employer_nid = $wizard_data['employer']['employer_nid'];
 
 			$tools = array();
 			$tools[] = l('Wizard', 'node/' . $nid . '/sirius_trust_election_wizard', array('attributes' => array('class' => array('tool-button'))));
@@ -54,8 +49,8 @@ function sirius_trust_page_election_wizard_list_form($form, &$form_state) {
 			}
 
 			$row = array();
-			$row[] = $ssn;
 			$row[] = $worker_node->title;
+			$row[] = sirius_node_title($employer_nid);
 			$row[] = $wizard_node->field_sirius_type['und'][0]['value'];
 			$row[] = join(' ', $tools);
 			$rows[] = $row;

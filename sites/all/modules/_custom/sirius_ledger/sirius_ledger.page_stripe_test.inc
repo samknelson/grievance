@@ -5,13 +5,13 @@ function sirius_ledger_page_stripe_test() {
 }
 
 function sirius_ledger_page_stripe_test_form($form, &$form_state) {
-	sirius_require('sirius_ledger', 'sirius_ledger.stripe.inc');
+	$service = sirius_ledger_service();
 
 	$form['mode'] = array(
 		'#type' => 'select',
 		'#title' => t('Mode'),
 		'#options' => array(
-			NULL => t('System Default: ') . sirius_ledger_stripe_mode(),
+			NULL => t('System Default: ') . $service->mode(),
 			'test' => t('Test Mode'),
 			'live' => t('Live Mode'),
 		),
@@ -29,11 +29,11 @@ function sirius_ledger_page_stripe_test_form($form, &$form_state) {
 }
 
 function sirius_ledger_page_stripe_test_form_submit($form, &$form_state) {
-	sirius_require('sirius_ledger', 'sirius_ledger.stripe.inc');
+	$service = sirius_ledger_service();
 
 	$form_state['rebuild'] = TRUE;
 
-	$result = sirius_ledger_stripe_ping($form_state['values']['mode']);
+	$result = $service->ping($form_state['values']['mode']);
 
 	if ($result['success']) {
 		sirius_minilog('<pre>' . print_r($result, 1) . '</pre>');

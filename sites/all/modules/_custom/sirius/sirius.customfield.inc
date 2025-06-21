@@ -125,6 +125,11 @@ function sirius_customfield_content_types_all() {
   		'permission' => 'sirius domain admin',
   	);
 
+  	$types['grievance_shop'] = array(
+  		'key' => 'grievance_shop',
+  		'permission' => 'sirius employer admin',
+  	);
+
   	foreach ($types as $key => $record) { 
   		$types[$key]['title'] = sirius_content_type_name($key); 
   	}
@@ -150,7 +155,7 @@ function sirius_customfield_content_type_options($content_types) {
 	return $result;
 }
 
-function sirius_customfield_set_list_all($content_type = NULL) {
+function sirius_customfield_set_list_all($content_type = NULL, $category = NULL, $params = array()) {
 	$domain_nid = sirius_domain_nid();
 
 	$sql_args = array();
@@ -179,9 +184,26 @@ function sirius_customfield_set_list_all($content_type = NULL) {
 	foreach ($options_all as $cf_nid => $ignore) {
 		$cf_node = node_load($cf_nid);
 		$cf_json = sirius_json_get($cf_node);
+
+		if (!$cf_json['customfield']['tab']['show_by_default']) {
+			$cf_json['customfield']['tab']['show_by_default'] = 'No';
+		}
+		if ($params['tab']['show_by_default']) {
+			if ($cf_json['customfield']['tab']['show_by_default'] != $params['tab']['show_by_default']) {
+				continue;
+			}
+		}
+
+
 		$content_types = sirius_customfield_content_types($cf_json);
 		if (!$content_types) { $content_types = array(); }
 		if (!in_array($content_type, array_keys($content_types))) { continue; }
+
+		if ($content_type == 'sirius_log' && $category && isset($cf_json['customfield']['content_types']['log_categories'])) {
+			if (!in_array($category, array_filter(array_values($cf_json['customfield']['content_types']['log_categories'])))) {
+				continue; 
+			}
+		}
 		$options[$cf_nid] = $cf_node->title;
 	}
 	return $options;

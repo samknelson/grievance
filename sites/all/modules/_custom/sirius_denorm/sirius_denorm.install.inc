@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * Create the denorm table.
+ */
+
+function sirius_denorm_update_7001() {
+
+  $sqls = array();
+
+  $sqls[] = "create table sirius_denorm_queue (
+    denorm_id integer primary key auto_increment,
+    denorm_created_ts integer,
+    denorm_updated_ts integer,
+    denorm_source_nid integer,
+    denorm_target_nid integer,
+    denorm_status varchar(255),
+    denorm_trigger varchar(255),
+    index(denorm_created_ts),
+    index(denorm_updated_ts),
+    index(denorm_source_nid),
+    index(denorm_target_nid)
+  );";
+
+  // $sqls[] = 'create index sirius_hours_cache_idx01 on sirius_hours_cache (payperiod_nid);';
+
+  foreach ($sqls as $sql)
+  try { 
+    print "Executing: $sql\n";
+    db_query($sql, array());
+  } catch (exception $ignore) {
+    // Do nothing.
+  }
+}

@@ -1,0 +1,38 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_cardcheck') . '/sirius_cardcheck.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_cardcheck') . '/sirius_cardcheck.permission.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_cardcheck') . '/sirius_cardcheck.cardcheck.inc';
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_cardcheck_sirius_domain_component_info() {
+  return array(
+    'cardcheck' => array(
+      'title' => 'Card Check',
+      'description' => 'Enable card check functionality',
+    ),
+  );
+}
+
+/**
+ * Implements hook_sirius_config_links_alter
+ */
+
+function sirius_cardcheck_sirius_config_links_alter(&$links) {
+  $links['cardcheck'] = array('title' => 'Card Check');
+  $links['cardcheck']['links']['sirius/cardcheck'] = array('title' => 'Config', 'description' => 'Configure card check features.');
+}
+
+/** 
+ * Implements hook_sirius_access_info
+ */
+
+function sirius_cardcheck_sirius_access_info() {
+  $infos = array();
+  Sirius_Cardcheck_Access::getInstance()->setInfo($infos);
+  return $infos;
+}
+

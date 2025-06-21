@@ -34,7 +34,7 @@ function grievance_letter_form_submit($form, &$form_state) {
 	}
 
 	if ($mustlog) {
-		if ($output == 'pdf' || $output == 'send-email' || $output == 'send-fax') {
+		if ($output == 'pdf' || $output == 'send-email') {
 			if (!$form_state['values']['logging']) {
 				drupal_set_message(t('Letters of this type MUST be logged.'), 'error');
 				return;
@@ -303,75 +303,6 @@ function grievance_letter_form_submit($form, &$form_state) {
 			drupal_set_message(t('Notification TO: ') . htmlspecialchars($to));
 			if ($cc) { drupal_set_message(t('Notification CC: ') . htmlspecialchars($cc)); }
 			if ($bcc) { drupal_set_message(t('Notification BCC: ') . htmlspecialchars($bcc)); }
-		}
-
-		return;
-	}
-
-	// ////////////////////////////////////////////
-	// Send Email
-	// ////////////////////////////////////////////
-
-	if ($output == 'send-fax') {
-		
-		$fax_number = $form_state['values']['fax_recipient'];
-		if (!$fax_number) {
-			drupal_set_message(t('Please select a fax recipient in order to send a fax.'), 'error');
-			return;
-		}
-
-		require_once DRUPAL_ROOT . '/sites/all/libraries/phaxio/lib/Phaxio/PhaxioException.php';
-		require_once DRUPAL_ROOT . '/sites/all/libraries/phaxio/lib/Phaxio/PhaxioOperationResult.php';
-		require_once DRUPAL_ROOT . '/sites/all/libraries/phaxio/lib/Phaxio/Phaxio.php';
-		// use Phaxio\Phaxio;
-		$phaxio = new \Phaxio\Phaxio(variable_get('grievance_phaxio_api_key', ''), variable_get('grievance_phaxio_api_secret', ''), variable_get('grievance_phaxio_api_host', 'https://api.phaxio.com/v1/'));
-		$pdf_contents = grievance_letter_pdf_contents($grievance_node, $letter_nids, $form_state['values']);
-		$basename = grievance_letter_pdf_basename($grievance_node, $letter_nids);
-
-		$path = '/tmp/' . $basename . '.pdf';
-		file_put_contents($path, $pdf_contents);
-		// $fax_result = $phaxio->sendFax('866-691-5968', array($path), array());
-		// $fax_result = $phaxio->sendFax('123-456-7890', array($path), array());
-		// global $base_url;
-		global $is_https;
-		if ($is_https ||
-			(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) {
-			$callback_url = 'https://';
-		} else { 
-			$callback_url = 'http://';
-		}
-		$callback_url .= $_SERVER['SERVER_NAME'];
-		$callback_url .= '/grievances/phaxio/callback-sent';
-		$callback_url .= '/' . variable_get('grievance_phaxio_callback_token', '');
-
-		$fax_result = $phaxio->sendFax(
-			$fax_number, 
-			array($path), 
-			array('callback_url' => $callback_url)
-		);
-		unlink($path);
-
-		if (!$fax_result->succeeded()) {
-			drupal_set_message("Fax failed: " . $fax_result->getMessage(), 'error');
-		} else {
-			$fax_id = $fax_result->getData()['faxId'];
-			drupal_set_message("Fax sent to " . $fax_number);
-			// Log the letter
-			if ($form_state['values']['logging']) {
-				$log_title = "Faxed to $fax_number: ";
-				$is_first = TRUE;
-				foreach ($letter_nodes as $letter_node) {
-					if ($is_first) {
-						$is_first = FALSE;
-					} else {
-						$log_title .= ' / ';
-					}
-					$log_title .= $letter_node->title;
-				}
-
-				$log_body = '';
-				grievance_letter_log($form_state, $log_title, $log_body, $pdf_contents, $basename, 'phaxio_id_sent_' . $fax_id);
-			}
 		}
 
 		return;

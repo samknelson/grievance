@@ -89,14 +89,6 @@ function grievance_admin_log_types_DEFUNCT() {
     '#description' => t("Grievance log type to be used for initial call to grievant.  Used for reporting."),
   );
 
-  $form['grievance_log_phaxio_callback_type'] = array(
-    '#type' => 'select',
-    '#options' => $log_type_options,
-    '#title' => t('Phaxio Callback Type'),
-    '#default_value' => variable_get('grievance_log_phaxio_callback_type', ''),
-    '#description' => t("Grievance log type to be used for Phaxio callback -- i.e. fax confirmation receipts."),
-  );
-
   $form['grievance_log_spi_type'] = array(
     '#type' => 'select',
     '#options' => $log_type_options,

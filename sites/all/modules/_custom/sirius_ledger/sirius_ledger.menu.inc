@@ -44,30 +44,20 @@ function sirius_ledger_node_tabs() {
     'weight' => 4,
   );
 
-  $node_tabs['sirius_payment']['sirius_payment_allocate/transmittal'] = array(
-    'title' => 'Transmittal',
-    'description' => '',
-    'callback' => 'sirius_ledger_node_tab_payment_allocate_transmittal',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 4,
-  );
-
-  /*
-  $node_tabs['sirius_payment']['sirius_payment_post'] = array(
-    'title' => 'Post',
-    'description' => '',
-    'callback' => 'sirius_ledger_node_tab_payment_post',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 2,
-  );
-  */
-
   $node_tabs['sirius_payment']['sirius_payment_update'] = array(
     'title' => 'Update',
     'description' => '',
     'callback' => 'sirius_ledger_node_tab_payment_update',
     'permissions' => array('sirius ledger admin'),
     'weight' => 3,
+  );
+
+  $node_tabs['sirius_ledger_account']['sirius_ledger_account_ar'] = array(
+    'title' => 'A/R',
+    'description' => '',
+    'callback' => 'sirius_ledger_node_tab_account_ar',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 1,
   );
 
   $node_tabs['sirius_ledger_account']['sirius_ledger_account_payments'] = array(
@@ -78,57 +68,93 @@ function sirius_ledger_node_tabs() {
     'weight' => 2,
   );
 
-  $node_tabs['sirius_ledger_account']['sirius_ledger_account_ar'] = array(
-    'title' => 'A/R',
-    'description' => '',
-    'callback' => 'sirius_ledger_node_tab_account_ar',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 2,
-  );
-
   $node_tabs['sirius_ledger_account']['sirius_ledger_account_settings'] = array(
     'title' => 'Settings',
     'description' => '',
     'callback' => 'sirius_ledger_node_tab_account_settings',
     'permissions' => array('sirius ledger admin'),
-    'weight' => 2,
+    'weight' => 3,
+    'file' => 'sirius_ledger.page_account_settings.inc',
   );
 
-  $node_tabs['sirius_contact']['sirius_contact_payments'] = array(
-    'title' => 'Payments',
+  $node_tabs['sirius_ledger_account']['sirius_ledger_account_settings/general'] = array(
+    'title' => 'General Settings',
     'description' => '',
-    'callback' => 'sirius_ledger_node_tab_contact_payments',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 2,
-  );
-
-
-  $node_tabs['sirius_worker']['sirius_worker_ledger'] = array(
-    'title' => 'A/R',
-    'description' => '',
-    'callback' => 'sirius_ledger_node_tab_worker_ar',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 2,
-  );
-
-  $node_tabs['sirius_worker']['sirius_worker_ledger/ar'] = array(
-    'title' => 'A/R',
-    'description' => '',
-    'callback' => 'sirius_ledger_node_tab_worker_ar',
+    'callback' => 'sirius_ledger_node_tab_account_settings',
     'permissions' => array('sirius ledger admin'),
     'weight' => 1,
+    'file' => 'sirius_ledger.page_account_settings.inc',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_ledger/payments'] = array(
-    'title' => 'Payments and Adjustments',
+  $node_tabs['sirius_ledger_account']['sirius_ledger_account_settings/description'] = array(
+    'title' => 'Description',
     'description' => '',
-    'callback' => 'sirius_ledger_node_tab_worker_payments',
+    'callback' => 'sirius_ledger_node_tab_account_settings_description',
     'permissions' => array('sirius ledger admin'),
     'weight' => 2,
+    'file' => 'sirius_ledger.page_account_settings_description.inc',
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_ledger/monthly'] = array(
+  $node_tabs['sirius_ledger_account']['sirius_ledger_account_settings/invoices'] = array(
+    'title' => 'Invoices',
+    'description' => '',
+    'callback' => 'sirius_ledger_node_tab_account_settings_invoices',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 3,
+    'file' => 'sirius_ledger.page_account_settings_invoices.inc',
+  );
+
+  $node_tabs['sirius_ledger_account']['sirius_ledger_account_reset'] = array(
+    'title' => 'Reset',
+    'description' => '',
+    'callback' => 'sirius_ledger_node_tab_account_reset',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 11,
+    'file' => 'sirius_ledger.page_account_reset.inc',
+  );
+
+  $node_tabs['sirius_ledger_account']['sirius_ledger_account_purge'] = array(
+    'title' => 'Purge',
+    'description' => '',
+    'callback' => 'sirius_ledger_node_tab_account_purge',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 11,
+    'file' => 'sirius_ledger.page_account_purge.inc',
+  );
+
+  $items['sirius/config/ledger/purge'] = array(
+    'title' => 'Purge',
+    'page callback' => 'sirius_ledger_page_ar_purge',
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 4,
+    'file' => 'sirius_ledger.page_purge.inc',
+  );
+
+
+  foreach (array('sirius_worker', 'grievance_shop') as $content_type) {
+    $node_tabs[$content_type][$content_type . '_ledger'] = array(
+      'title' => 'Invoices and Payments',
+      'description' => '',
+      'callback' => 'sirius_ledger_node_tab_entity_accounts',
+      'permissions' => array('sirius'),
+      'weight' => 2,
+      'file' => 'sirius_ledger.page_entity_accounts.inc',
+    );
+
+    $node_tabs[$content_type][$content_type . '_ledger/ar'] = array(
+      'title' => 'Accounts',
+      'description' => '',
+      'callback' => 'sirius_ledger_node_tab_entity_accounts',
+      'permissions' => array('sirius'),
+      'weight' => 1,
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'file' => 'sirius_ledger.page_entity_accounts.inc',
+    );
+  }
+
+  $node_tabs['sirius_worker']['grievance_shop_ledger/monthly'] = array(
     'title' => 'Monthly Charge',
     'description' => '',
     'callback' => 'sirius_ledger_node_tab_worker_monthly',
@@ -136,50 +162,51 @@ function sirius_ledger_node_tabs() {
     'weight' => 3,
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_ledger/stripe'] = array(
-    'title' => 'Stripe',
+  $node_tabs['sirius_worker']['sirius_worker_ledger/stripe_paymentmethods'] = array(
+    'title' => 'Payment Methods',
     'description' => '',
-    'callback' => 'sirius_ledger_node_tab_entity_stripe',
-    'permissions' => array('sirius ledger admin'),
-    'file' => 'sirius_ledger.page_entity_stripe.inc',
-    'weight' => 4,
+    'callback' => 'sirius_ledger_node_tab_entity_stripe_paymentmethods',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_ledger.page_entity_stripe_paymentmethods.inc',
+    'weight' => 10,
     'component' => 'ledger:stripe',
   );
 
-  $node_tabs['grievance_shop']['sirius_employer_ledger'] = array(
-    'title' => 'A/R',
-    'callback' => 'sirius_ledger_node_tab_employer_ar',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 2,
+  $node_tabs['sirius_worker']['sirius_worker_ledger/stripe_customer'] = array(
+    'title' => 'Stripe Customer',
+    'description' => '',
+    'callback' => 'sirius_ledger_node_tab_entity_stripe_customer',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_ledger.page_entity_stripe_customer.inc',
+    'weight' => 10,
+    'component' => 'ledger:stripe',
   );
 
-  $node_tabs['grievance_shop']['sirius_employer_ledger/ar'] = array(
-    'title' => 'A/R',
-    'callback' => 'sirius_ledger_node_tab_employer_ar',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 1,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
+  $node_tabs['grievance_shop']['grievance_shop_ledger/stripe_paymentmethods'] = array(
+    'title' => 'Payment Methods',
+    'description' => '',
+    'callback' => 'sirius_ledger_node_tab_entity_stripe_paymentmethods',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_ledger.page_entity_stripe_paymentmethods.inc',
+    'weight' => 10,
+    'component' => 'ledger:stripe',
   );
 
-  $node_tabs['grievance_shop']['sirius_employer_ledger/payments'] = array(
-    'title' => 'Payments',
-    'callback' => 'sirius_ledger_node_tab_employer_payments',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 2,
+  $node_tabs['grievance_shop']['grievance_shop_ledger/stripe_customer'] = array(
+    'title' => 'Stripe Customer',
+    'description' => '',
+    'callback' => 'sirius_ledger_node_tab_entity_stripe_customer',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_ledger.page_entity_stripe_customer.inc',
+    'weight' => 10,
+    'component' => 'ledger:stripe',
   );
 
-  $node_tabs['grievance_shop']['sirius_employer_ledger/policy'] = array(
+  $node_tabs['grievance_shop']['grievance_shop_ledger/policy'] = array(
     'title' => 'Policy',
     'callback' => 'sirius_ledger_node_tab_entity_policy',
     'permissions' => array('sirius ledger admin'),
     'weight' => 3,
-  );
-
-  $node_tabs['grievance_shop']['sirius_employer_ledger/transmittal'] = array(
-    'title' => 'Transmittal',
-    'callback' => 'sirius_ledger_node_tab_employer_transmittal',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 4,
   );
 
   $node_tabs['grievance_contract_template']['sirius_employer_ledger_policy'] = array(
@@ -189,58 +216,40 @@ function sirius_ledger_node_tabs() {
     'weight' => 3,
   );
 
-
-  $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition'] = array(
-    'title' => 'Billing Policy',
-    'callback' => 'sirius_ledger_node_tab_policy_definition',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 2,
-  );
-
-  $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/definition'] = array(
-    'title' => 'General Settings',
-    'callback' => 'sirius_ledger_node_tab_policy_definition',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 1,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-
-  $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/monthly'] = array(
-    'title' => 'Monthly Settings',
-    'callback' => 'sirius_ledger_node_tab_policy_definition_monthly',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 2,
-  );
-
-  $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/rates'] = array(
-    'title' => 'Rates',
-    'callback' => 'sirius_ledger_node_tab_policy_definition_rates',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 2,
-    'file' => 'sirius_ledger.page_policy_definition_rates.inc',
-  );
-
-  $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/rates_new'] = array(
-    'title' => 'Rates (New)',
-    'callback' => 'sirius_ledger_node_tab_policy_rates_new',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 2,
-    'file' => 'sirius_ledger.page_policy_rates_new.inc',
-  );
-
-  $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/rates_test'] = array(
-    'title' => 'Rates Test',
-    'callback' => 'sirius_ledger_node_tab_policy_rates_test',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 3,
-    'file' => 'sirius_ledger.page_policy_rates_test.inc',
-  );
-
-  $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/exim'] = array(
-    'title' => 'Export / Import',
-    'callback' => 'sirius_ledger_node_tab_policy_definition_exim',
+  $node_tabs['sirius_json_definition']['sirius_ledger_policy_charge_plugins'] = array(
+    'title' => 'Charge Plugins',
+    'callback' => 'sirius_node_tab_entity_plugins',
     'permissions' => array('sirius ledger admin'),
     'weight' => 10,
+    'file' => 'sirius.page_entity_plugins.inc',
+    'callback arguments' => array('ledger_charge'),
+    'module' => 'sirius',
+  );
+
+  $node_tabs['grievance_shop']['sirius_employer_ledger/charge_plugin_settings'] = array(
+    'title' => 'Charge Plugin Settings',
+    'callback' => 'sirius_ledger_node_tab_employer_charge_plugin_settings',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 10,
+    'file' => 'sirius_ledger.page_employer_charge_plugin_settings.inc',
+  );
+  
+  $node_tabs['sirius_event']['sirius_event_charge_plugin_settings'] = array(
+    'title' => 'Fees',
+    'callback' => 'sirius_ledger_node_tab_event_charge_plugin_settings',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 10,
+    'component' => 'ledger:charge:event',
+    'file' => 'sirius_ledger.page_event_charge_plugin_settings.inc',
+  );
+
+  $node_tabs['sirius_event_participant']['sirius_ledger_event_participant_test'] = array(
+    'title' => 'Ledger Tester',
+    'callback' => 'sirius_ledger_node_tab_event_participant_test',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 11,
+    'file' => 'sirius_ledger.page_event_participant_test.inc',
+    'component' => 'ledger:charge:event',
   );
 
   $node_tabs['sirius_payperiod']['sirius_payperiod_ledger_test'] = array(
@@ -248,6 +257,8 @@ function sirius_ledger_node_tabs() {
     'callback' => 'sirius_ledger_node_tab_payperiod_test',
     'permissions' => array('sirius ledger admin'),
     'weight' => 11,
+    'file' => 'sirius_ledger.page_payperiod_test.inc',
+    'component' => 'ledger:worker:charge:hourly',
   );
 
   foreach (array('sirius_ledger_account', 'sirius_event') as $content_type) {
@@ -300,6 +311,70 @@ function sirius_ledger_node_tabs() {
     'weight' => 4,
   );
 
+  $node_tabs['sirius_log']['sirius_ea'] = array(
+    'title' => 'Account Overview',
+    'callback' => 'sirius_ledger_node_tab_ea',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_ledger.page_ea.inc',
+    'weight' => 0,
+    'skip_node_view_check' => TRUE,
+  );
+
+  $node_tabs['sirius_log']['sirius_ea_ar'] = array(
+    'title' => 'All Transactions',
+    'callback' => 'sirius_ledger_node_tab_ea_ar',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_ledger.page_ea_ar.inc',
+    'weight' => 1,
+    'skip_node_view_check' => TRUE,
+  );
+
+  $node_tabs['sirius_log']['sirius_ea_employer_workers'] = array(
+    'title' => 'Statement',
+    'callback' => 'sirius_ledger_node_tab_ea_employer_workers',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_ledger.page_ea_employer_workers.inc',
+    'weight' => 1,
+    'skip_node_view_check' => TRUE,
+  );
+
+  $node_tabs['sirius_log']['sirius_ea_invoices'] = array(
+    'title' => 'Invoices',
+    'callback' => 'sirius_ledger_node_tab_ea_invoices',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_ledger.page_ea_invoices.inc',
+    'weight' => 2,
+    'skip_node_view_check' => TRUE,
+  );
+
+  $node_tabs['sirius_log']['sirius_ea_payments'] = array(
+    'title' => 'Payments and Adjustments',
+    'callback' => 'sirius_ledger_node_tab_ea_payments',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_ledger.page_ea_payments.inc',
+    'weight' => 2,
+    'skip_node_view_check' => TRUE,
+  );
+
+  $node_tabs['sirius_log']['sirius_ea_payment_create'] = array(
+    'title' => 'Add an Offline Payment',
+    'callback' => 'sirius_ledger_node_tab_ea_payment_create',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_ledger.page_ea_payment_create.inc',
+    'weight' => 3,
+    'skip_node_view_check' => TRUE,
+  );
+
+  $node_tabs['sirius_log']['sirius_ea_stripe_payment'] = array(
+    'title' => 'Make a Payment',
+    'callback' => 'sirius_ledger_node_tab_ea_stripe_payment',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_ledger.page_ea_stripe_payment.inc',
+    'weight' => 4,
+    'skip_node_view_check' => TRUE,
+    'component' => 'ledger:stripe',
+  );
+
   sirius_node_tab_set_module('sirius_ledger', $node_tabs);
   return $node_tabs;
 }
@@ -322,6 +397,15 @@ function sirius_ledger_term_tabs() {
     'permissions' => array('sirius ledger admin'),
     'weight' => 20,
     'file' => 'sirius_ledger.term_tab_entity_type_auths.inc',
+  );
+
+  $term_tabs['sirius_event_type']['sirius_event_type_charge_plugin_settings'] = array(
+    'title' => 'Fees',
+    'callback' => 'sirius_ledger_term_tab_event_type_charge_plugin_settings',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 10,
+    'component' => 'ledger:charge:event',
+    'file' => 'sirius_ledger.page_event_type_charge_plugin_settings.inc',
   );
 
   sirius_node_tab_set_module('sirius_ledger', $term_tabs);
@@ -373,33 +457,38 @@ function sirius_ledger_menu() {
   $items['sirius/config/ledger/test-monthly'] = array(
     'title' => 'Tester - Monthly Charges',
     'page callback' => 'sirius_ledger_page_monthly_test',
-    'access arguments' => array('sirius ledger admin'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
+    'file' => 'sirius_ledger.page_monthly_test.inc',
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius ledger admin',
+        'component' => 'ledger:worker:charge:monthly',
+      ),
+    ),
   );
 
-  $items['sirius/config/ledger/transmittal'] = array(
-    'title' => 'Transmittal Sheets',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sirius_ledger_config_transmittal'),
-    'access arguments' => array('sirius ledger admin'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 3,
-  );
-
-  $items['sirius/config/ledger/purge'] = array(
-    'title' => 'Purge',
-    'page callback' => 'sirius_ledger_page_ar_purge',
+  $items['sirius/config/ledger/dev'] = array(
+    'title' => 'Dev Tools',
+    'page callback' => 'sirius_ledger_page_dev',
     'access arguments' => array('sirius admin'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 4,
+    'file' => 'sirius_ledger.page_dev.inc',
   );
 
   $items['sirius/ledger/stripe/config'] = array(
     'title' => 'Stripe',
     'page callback' => 'sirius_ledger_page_stripe_config',
     'page arguments' => array(),
-    'access arguments' => array('sirius domain admin'),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius ledger admin',
+        'component' => 'ledger:stripe',
+      ),
+    ),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'sirius_ledger.page_stripe_config.inc',
   );
@@ -408,7 +497,13 @@ function sirius_ledger_menu() {
     'title' => 'Account Information',
     'page callback' => 'sirius_ledger_page_stripe_config',
     'page arguments' => array(),
-    'access arguments' => array('sirius domain admin'),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius ledger admin',
+        'component' => 'ledger:stripe',
+      ),
+    ),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'file' => 'sirius_ledger.page_stripe_config.inc',
     'weight' => 1,
@@ -418,7 +513,13 @@ function sirius_ledger_menu() {
     'title' => 'Test',
     'page callback' => 'sirius_ledger_page_stripe_test',
     'page arguments' => array(),
-    'access arguments' => array('sirius domain admin'),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius ledger admin',
+        'component' => 'ledger:stripe',
+      ),
+    ),
     'type' => MENU_LOCAL_TASK,
     'file' => 'sirius_ledger.page_stripe_test.inc',
     'weight' => 2,
@@ -428,64 +529,32 @@ function sirius_ledger_menu() {
     'title' => 'Webhook',
     'page callback' => 'sirius_ledger_page_stripe_config_webhook',
     'page arguments' => array(),
-    'access arguments' => array('sirius domain admin'),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius ledger admin',
+        'component' => 'ledger:stripe',
+      ),
+    ),
     'type' => MENU_LOCAL_TASK,
     'file' => 'sirius_ledger.page_stripe_config_webhook.inc',
     'weight' => 2,
   );
 
- $items['sirius/ledger/payment/create'] = array(
-    'title' => 'Create a Payment',
+  $items['sirius/ledger/stripe/idsearch'] = array(
+    'title' => 'Search by Stripe ID',
     'description' => '',
-    'access arguments' => array('sirius ledger admin'),
-    'page callback' => 'sirius_ledger_page_payment_create',
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius ledger admin',
+        'component' => 'ledger:stripe',
+      ),
+    ),
+    'page callback' => 'sirius_ledger_page_stripe_idsearch',
     'page arguments' => array(),
-    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_ledger.page_stripe_idsearch.inc',
   );
-
-
- $items['sirius/ledger/transmittal'] = array(
-    'title' => 'Transmittal Sheets',
-    'description' => '',
-    'access arguments' => array('sirius ledger admin'),
-    'page callback' => 'sirius_ledger_page_transmittal',
-    'page arguments' => array(),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
- $items['sirius/ledger/transmittal/generate'] = array(
-    'title' => 'Generate PDFs',
-    'description' => '',
-    'access arguments' => array('sirius ledger admin'),
-    'page callback' => 'sirius_ledger_page_transmittal',
-    'page arguments' => array(),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => 1,
-  );
-
-  $items['sirius/ledger/transmittal/byemployer'] = array(
-    'title' => 'List By Month / Employer',
-    'description' => '',
-    'access arguments' => array('sirius ledger admin'),
-    'page callback' => 'sirius_ledger_page_transmittal_byemployer',
-    'page arguments' => array(),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-    'file' => 'sirius_ledger.page_transmittal_byemployer.inc',
-  );
-
-  /*
-  $items['sirius/ledger/transmittal/balances'] = array(
-    'title' => 'Balances',
-    'description' => '',
-    'access arguments' => array('sirius ledger admin'),
-    'page callback' => 'sirius_ledger_page_transmittal_balances',
-    'page arguments' => array(),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 3,
-    'file' => 'sirius_ledger.page_transmittal_balances.inc',
-  );
-  */
 
   $items['sirius/ledger/delinquency'] = array(
     'title' => 'Delinquency Letters',
@@ -533,6 +602,31 @@ function sirius_ledger_menu() {
     'file' => 'sirius_ledger.page_ar_search.inc',
   );
 
+  $items['sirius/ledger/balance/search/worker'] = array(
+    'title' => 'Balance Search - Workers',
+    'description' => '',
+    'page callback' => 'sirius_ledger_page_balance_search_worker',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius ledger admin',
+        // 'component' => '...',
+      ),
+    ),
+    'file' => 'sirius_ledger.page_balance_search_worker.inc',
+  );
+
+
+  $items['sirius/modal/ledger/ar/view/%'] = array(
+    'title' => 'AR View',
+    'description' => '',
+    'access arguments' => array('sirius admin'),
+    'page callback' => 'sirius_ledger_page_ar_view',
+    'page arguments' => array(5),
+    'file' => 'sirius_ledger.page_ar_view.inc',
+  );
+
   $items['sirius/ledger/stripe/paymentmethod/add'] = array(
     'title' => 'Add a Payment Method',
     'description' => '',
@@ -556,3 +650,14 @@ function sirius_ledger_menu() {
   return $items;
 }
 
+/**
+ * Implments hook_modal_paths
+ */
+
+function sirius_ledger_modal_paths() {
+  $paths = array();
+
+  $paths['sirius/modal/ledger/ar/view/%'] = array('style' => 'sirius-modal-style');
+
+  return $paths;
+}

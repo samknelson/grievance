@@ -3,10 +3,20 @@
 // I hate notice errors
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.menu.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.feed_members.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.feed_memberelections.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.feed_dependents.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.feed_contributions.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.feed_notes.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.feed_histwb.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.autotag.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.emphist.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.wym.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.views_taxonomy_restrict_by_parent.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.fmla.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.cobra.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.ms.inc';
 
 /***
  * Implements hook_sirius_wizard_info()
@@ -14,11 +24,330 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sir
 
 function sirius_smf_sirius_wizard_info() {
   $items = array();
-
   $items += sirius_smf_feed_members_info();
+  $items += sirius_smf_feed_memberelections_info();
   $items += sirius_smf_feed_dependents_info();
   $items += sirius_smf_feed_contributions_info();
   $items += sirius_smf_feed_notes_info();
+  $items += sirius_smf_feed_histwb_info();
+
+  sirius_require('sirius_smf', 'sirius_smf.ehrs.inc');
+  $items += sirius_smf_feed_ehrs_info();
+  return $items;
+}
+
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+function sirius_smf_sirius_config_links_alter(&$links) {
+  $links['smf']['title'] = 'SMF';
+  $links['smf']['links']['sirius/smf/views-taxonomy-restrict-by-parent-config'] = array('title' => 'Views Taxonomy Restrict by Parent');
+}
+
+/**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_smf_sirius_cron_scan_info() {
+  sirius_require('sirius_smf', '/sirius_smf.automsg.inc');
+  sirius_require('sirius_smf', '/sirius_smf.automsg_mlk.inc');
+
+  Sirius_Smf_Automsg_Mlk::getInstance()->setInfo($items);
+  
+  return $items;
+}
+
+/**
+ * Implements hook_sirius_denorm
+ */
+
+function sirius_smf_sirius_denorm($item) {
+  if ($item['denorm_trigger'] == 'sirius_smf_autotag') {
+    sirius_smf_autotag($item);
+  }
+
+  if ($item['denorm_trigger'] == 'sirius_smf_emphist') {
+    sirius_smf_emphist($item);
+  }
+}
+
+/**
+ * Implements hook_node_update
+ */
+
+function sirius_smf_node_update($node) {
+
+  if ($node->type == 'sirius_trust_worker_benefit') {
+    sirius_require('sirius_smf', '/sirius_smf.automsg.inc');
+    sirius_require('sirius_smf', '/sirius_smf.automsg_mlk.inc');
+    sirius_smf_automsg_wb_node_updateinsert($node);
+  }
+
+  return sirius_smf_denormalize_queue($node);
+}
+
+/**
+ * Implements hook_node_insert
+ */
+
+function sirius_smf_node_insert($node) {
+  if ($node->type == 'sirius_trust_worker_benefit') {
+    sirius_require('sirius_smf', '/sirius_smf.automsg.inc');
+    sirius_require('sirius_smf', '/sirius_smf.automsg_mlk.inc');
+    sirius_smf_automsg_wb_node_updateinsert($node);
+  }
+
+  return sirius_smf_denormalize_queue($node);
+}
+
+/**
+ * Implements hook_node_delete
+ */
+
+function sirius_smf_node_delete($node) { return sirius_smf_denormalize_queue($node); }
+
+/**
+ * React to node save: anything that might impact our autotags should trigger a re-autotag.
+ */
+
+function sirius_smf_denormalize_queue($node) {
+  if ($node->type == 'sirius_worker') {
+    sirius_denorm_queue_add($node->nid, $node->nid, 'sirius_smf_autotag');
+  }
+
+  if ($node->type == 'sirius_contact') {
+    $worker_nid = sirius_worker_get_by_contact_nid($node->nid, TRUE);
+    if ($worker_nid) {
+      sirius_denorm_queue_add($node->nid, $worker_nid, 'sirius_smf_autotag');
+    }
+  }
+
+  if ($node->type == 'sirius_trust_worker_benefit') {
+    sirius_denorm_queue_add($node->nid, $node->field_sirius_worker['und'][0]['target_id'], 'sirius_smf_autotag');
+  }
+
+  if ($node->type == 'sirius_trust_worker_election') {
+    sirius_denorm_queue_add($node->nid, $node->field_sirius_worker['und'][0]['target_id'], 'sirius_smf_autotag');
+  }
+
+  if ($node->type == 'sirius_payperiod') {
+    // Denorm employment history
+    sirius_denorm_queue_add($node->nid, $node->field_sirius_worker['und'][0]['target_id'], 'sirius_smf_emphist');
+
+    // Denorm current worker
+    sirius_denorm_queue_add($node->nid, $node->field_sirius_worker['und'][0]['target_id'], 'sirius_smf_autotag');
+
+    // Denorm all autotag records from the date of the payperiod until today.
+    if ($node->field_sirius_date_start['und'][0]['value']) {
+      $asof_ts = strtotime('+15 days', strtotime($node->field_sirius_date_start['und'][0]['value']));
+      if (!$asof_ts) { return; }
+
+      $y_now = date('Y');
+      $m_now = date('n');
+
+      $y = date('Y', $asof_ts);
+      $m = date('n', $asof_ts);
+
+      $count = 0;
+      while (TRUE) {
+        ++$count;
+        if ($y > $y_now) { break; }
+        if (($y == $y_now) && ($m >= $m_now)) { break; }
+        if ($count > 100) { break; }
+
+        sirius_denorm_queue_add($node->nid, $node->field_sirius_worker['und'][0]['target_id'], 'sirius_smf_autotag', array('asof_ts' => strtotime("$y-$m-15")));
+
+        ++$m;
+        if ($m > 12) { $m = 1; ++$y; }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_node_view_alter
+ */
+
+function sirius_smf_node_view($node, $view_mode, $langcode) {
+  // SMF wants to hide industry and member status.
+  if ($view_mode == 'full' && $node->type == 'sirius_worker') {
+    unset($node->content['field_sirius_industry']);
+    unset($node->content['field_sirius_member_status']);
+  }
+}
+
+
+/**
+ * Implements hook_sirius_trust_eligibility_plugin_info
+ */
+
+function sirius_smf_sirius_trust_eligibility_plugin_info() {
+  sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_geog.inc');
+
+  sirius_require('sirius_smf', 'sirius_smf.eligibility_buildup.inc');
+  sirius_require('sirius_smf', 'sirius_smf.eligibility_hours.inc');
+  sirius_require('sirius_smf', 'sirius_smf.eligibility_lastmonth.inc');
+  sirius_require('sirius_smf', 'sirius_smf.eligibility_linked.inc');
+  sirius_require('sirius_smf', 'sirius_smf.eligibility_kaiser.inc');
+  sirius_require('sirius_smf', 'sirius_smf.eligibility_healthnet.inc');
+
+  $items = array();
+  Sirius_Smf_Eligibility_Plugin_Buildup::getInstance()->setInfo($items);
+  Sirius_Smf_Eligibility_Plugin_Hours::getInstance()->setInfo($items);
+  Sirius_Smf_Eligibility_Plugin_Lastmonth::getInstance()->setInfo($items);
+  Sirius_Smf_Eligibility_Plugin_Linked::getInstance()->setInfo($items);
+  Sirius_Smf_Eligibility_Plugin_Kaiser::getInstance()->setInfo($items);
+  Sirius_Smf_Eligibility_Plugin_Healthnet::getInstance()->setInfo($items);
+  return $items;
+}
+
+/**
+ * Implements hook_node_access
+ */
+
+function sirius_smf_node_access($node, $op, $account) {
+  // Get the node type
+  if (is_object($node)) { $type = $node->type; } else { $type = $node; }
+
+  // Specific checks by node type
+  if ($type == 'smf_worker_month') { return user_access('sirius trust staff'); }
+
+  // We know nothing.
+  return NODE_ACCESS_IGNORE;
+}
+
+
+/***
+ * Implements hook_report_cache_info()
+ */
+
+function sirius_smf_report_cache_info() {
+  $items = array();
+
+  sirius_require('sirius_smf', 'reports/empstatus.inc');
+  sirius_require('sirius_smf', 'reports/emprates.inc');
+  sirius_require('sirius_smf', 'reports/actuarialhours.inc');
+  sirius_require('sirius_smf', 'reports/autotag_interval.inc');
+  sirius_require('sirius_smf', 'reports/disability_without_fmla.inc');
+  sirius_require('sirius_smf', 'reports/edi_local11.inc');
+  sirius_require('sirius_smf', 'reports/edi_hinge.inc');
+
+  Sirius_Smf_Report_Empstatus::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Emprates::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Actuarial_Hours::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Autotag_Interval::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Disabilitywithoutfmla::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Local11::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Hinge::getInstance()->setInfo($items);
 
   return $items;
+}
+
+/**
+ * Implements hook_sirius_backlinks_from_node_alter
+ */
+
+function sirius_smf_sirius_backlinks_from_node_alter(&$links, $node) {
+  if ($node->type == 'sirius_log' && $node->field_sirius_category['und'][0]['value'] == 'smf:ehrs') {
+    $employer_node = sirius_log_handler($node, 'grievance_shop');
+    unset($links['node/' . $employer_node->nid . '/grievance_shop_log']);
+    $links['node/' . $employer_node->nid . '/sirius_smf_ehrs'] = array('name' => 'All Uploads');
+  }
+}
+
+function sirius_smf_oneoff_queue_all_emphist() {
+  $sql = "select distinct worker_nid from sirius_hours_cache order by worker_nid ";
+  $stmt = sirius_sql_query($sql, array());
+
+  while ($hr = $stmt->fetchAssoc()) {
+    print $hr['worker_nid'] . "\n";
+    sirius_denorm_queue_add($hr['worker_nid'], $hr['worker_nid'], 'sirius_smf_emphist');
+  }
+}
+
+function sirius_smf_oneoff_queue_all_autotag() {
+  $sql = "select distinct worker_nid from sirius_hours_cache order by worker_nid ";
+  $stmt = sirius_sql_query($sql, array());
+
+  while ($hr = $stmt->fetchAssoc()) {
+    print $hr['worker_nid'] . "\n";
+    sirius_denorm_queue_add($hr['worker_nid'], $hr['worker_nid'], 'sirius_smf_autotag');
+  }
+}
+
+function sirius_smf_oneoff_queue_all_autotag_month($year, $month) {
+  $asof_ts = strtotime("$year-$month-01");
+
+  $sql = "select distinct worker_nid from sirius_hours_cache order by worker_nid ";
+  $stmt = sirius_sql_query($sql, array());
+  while ($hr = $stmt->fetchAssoc()) {
+    print "Queue: $year / $month / " . $hr['worker_nid'] . "\n";
+    sirius_denorm_queue_add($hr['worker_nid'], $hr['worker_nid'], 'sirius_smf_autotag', array('asof_ts' => $asof_ts));
+  }
+}
+
+function sirius_smf_oneoff_queue_all_autotag_month_extra($year, $month) {
+  $asof_ts = strtotime("$year-$month-01");
+
+  $sql = "select nid from node where type = 'sirius_worker' ";
+  $stmt = sirius_sql_query($sql, array());
+  while ($hr = $stmt->fetchAssoc()) {
+    print "Queue: $year / $month / " . $hr['nid'] . "\n";
+    sirius_denorm_queue_add($hr['nid'], $hr['nid'], 'sirius_smf_autotag', array('asof_ts' => $asof_ts));
+  }
+}
+
+function sirius_smf_oneoff_queue_all_autotag_year($year) {
+  for ($month=1; $month<=12; ++$month) {
+    if (strtotime("$year-$month-1") > time()) { continue; }
+    sirius_smf_oneoff_queue_all_autotag_month($year, $month);
+  }
+}
+
+/**
+ * Implements hook_tokens
+ */
+
+function sirius_smf_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+
+  if ($type == 'smf') {
+    foreach ($tokens as $name => $original) {
+      if ($name == 'cobra:rate') {
+        $cobra = Sirius_Smf_Cobra::getInstance();
+        $result = $cobra->rate_from_worker($data['worker_node']);
+        if ($result['success']) {
+          $replacements[$original] = '$' . number_format($result['rate'], 2);
+        } else {
+          sirius_token_failures_set($original, $result['msg']);
+        }
+      }
+    }
+  }
+
+
+  return $replacements;
+}
+
+/**
+ * Implements hook_sirius_flood_info
+ */
+
+function sirius_smf_sirius_flood_info() {
+  $info['sirius_smf_register_ip'] = array(
+    'title' => 'SMF: Register: IP',
+    'threshold_default' => 25,
+    'window_default' => 5*60,
+    'description' => 'A user attempted to register (IP block)',
+  );
+
+  $info['sirius_smf_register_ssn'] = array(
+    'title' => 'SMF: Register: SSN',
+    'threshold_default' => 25,
+    'window_default' => 5*60,
+    'description' => 'A user attempted to register (SSN block)',
+  );
+
+  return $info;
 }

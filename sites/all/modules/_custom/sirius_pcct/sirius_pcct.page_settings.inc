@@ -26,7 +26,7 @@ function sirius_pcct_page_settings_form($form, &$form_state) {
 		'#type' => 'textfield',
 		'#title' => t('Launch Code'),
 		'#description' => t('The "launch code" is the URL component that visitors will use to find the site. The final URL will be: ') .
-			'https://' . $base_url . '/pcct/[launch code]',
+			$base_url . '/pcct/[launch code]',
 		'#default_value' => sirius_domain_variable_get('sirius_pcct_launch_code'),
 		'#required' => TRUE,
 	);

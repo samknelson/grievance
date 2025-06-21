@@ -33,13 +33,13 @@ function sirius_letter_wizard_steps($data, $entity_node) {
 	  	'file' => 'sirius.letter_wizard.recipients_phone.inc',
 	  	'module' => 'sirius',
   	);
-  } else if ($data['format'] == 'fax') {
-  	$steps['recipients'] = array(
-  		'label' => 'Recipients', 
-  		'callback' => 'sirius_letter_wizard_recipients_fax',
-	  	'file' => 'sirius.letter_wizard.recipients_fax.inc',
-	  	'module' => 'sirius',
-  	);
+  } else if ($data['format'] == 'postal') {
+    $steps['recipients'] = array(
+      'label' => 'Recipients', 
+      'callback' => 'sirius_letter_wizard_recipients_postal',
+      'file' => 'sirius.letter_wizard.recipients_postal.inc',
+      'module' => 'sirius',
+    );
   }
   $steps['body'] = array(
   	'label' => 'Subject and Body', 

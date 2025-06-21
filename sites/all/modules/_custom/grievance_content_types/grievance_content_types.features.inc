@@ -256,7 +256,7 @@ function grievance_content_types_node_info() {
       'base' => 'node_content',
       'description' => '',
       'has_title' => '1',
-      'title_label' => t('Subject'),
+      'title_label' => t('Title'),
       'help' => '',
     ),
     'sirius_callerid' => array(
@@ -325,6 +325,14 @@ function grievance_content_types_node_info() {
     ),
     'sirius_domain' => array(
       'name' => t('Sirius Domain'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_edls_sheet' => array(
+      'name' => t('Sirius EDLS Sheet'),
       'base' => 'node_content',
       'description' => '',
       'has_title' => '1',

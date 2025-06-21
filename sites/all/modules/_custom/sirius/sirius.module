@@ -2,6 +2,7 @@
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.error.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/Sirius/Singleton.php';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/Sirius/Result.php';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.access.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
@@ -22,7 +23,10 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.footer.inc'
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.addr.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phonetree.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.comm.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.email.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sms.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.voice.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.specialtid.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sns.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.qr.inc';
@@ -44,7 +48,6 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.node_tabs.i
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.masquerade.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letter.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letter_wizard.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.fax.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.field_overrides.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.esignature.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mightysearch.inc';
@@ -66,8 +69,9 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.tooltip.inc
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.proxy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.nota.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.lang.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.plugin.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.dev.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
-
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
@@ -125,12 +129,39 @@ function sirius_cron() {
 }
 
 /**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_sirius_cron_scan_info() {
+  $items = array();
+
+  $items['log_cleanup_orphans'] = array(
+    'title' => 'Cleanup Orphaned Log Entries',
+    'description' => 'Deletes any log entries where the handlers are all missing.',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_log_cleanup_orphans',
+    'multidomain' => FALSE,
+  );
+
+  $items['sirius_cleanup_temporary_files'] = array(
+    'title' => 'Cleanup Temporary Files',
+    'description' => 'Deletes any temporary files that are not referenced.',
+    'schedule' => 'daily',
+    'callback' => 'sirius_cleanup_temporary_files',
+    'multidomain' => FALSE,
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_entity_presave()
  */
 
 function sirius_entity_presave($entity, $type) {
   if ($type == 'node') {
     if ($entity->type == 'sirius_worker') { sirius_contact_sync_from_worker($entity); }
+    if ($entity->type == 'grievance_shop_contact') { sirius_contact_sync_from_grievance_shop_contact($entity); }
   }
   if ($type == 'user') { sirius_contact_sync_from_user($entity); }
 }
@@ -292,7 +323,7 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
-  $defaultable_fields = array('sirius_type');
+  $defaultable_fields = array('sirius_type', 'sirius_paths');
   foreach ($defaultable_fields as $field) {
     if (isset($_GET[$field]) && isset($form['field_' . $field])) {
       $form['field_' . $field]["und"][0]['value']['#default_value'] = $_GET[$field];
@@ -341,6 +372,12 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     if (!user_access('sirius admin')) {
       $form['field_sirius_denorm_level']['#access'] = FALSE;
       $form['field_sirius_denorm_benefits']['#access'] = FALSE;
+    }
+  }
+
+  if ($form_id == 'grievance_shop_contact_node_form') {
+    if (!user_access('sirius admin')) {
+      $form['field_sirius_contact']['#access'] = FALSE;
     }
   }
 
@@ -911,6 +948,29 @@ function sirius_user_login(&$edit, $account) {
 
 function sirius_node_update($node) {
   if ($node->type == 'sirius_domain') { sirius_domain_node_update($node); }
+  if ($node->type == 'sirius_log') { sirius_denormalize_queue($node); }
+}
+
+function sirius_denormalize_queue($node) {
+  if ($node->type == 'sirius_log') {
+    $instance = sirius_comm_instance($node);
+    if ($instance) {
+      sirius_denorm_queue_add($node->nid, $node->nid, 'sirius_comm_update_handlers');
+    }
+  }
+}
+
+/**
+ * Implements hook_sirius_denorm
+ */
+
+function sirius_sirius_denorm($item) {
+  if ($item['denorm_trigger'] == 'sirius_comm_update_handlers') {
+    sirius_comm_update_handlers($item['denorm_source_nid']);
+  }
+  if ($item['denorm_trigger'] == 'sirius_sns_incoming_denorm') {
+    sirius_sns_incoming_denorm($item);
+  }
 }
 
 /**
@@ -980,7 +1040,7 @@ function sirius_views_pre_view(&$view, &$display_id, &$args) {
 function sirius_quicknav($links) {
   $current_path = current_path();
 
-  $html = '<div class="sirius_quicknav">';
+  $html = '<div class="sirius_quicknav sirius_noprint">';
   foreach ($links as $link) {
     $path = $link['path'];
     $query = $link['query'];
@@ -1077,6 +1137,7 @@ function sirius_ajax_generic_replace($form, $form_state) {
   }
   $commands = array();
   $commands[] = ajax_command_replace($wrapper, render($element));
+  $commands[] = ajax_command_invoke('body', 'trigger', array('sirius_ajax_generic_replace'));
   return array(
     '#type' => 'ajax',
     '#commands' => $commands
@@ -1286,4 +1347,40 @@ function sirius_str_to_options($str) {
   }
 
   return $options;
+}
+
+function sirius_cleanup_temporary_files($mode = 'test') {
+  sirius_minilog("Starting temporary file cleanup.");
+
+  $sql = "select file_managed.fid from file_managed ";
+  $sql .= "left join file_usage on file_usage.fid = file_managed.fid ";
+  $sql .= "where file_usage.fid is null ";
+  $sql .= "and file_managed.status = 0 ";
+  $sql .= "and timestamp < :cutoff ";
+  $sql .= "order by file_managed.fid ";
+  $sql .= "limit 100 ";
+  $stmt = db_query($sql, array(':cutoff' => time() - 60*60*24*7));
+
+  $fids = array();
+  while ($hr = $stmt->fetchAssoc()) { $fids[] = $hr['fid']; }
+
+  if (!$fids) {
+    sirius_minilog("No files found.");
+    return array('success' => TRUE, 'count' => 0);
+  }
+
+  $count = 0;
+  foreach ($fids as $fid) {
+    ++$count;
+    sirius_minilog("Purging file: $fid");
+    if ($mode == 'live') {
+      $sql = "delete from file_managed where fid = :fid";
+      $stmt = db_query($sql, array(':fid' => $fid));
+    } else {
+      sirius_minilog("-- Skipping purge because mode = $mode.");
+    }
+  }
+
+  sirius_minilog("Cleaned up $count files.");
+  return array('success' => TRUE, 'count' => $count);
 }

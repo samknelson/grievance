@@ -39,6 +39,7 @@ class Grievance_Report_Settlement_Summary extends Report_Cache_Report_Generator 
           'date',
           'amt',
         ),
+        'preview_links' => TRUE,
       ),
     );
     return parent::info($result);

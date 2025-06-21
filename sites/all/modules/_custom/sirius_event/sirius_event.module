@@ -22,6 +22,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.vbo.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.widgets.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.followup.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.sched.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_user_select.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_user_self.inc";
@@ -41,7 +42,6 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_definition_callerid.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_definition_followup.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_list.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_list_bullpen.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_list_classes.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_create.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_info.inc";
@@ -83,6 +83,19 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_pstatus.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.report_wwe.inc";
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_event_sirius_domain_component_info() {
+  return array(
+    'event' => array(
+      'title' => 'Event',
+      'description' => 'Enable event functionality',
+    ),
+  );
+}
 
 function sirius_event_type_json($event_node) {
   $event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
@@ -161,17 +174,21 @@ function sirius_event_duration_format($seconds) {
   $minutes = floor($seconds / 60);
   $seconds = $seconds - $minutes * 60;
 
-  if($days > 0) {
-    $duration .= $days . ' days';
+  if ($days > 0) {
+    $duration .= "$days day";
+    if ($days > 1) { $duration .= 's'; }
   }
   if($hours > 0) {
-    $duration .= ' ' . $hours . ' hours';
+    $duration .= ' ' . $hours . ' hour';
+    if ($hours > 1) { $duration .= 's'; }
   }
   if($minutes > 0) {
-    $duration .= ' ' . $minutes . ' minutes';
+    $duration .= ' ' . $minutes . ' minute';
+    if ($minutes > 1) { $duration .= 's'; }
   }
   if($seconds > 0) {
-    $duration .= ' ' . $seconds . ' seconds';
+    $duration .= ' ' . $seconds . ' second';
+    if ($seconds > 1) { $duration .= 's'; }
   }
   return $duration;
 }
@@ -466,7 +483,7 @@ function sirius_event_render_teaser($event_node) {
   sort($tss);
 
   if ($tss) {
-    $ts_render =  date('l, F j, g:i A', $ts[0]);
+    $ts_render =  date('l, F j, g:i A', $tss[0]);
     if (count($tss) > 1) {
       $ts_render .= ' through ';
       $ts_render .= date('l, F j, g:i A', array_pop($tss));

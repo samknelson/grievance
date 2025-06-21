@@ -51,6 +51,19 @@ function report_cache_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['sirius/reports/%/modal'] = array(
+		'title' => 'Modal',
+		'description' => '',
+		'page callback' => 'report_cache_page_report',
+		'page arguments' => array(2),
+   	'access callback' => 'report_cache_access',
+    'access arguments' => array(2),
+		'type' => MENU_NORMAL_ITEM,
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+	);
+
 	$items['sirius/reports/%/list'] = array(
 		'title' => 'List',
 		'description' => '',
@@ -99,3 +112,28 @@ function report_cache_menu() {
 
   return $items;
 }
+
+function report_cache_modal_paths() {
+  $paths = array();
+
+  $paths['sirius/reports/%/modal'] = array(
+    'style' => 'report-cache-style',
+  );
+
+  return $paths;
+}
+
+function report_cache_modal_styles() {
+  $styles = array();
+
+  $styles['report-cache-style'] = array(
+    'modalSize' => array(
+      'type' => 'fixed',
+      'width' => 800,
+      'height' => 800,
+    ),
+  );
+
+  return $styles;
+}
+

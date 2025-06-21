@@ -19,7 +19,7 @@ function sirius_node_tabs() {
       'permissions' => array('sirius'),
       'weight' => 20,
     );
-    if ($content_type == 'sirius_log') {
+    if (in_array($content_type, array('sirius_log', 'sirius_event'))) {
       $node_tabs[$content_type][$content_type . '_materials']['skip_node_view_check'] = TRUE;
     }
   }
@@ -148,6 +148,17 @@ function sirius_node_tabs() {
     'skip_node_view_check' => TRUE,
   );
 
+  $node_tabs['sirius_log']['sirius_log_comm'] = array(
+    'title' => 'Comm',
+    'description' => '',
+    'callback' => 'sirius_node_tab_comm',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'file' => 'sirius.page_comm.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+
   // 
   // Entity Log
   //
@@ -206,6 +217,14 @@ function sirius_node_tabs() {
       'permissions' => array('sirius'),
     );
   }
+
+  $node_tabs['sirius_log']['sirius_letter'] = array(
+    'title' => 'Letter',
+    'description' => '',
+    'callback' => 'sirius_node_tab_letter',
+    'permissions' => array('sirius'),
+    'file' => 'sirius.page_letter.inc',
+  );
 
   $node_tabs['grievance_letter_template']['sirius_letter_template_recipients'] = array(
     'title' => 'Recipients',
@@ -329,6 +348,24 @@ function sirius_node_tabs() {
     'callback' => 'sirius_node_tab_json_definition_disclaimer',
     'permissions' => array('sirius domain admin'),
     'weight' => 1,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_json_definition_disclaimer/edit'] = array(
+    'title' => 'Edit',
+    'description' => '',
+    'callback' => 'sirius_node_tab_json_definition_disclaimer',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_json_definition_disclaimer/preview'] = array(
+    'title' => 'Preview',
+    'description' => '',
+    'callback' => 'sirius_node_tab_disclaimer_definition_preview',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 2,
+    'file' => 'sirius.page_disclaimer_definition_preview.inc',
   );
 
   $node_tabs['sirius_json_definition']['sirius_customfield_content_types'] = array(
@@ -513,6 +550,16 @@ function sirius_term_tabs() {
     }
   }
 
+  $term_tabs['sirius_contact_tags']['sirius_contact_tags_display'] = array(
+    'title' => 'Term Display Options',
+    'description' => '',
+    'callback' => 'sirius_node_tab_contact_tags_display',
+    'permissions' => array('sirius domain admin'),
+    'file' => 'sirius.page_contact_tags_display.inc',
+    'weight' => 4,
+  );
+
+
   sirius_node_tab_set_module('sirius', $term_tabs);
   return $term_tabs;
 
@@ -609,10 +656,10 @@ function sirius_menu() {
   );
 
   $items['sirius/admin/do_not_disturb'] = array(
-    'title' => 'Do Not Disurb Configuration',
+    'title' => 'Do Not Disturb Configuration',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
-    'page callback' => 'sirius_page_do_not_disurb_config',
+    'page callback' => 'sirius_page_do_not_disturb_config',
     'page arguments' => array(),
     'type' => MENU_NORMAL_ITEM,
   );
@@ -621,7 +668,7 @@ function sirius_menu() {
     'title' => 'Settings',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
-    'page callback' => 'sirius_page_do_not_disurb_config',
+    'page callback' => 'sirius_page_do_not_disturb_config',
     'page arguments' => array(),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
@@ -631,7 +678,7 @@ function sirius_menu() {
     'title' => 'Test',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
-    'page callback' => 'sirius_page_do_not_disurb_test',
+    'page callback' => 'sirius_page_do_not_disturb_test',
     'page arguments' => array(),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
@@ -664,6 +711,16 @@ function sirius_menu() {
     'page arguments' => array('sirius_footer_config'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
+  );
+
+  $items['sirius/admin/banner/login'] = array(
+    'title' => 'Login',
+    'description' => '',
+    'access arguments' => array('sirius admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_login_config'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
   );
 
   $items['sirius/auditlog/config'] = array(
@@ -777,12 +834,21 @@ function sirius_menu() {
   );
 
   $items['sirius/config/phone/sms_global_disable'] = array(
-    'title' => 'SMS Global Disable',
+    'title' => 'Global Disable',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_sms_admin'),
     'access arguments' => array('sirius admin'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 5,
+  );
+
+  $items['sirius/config/phone/sms_optin'] = array(
+    'title' => 'Optin',
+    'page callback' => 'sirius_page_sms_optin_config',
+    'access arguments' => array('sirius domain admin'),
+    'file' => 'sirius.page_sms_optin_config.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 6,
   );
 
   $items['sirius/config/menu'] = array(
@@ -927,7 +993,7 @@ function sirius_menu() {
     'access callback' => TRUE,
     'page callback' => 'sirius_sns_incoming',
     'page arguments' => array(),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/sns/config'] = array(
@@ -1313,6 +1379,22 @@ function sirius_menu() {
     'modal'            => TRUE,
   );
 
+  $items['sirius/modal/%node/quicklog-view'] = array(
+    'title'            => 'View Log Entry',
+    'page callback'    => 'sirius_page_log_modal_view',
+    'page arguments'   => array(2),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permissions' => array('sirius dispatch staff', 'sirius trust staff')
+      ),
+    ),
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+    'file' => 'sirius.page_log_modal_view.inc',
+  );
+
   $items['sirius/phonenumber'] = array(
     'title' => 'Manage Phone Numbers',
     'page callback' => 'sirius_page_phonenumber_list',
@@ -1386,6 +1468,15 @@ function sirius_menu() {
     'access arguments' => array('sirius domain admin'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
+  );
+
+  $items['sirius/dev/config'] = array(
+    'title' => 'Development Settings',
+    'page callback' => 'sirius_page_dev_config',
+    'page arguments' => array(),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius.page_dev_config.inc',
   );
 
   $links = sirius_config_links();
@@ -1493,6 +1584,7 @@ function sirius_menu() {
   );
   */
 
+  /*
   $items['user/%/sirius_proxy'] = array(
     'title' => 'Proxy',
     'page callback' => 'sirius_user_tab_proxy',
@@ -1502,6 +1594,7 @@ function sirius_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 8,
   );
+  */
 
   $items['user/%/current_location'] = array(
     'title' => 'Current Location',
@@ -1632,6 +1725,10 @@ function sirius_modal_paths() {
     'style' => 'sirius-modal-style',
   );
 
+  $paths['sirius/modal/%node/quicklog-view'] = array(
+    'style' => 'sirius-modal-style',
+  );
+
   return $paths;
 }
 
@@ -1683,6 +1780,15 @@ function sirius_menu_access_callback($options) {
     if (!sirius_domain_component_enabled($options['component'])) {
       return FALSE;
     }
+  }
+
+  // Access plugin
+  if ($options['access']) {
+    $instance = sirius_access_instance($options['access']['type']);
+    if (!$instance) { return FALSE; }
+    $action = $options['access']['action'];
+    $context = $options['access']['context'];
+    if (!$instance->access($action, $context)) { return FALSE; }
   }
 
   // Passed all tests

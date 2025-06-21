@@ -5,15 +5,10 @@ function sirius_event_register_bullpen_signin_form($form, &$form_state, $event_n
   $form_state['rule'] = $rule;
   $form_state['participant_role_tid'] = $participant_role_tid;
 
-  $ts = sirius_event_bullpen_ts($event_node);
-  if ($ts['signin_opens_others'] > time()) {
-    drupal_set_message("Sign-in opens at " . date('g:i A, l, F j', $ts['signin_opens_others']), 'warning');
-    return array();
-  } 
-  if ($ts['signin_closes'] < time()) {
-    drupal_set_message("Sign-in closed at " . date('g:i A, l, F j', $ts['signin_closes']), 'warning');
-    return array();
-  }
+  $access = Sirius_Event_Bullpen_Access::getInstance();
+  $context = array();
+  $context['event_node'] = $event_node;
+  if (!$access->access('register_open', $context)) { return sirius_form_error($access->error_msg()); }
 
 	// $open = sirius_dispatch_bullpen_signin_open($job_node, FALSE);
   $form['worker'] = array(
@@ -33,7 +28,8 @@ function sirius_event_register_bullpen_signin_form($form, &$form_state, $event_n
 
 
 function sirius_event_register_bullpen_signin_form_submit($form, &$form_state) {
-  $event_nid = $form_state['event_nid'];
+  $event_node = node_load($form_state['event_nid']);
+  $event_nid = $event_node->nid;
   $rule = $form_state['rule'];
 
   $worker_str = $form_state['values']['worker'];
@@ -52,20 +48,18 @@ function sirius_event_register_bullpen_signin_form_submit($form, &$form_state) {
   }
 
   $worker_node = node_load($worker_nid);
-  $contact_nid = $worker_node->field_sirius_contact['und'][0]['target_id'];
-  if (!$contact_nid) {
-    drupal_set_message(t('There is no contact associated with that worker.'), 'warning');
+
+  $access = Sirius_Event_Bullpen_Access::getInstance();
+  $context = array();
+  $context['event_node'] = $event_node;
+  $context['worker_node'] = $worker_node;
+  if (!$access->access('register_worker', $context)) {
+    drupal_set_message($access->error_msg(), 'error');
+    drupal_set_message(t('The worker is NOT signed in to the bullpen.'), 'warning');
     return;
   }
 
-  $job_node = sirius_event_bullpen_job($event_nid);
-  $result = sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker_nid, array('ignore_skill' => TRUE, 'ignore_department' => TRUE, 'ignore_dispatch_status' => TRUE, 'ignore_event' => TRUE));
-  if (!$result['success']) {
-    drupal_set_message($result['msg'], 'warning');
-    drupal_set_message(t('The worker is NOT signed in to the bullpen.'), 'warning');
-    $form_state['rebuild'] = TRUE;
-    return;
-  }
+  $contact_nid = $worker_node->field_sirius_contact['und'][0]['target_id'];
 
   foreach ($rule['register_as'] as $key) {
     list ($prole_tid, $pstatus_tid) = explode('|', $key);
@@ -75,8 +69,16 @@ function sirius_event_register_bullpen_signin_form_submit($form, &$form_state) {
     drupal_set_messge(t('The event is misconfigured; no prole or pstatus set.'), 'warning');
   }
 
-  $result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid);
-  if ($result['success']) { drupal_set_message(t('The worker has been signed in to the event.')); } else { drupal_set_message($result['msg'], 'error'); }
+  $participant_json = array();
+  $participant_json['bullpen']['self'] = TRUE;
+  $participant_json['comments'] = 'Staff Sign-In';
+
+  $result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid, $participant_json);
+  if ($result['success']) { 
+    drupal_set_message('The worker has been signed in to the event.');
+  } else { 
+    drupal_set_message($result['msg'], 'error');
+  }
 }
 
 

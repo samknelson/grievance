@@ -122,6 +122,24 @@ function sirius_event_node_tab_catalog_settings_form($form, &$form_state, $catal
 		$form['settings']['course_display']['filter_custom_fields']['#default_value'] = $catalog_json['settings']['course_display']['filter_custom_fields'];
 	}
 
+	$form['settings']['filters'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Filters',
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+	);
+
+	$form['settings']['filters']['show_filters'] = array(
+		'#title' => t('Show Filters?'),
+		'#type' => 'select',
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => $catalog_json['settings']['filters']['show_filters'],
+	);
+
 	$form['settings']['access'] = array(
 		'#type' => 'fieldset',
 		'#title' => 'Access',
@@ -140,8 +158,10 @@ function sirius_event_node_tab_catalog_settings_form($form, &$form_state, $catal
 		'#default_value' => $catalog_json['settings']['access']['public'],
 	);
 
-	$roles = sirius_domain_usermanage_roles();
-	$role_options = $roles['optional'] + $roles['required'];
+	// $roles = sirius_domain_usermanage_roles();
+	// $role_options = $roles['optional'] + $roles['required'];
+	$role_options = user_roles();
+
 	$form['settings']['access']['roles'] = array(
 		'#title' => t('Roles'),
 		'#type' => 'checkboxes',

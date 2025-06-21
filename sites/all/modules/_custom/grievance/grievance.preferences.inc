@@ -10,6 +10,9 @@ function grievance_page_preferences_access($uid) {
 	// For the moment, "preferences" are only for alerts. So we only allow access to this page if alerts are enabled on the site.
 	if (sirius_domain_variable_get('grievance_alert_disable', NULL) == 'Yes') { return FALSE; }
 
+	// Need the "grievances" component
+	if (!sirius_domain_component_enabled('grievance')) { return FALSE; }
+
 	return TRUE;
 }
 
