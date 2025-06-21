@@ -1,5 +1,9 @@
 <?php
 
+function unite_node_tab_casino_edit_access($property_node) {
+	return $property_node->field_is_casino['und'][0]['value'] == 'Y';
+}
+
 function unite_node_tab_casino_edit($property_node) {
 	return drupal_get_form('unite_node_tab_casino_edit_form', $property_node);
 }

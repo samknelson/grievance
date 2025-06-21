@@ -48,4 +48,44 @@ function unite_update_7002() {
   }
 }
 
+/**
+ * Set "is_hotel" to "Y"
+ */
+
+function unite_update_7003() {
+  // Find all locals with no name. This is a fairly cumbersome way to do it, because I want to output some debugging.
+  $sql = "select nid from node ";
+  $sql .= "left join field_data_field_is_hotel on field_data_field_is_hotel.entity_type = 'node' and field_data_field_is_hotel.entity_id = node.nid ";
+  $sql .= "where node.type = 'property' ";
+  $sql .= "and field_is_hotel_value is null ";
+  $sql .= "order by nid ";
+  $stmt = sirius_sql_query($sql, array());
+  $property_nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $property_nids[] = $hr['nid'];
+  }
+
+  $count = 0;
+  $total = count($property_nids);
+  foreach ($property_nids as $property_nid) {
+    ++$count;
+    print "Updating $count / $total: " . $property_node->title . " ($property_nid)\n";
+    $property_node = node_load($property_nid);
+    $property_node->field_is_hotel['und'][0]['value'] = 'Y';
+    node_save($property_node);
+    // break;
+  }
+}
+
+/**
+ * Remove "Non-Tribal"
+ */
+
+function unite_update_7004() {
+  $sql = "delete from field_data_field_csno_type where field_csno_type_value = 'Non-Tribal'";
+  $stmt = sirius_sql_query($sql, array());
+
+  $sql = "delete from field_revision_field_csno_type where field_csno_type_value = 'Non-Tribal'";
+  $stmt = sirius_sql_query($sql, array());
+}
 

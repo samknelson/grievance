@@ -59,9 +59,6 @@ function unite_feed_property_info() {
         'rest_contract_start_date' => array('group' => 'contract', 'type' => 'date'),
         'rest_contract_end_date' => array('group' => 'contract', 'type' => 'date'),
 
-        'airport' => array('group' => 'airport', 'type' => 'entity_reference', 'entity_type' => 'hdb_airport'),
-        'airport_alt' => array('group' => 'airport', 'type' => 'entity_reference', 'entity_type' => 'hdb_airport'),
-
         'convention_center' => array('group' => 'convention', 'type' => 'entity_reference', 'entity_type' => 'hdb_convention_center'),
         'convention_center_attached' => array('group' => 'convention', 'type' => 'list'),
 

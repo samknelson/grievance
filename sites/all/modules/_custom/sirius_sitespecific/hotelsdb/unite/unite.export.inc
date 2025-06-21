@@ -8,7 +8,6 @@ function unite_export_union_hotel_guide_access() {
 function unite_export_union_hotel_guide_new($secs = 0) {
 	if (!$secs) { $secs = $_REQUEST["secs"]; }
 
-	$lookup_airports = unite_airports_list();
 	$lookup_convention = unite_conventions_list();
 	$lookup_brand = sirius_taxonomy_load('brand', 'tid', 'name');
 	$lookup_niche = sirius_taxonomy_load('hdb_niche', 'tid', 'name');
@@ -38,10 +37,6 @@ function unite_export_union_hotel_guide_new($secs = 0) {
 		'field_boycott_url_url' => 'boycott_url',
 		'field_fh_notes_value' => 'fh_notes',
 		'field_fh_nonunion_value' => 'fh_nonunion',
-		'field_airport_target_id' => 'airport',
-		'field_calc_airport_dist_value' => 'airport_dist',
-		'field_airport_alt_target_id' => 'airport_2',
-		'field_calc_airport_dist_alt_value' => 'airport_2_dist',
 		'field_convention_center_target_id' => 'convention_center',
 		'field_calc_convention_dist_value' => 'convention_center_dist',
 		'field_convention_center_attached_value' => 'convention_center_attached',
@@ -76,10 +71,6 @@ function unite_export_union_hotel_guide_new($secs = 0) {
 		'field_boycott_url',
 		'field_fh_notes',
 		'field_fh_nonunion',
-		'field_airport',
-		'field_calc_airport_dist',
-		'field_airport_alt',
-		'field_calc_airport_dist_alt',
 		'field_convention_center',
 		'field_calc_convention_dist',
 		'field_convention_center_attached',
@@ -125,8 +116,6 @@ function unite_export_union_hotel_guide_new($secs = 0) {
 		$row = array();
 		$delta = 0;
 
-		$hr['field_airport_target_id'] = $lookup_airports[$hr['field_airport_target_id']];
-		$hr['field_airport_alt_target_id'] = $lookup_airports[$hr['field_airport_alt_target_id']];
 		$hr['field_convention_center_target_id'] = $lookup_convention[$hr['field_convention_center_target_id']];
 		$brand_term = $lookup_brand_full[$hr['field_brand_tid']];
 		$hr['field_brand_tid'] = $lookup_brand[$hr['field_brand_tid']];

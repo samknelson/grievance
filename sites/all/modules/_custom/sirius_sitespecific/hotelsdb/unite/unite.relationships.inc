@@ -1,6 +1,8 @@
 <?php
 
 function unite_relationships_type_order($type_name) {
+	$order['Colocation Host'] = -2;
+	$order['Colocated'] = -1;
 	$order['Owner'] = 0;
 	$order['Operator'] = 1;
 	$order['Leaseholder'] = 2;
@@ -78,10 +80,10 @@ function unite_relationships_render_property($property_node, $options = array())
 	}
 
 	$header = array(
-		'entity_2' => t('Actor'),
-		'relationship_type' => t('Relationship'),
-		'ownership' => t('Summary'),
+		'actor' => t('Actor'),
+		'relationship' => t('Relationship'),
 		'notes' => t('Notes'),
+		'verified' => t('Verified'),
 		'tools' => 'Tools',
 	);
 
@@ -108,12 +110,15 @@ function unite_relationships_render_property($property_node, $options = array())
 
 		$name = $actor_node->title;
 
-		$notes = substr($pa_node->field_notes['und'][0]['value'], 0, 200);
+		$notes = array();
+		$notes[] = substr($pa_node->field_notes['und'][0]['value'], 0, 200);
 		$parent_nids = sirius_fieldvals($actor_node, 'field_actors', 'target_id');
+		$notes[] = $pa_node->field_sublocation['und'][0]['value'];
 		foreach ($parent_nids as $parent_nid) {
-			if ($notes) { $notes .= '<br />'; }
-			$notes .= l(sirius_node_title($parent_nid), "node/$parent_nid");
+			$notes[] = l(sirius_node_title($parent_nid), "node/$parent_nid");
 		}
+		$notes[] = $ownership;
+		$notes = join('<br />', array_filter($notes));
 
 	  $last_verified = $pa_node->field_verified_date['und'][0]['value'];
 	  if ($last_verified) {
@@ -127,8 +132,8 @@ function unite_relationships_render_property($property_node, $options = array())
 	  	$class = "hotelsdb_last_verified_red";
 	  	$last_verified_txt = "Verified: <strong>Never</strong>";
 	  }
-	  if ($notes) { $notes .= '<br />'; }
-	  $notes .= l(
+
+	  $verified = l(
 	  	$last_verified_txt, 
 	  	'sirius/modal/' . $pa_node->nid . '/unite-relationship-verify', 
 	  	array('query' => array('path' => $path), 'html' => TRUE, 'attributes' => array('class' => array('hotelsdb_last_verified_modal_link', $class)))
@@ -138,8 +143,8 @@ function unite_relationships_render_property($property_node, $options = array())
 		$row = array();
 		$row[] = $name;
 		$row[] = $pa_node->field_relationship_type['und'][0]['value'];
-		$row[] = $ownership;
 		$row[] = $notes;
+		$row[] = $verified;
 		$row[] = $tools;
 
 		$rows[] = $row;
