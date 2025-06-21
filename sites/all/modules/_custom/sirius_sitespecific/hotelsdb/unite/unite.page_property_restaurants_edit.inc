@@ -9,6 +9,7 @@ function unite_node_tab_restaurants_edit($property_node) {
 }
 
 function unite_node_tab_restaurants_edit_form($form, &$form_state, $property_node) {
+	$form = unite_node_subform($form, $form_state, $property_node, unite_restaurants_fields());
 	$form['intro'] = array(
 		'#markup' => '<p>' . '(Additional food service fields coming soon.)' . '</p>',
 		'#weight' => -100,
