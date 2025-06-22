@@ -3304,10 +3304,13 @@ table.grievance-timeline tr.pending {
   }
 }
 
-
 @media screen {
   div.grievance-letter-page-break {
     border-bottom: 2px dashed #1b4784;
+  }
+
+  div.sirius_printonly {
+    display: none;
   }
 }
 
