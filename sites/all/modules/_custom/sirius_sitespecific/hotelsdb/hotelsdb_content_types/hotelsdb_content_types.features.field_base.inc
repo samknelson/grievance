@@ -67,6 +67,7 @@ function hotelsdb_content_types_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
+      'options_list_callback' => 'content_taxonomy_allowed_values',
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -216,74 +217,6 @@ function hotelsdb_content_types_field_default_field_bases() {
     'type' => 'geofield',
   );
 
-  // Exported field_base: 'field_airport'.
-  $field_bases['field_airport'] = array(
-    'active' => 1,
-    'cardinality' => 1,
-    'deleted' => 0,
-    'entity_types' => array(),
-    'field_name' => 'field_airport',
-    'indexes' => array(
-      'target_id' => array(
-        0 => 'target_id',
-      ),
-    ),
-    'locked' => 0,
-    'module' => 'entityreference',
-    'settings' => array(
-      'handler' => 'views',
-      'handler_settings' => array(
-        'behaviors' => array(
-          'views-select-list' => array(
-            'status' => 1,
-          ),
-        ),
-        'view' => array(
-          'args' => array(),
-          'display_name' => 'entityreference_1',
-          'view_name' => 'hdb_airports',
-        ),
-      ),
-      'target_type' => 'node',
-    ),
-    'translatable' => 0,
-    'type' => 'entityreference',
-  );
-
-  // Exported field_base: 'field_airport_alt'.
-  $field_bases['field_airport_alt'] = array(
-    'active' => 1,
-    'cardinality' => 1,
-    'deleted' => 0,
-    'entity_types' => array(),
-    'field_name' => 'field_airport_alt',
-    'indexes' => array(
-      'target_id' => array(
-        0 => 'target_id',
-      ),
-    ),
-    'locked' => 0,
-    'module' => 'entityreference',
-    'settings' => array(
-      'handler' => 'views',
-      'handler_settings' => array(
-        'behaviors' => array(
-          'views-select-list' => array(
-            'status' => 1,
-          ),
-        ),
-        'view' => array(
-          'args' => array(),
-          'display_name' => 'entityreference_1',
-          'view_name' => 'hdb_airports',
-        ),
-      ),
-      'target_type' => 'node',
-    ),
-    'translatable' => 0,
-    'type' => 'entityreference',
-  );
-
   // Exported field_base: 'field_amount_owned'.
   $field_bases['field_amount_owned'] = array(
     'active' => 1,
@@ -374,39 +307,10 @@ function hotelsdb_content_types_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
+      'options_list_callback' => 'content_taxonomy_allowed_values',
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
-  );
-
-  // Exported field_base: 'field_calc_airport_dist'.
-  $field_bases['field_calc_airport_dist'] = array(
-    'active' => 1,
-    'cardinality' => 1,
-    'deleted' => 0,
-    'entity_types' => array(),
-    'field_name' => 'field_calc_airport_dist',
-    'indexes' => array(),
-    'locked' => 0,
-    'module' => 'number',
-    'settings' => array(),
-    'translatable' => 0,
-    'type' => 'number_integer',
-  );
-
-  // Exported field_base: 'field_calc_airport_dist_alt'.
-  $field_bases['field_calc_airport_dist_alt'] = array(
-    'active' => 1,
-    'cardinality' => 1,
-    'deleted' => 0,
-    'entity_types' => array(),
-    'field_name' => 'field_calc_airport_dist_alt',
-    'indexes' => array(),
-    'locked' => 0,
-    'module' => 'number',
-    'settings' => array(),
-    'translatable' => 0,
-    'type' => 'number_integer',
   );
 
   // Exported field_base: 'field_calc_convention_dist'.
@@ -797,8 +701,11 @@ function hotelsdb_content_types_field_default_field_bases() {
     'module' => 'list',
     'settings' => array(
       'allowed_values' => array(
+        'Commercial' => 'Commercial',
         'Tribal' => 'Tribal',
-        'Non-Tribal' => 'Non-Tribal',
+        'Race Track' => 'Race Track',
+        'Card Room' => 'Card Room',
+        'Historical Horse Racing Machine (HRM)' => 'Historical Horse Racing Machine (HRM)',
       ),
       'allowed_values_function' => '',
     ),
@@ -1163,6 +1070,47 @@ function hotelsdb_content_types_field_default_field_bases() {
     'type' => 'text_long',
   );
 
+  // Exported field_base: 'field_fs_segment'.
+  $field_bases['field_fs_segment'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_fs_segment',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'Airline Catering' => 'Airline Catering',
+        'Airport Concessions' => 'Airport Concessions',
+        'Airport Logistics' => 'Airport Logistics',
+        'Airport Lounge' => 'Airport Lounge',
+        'B&I' => 'B&I',
+        'Club' => 'Club',
+        'Cultural Center' => 'Cultural Center',
+        'Event Center' => 'Event Center',
+        'Extraction' => 'Extraction',
+        'Health Care' => 'Health Care',
+        'Higher Education' => 'Higher Education',
+        'K-12' => 'K-12',
+        'Lodging' => 'Lodging',
+        'Military' => 'Military',
+        'Rail' => 'Rail',
+        'Restaurant' => 'Restaurant',
+        'Theme Parks' => 'Theme Parks',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_hotel_contract_covered'.
   $field_bases['field_hotel_contract_covered'] = array(
     'active' => 1,
@@ -1269,6 +1217,58 @@ function hotelsdb_content_types_field_default_field_bases() {
     'type' => 'list_text',
   );
 
+  // Exported field_base: 'field_is_fs'.
+  $field_bases['field_is_fs'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_is_fs',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'Y' => 'Y',
+        'N' => 'N',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
+  // Exported field_base: 'field_is_hotel'.
+  $field_bases['field_is_hotel'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_is_hotel',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'Y' => 'Y',
+        'N' => 'N',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_labor_activity_index'.
   $field_bases['field_labor_activity_index'] = array(
     'active' => 1,
@@ -1339,6 +1339,7 @@ function hotelsdb_content_types_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
+      'options_list_callback' => 'content_taxonomy_allowed_values',
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -1722,6 +1723,7 @@ function hotelsdb_content_types_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
+      'options_list_callback' => 'content_taxonomy_allowed_values',
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -1748,6 +1750,7 @@ function hotelsdb_content_types_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
+      'options_list_callback' => 'content_taxonomy_allowed_values',
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -1843,6 +1846,7 @@ function hotelsdb_content_types_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
+      'options_list_callback' => 'content_taxonomy_allowed_values',
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -1911,6 +1915,7 @@ function hotelsdb_content_types_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
+      'options_list_callback' => 'content_taxonomy_allowed_values',
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -2146,6 +2151,8 @@ function hotelsdb_content_types_field_default_field_bases() {
         'Previous Owner' => 'Previous Owner',
         'Lender' => 'Lender',
         'CMBS Trust' => 'CMBS Trust',
+        'Colocated' => 'Colocated',
+        'Colocation Host' => 'Colocation Host',
       ),
       'allowed_values_function' => '',
     ),
@@ -2350,6 +2357,28 @@ function hotelsdb_content_types_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'datetime',
+  );
+
+  // Exported field_base: 'field_sublocation'.
+  $field_bases['field_sublocation'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_sublocation',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
   );
 
   // Exported field_base: 'field_title_canon'.
