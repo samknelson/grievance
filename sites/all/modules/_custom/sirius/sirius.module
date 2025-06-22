@@ -656,6 +656,9 @@ function sirius_user_edit_access($account) {
  */
 
 function sirius_sirius_pageicon($context) {
+  return;
+
+  // For example ...
   if (!$context['node']) { return; }
 
   if ($context['node']->type == 'sirius_worker') {
