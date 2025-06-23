@@ -124,7 +124,7 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
     return array_chunk($pks, 100);
   }
 
-  public function batch($wb_nids, $values, &$context) {
+  public function batch($wb_nids, $values, &$batch_context) {
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
       $pk = $wb_nid;
@@ -145,7 +145,7 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
       $row['last_name']  = $worker_node->field_sirius_name['und'][0]['family'];
 
       $dob = $worker_node->field_sirius_dob['und'][0]['value'];
-      if ($dob) { $dob = date('m/d/Y', strtotime($dob)); }
+      if ($dob) { $dob = date('Ymd', strtotime($dob)); }
       $row['dob'] = $dob;
 
       $sex = $worker_node->field_sirius_gender['und'][0]['tid'];
@@ -182,13 +182,17 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
       $row['zip'] = $worker_node->field_sirius_address['und'][0]['postal_code'];
       $row['email'] = $worker_node->field_sirius_email['und'][0]['value'];
 
-      $row['start_date'] = date('m/d/Y', strtotime($wb_node->field_sirius_date_start['und'][0]['value']));
+      $row['start_date'] = date('Ymd', strtotime($wb_node->field_sirius_date_start['und'][0]['value']));
 
       $term_date = $wb_node->field_sirius_date_end['und'][0]['value'];
-      if ($term_date) { $term_date = date('m/d/Y', strtotime($term_date)); }
+      if ($term_date) { $term_date = date('Ymd', strtotime($term_date)); }
       $row['term_date'] = $term_date;
 
       $row['language'] = $contact_node->field_sirius_lang['und'][0]['value'];
+
+      foreach ($row as $key => $value) {
+        $row[$key] = strtoupper($value);
+      }
 
       $rows[$pk] = $row;
     }

@@ -151,6 +151,8 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 				$break_count = 0;
 			}
 
+			// drupal_set_message("here with $ym, threshold $threshold, hours $hrs, buildup $buildup_count, break $break_count, ");
+
 			// Buildup complete
 			if ($buildup_count > 2) {
 				$msg = "The most recent buildup (threshold=$threshold) was complete after starting in $ym.";

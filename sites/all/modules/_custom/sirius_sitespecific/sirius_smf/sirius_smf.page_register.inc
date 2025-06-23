@@ -34,7 +34,7 @@ function sirius_smf_page_register_form_validate($form, &$form_state) {
 	}
 
 	if (!sirius_flood_is_allowed('sirius_smf_register_ip')) {
-		// form_set_error('ssn', 'Too many registration attempts from this address. Please try again later.');
+		form_set_error('ssn', 'Too many registration attempts from this address. Please try again later.');
 	}
 }
 
