@@ -7,9 +7,23 @@ function sirius_hour_node_tab_worker_hours_access($worker_node) {
 function sirius_hour_node_tab_worker_hours_form($form, &$form_state, $worker_node) {
 	$is_staff = Sirius_Hour_Access::getInstance()->access('worker_hours_edit', array('worker_node' => $worker_node));
 
+	$month_options = array(
+		1 => t('January'),
+		2 => t('February'),
+		3 => t('March'),
+		4 => t('April'),
+		5 => t('May'),
+		6 => t('June'),
+		7 => t('July'),
+		8 => t('August'),
+		9 => t('September'),
+		10 => t('October'),
+		11 => t('November'),
+		12 => t('December'),
+	);
+
 	$worker_nid = $worker_node->nid;
 	$form_state['worker_nid'] = $worker_nid;
-
 
 	$form['wrap_open'] = array('#markup' => '<div class="sirius-form">');
 
@@ -90,7 +104,7 @@ function sirius_hour_node_tab_worker_hours_form($form, &$form_state, $worker_nod
 
 		$row = array();
 		$row[] = $hr['year'];
-		$row[] = $hr['month'];
+		$row[] = $month_options[$hr['month']];
 		if ($is_complex) {
 			$row[] = $hr['day'];
 		}
