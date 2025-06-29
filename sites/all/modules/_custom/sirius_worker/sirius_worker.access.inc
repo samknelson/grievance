@@ -19,6 +19,7 @@ class Sirius_Worker_Access extends Sirius_Access {
 
       // worker
       'view',
+      'view status',
       'update addr',
       'update phone',
       'update email',
@@ -94,6 +95,11 @@ class Sirius_Worker_Access extends Sirius_Access {
     if (in_array($action, array('view', 'update addr', 'update phone', 'update email', 'update password'))) {
       // Workers can update their own address
       if ($is_worker) { return TRUE; }
+    }
+
+    if (in_array($action, array('view status'))) {
+      // Some workers can view their own status
+      if ($is_worker && user_access('sirius worker view own status')) { return TRUE; }
     }
 
     // Oh well
