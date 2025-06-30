@@ -13,80 +13,382 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
 		  return !preg_match('/FILLER/i', $v);
 		});
 		$result['preview']['default_display_fields'] = $default_display_fields;
+    $result['preview']['preview_links'] = TRUE;
+
+    if ($this->edi_has_header()) {
+      $result['render_callbacks']['header'] = array(
+        'method' => 'edi_render_header',
+        'csv' => TRUE,
+      );
+    }
+
+    if ($this->edi_has_footer()) {
+      $result['render_callbacks']['footer'] = array(
+        'method' => 'edi_render_footer',
+        'csv' => TRUE,
+      );
+    }
+
+    if ($this->edi_has_premium()) {
+      $result['render_callbacks']['premium'] = array(
+        'method' => 'edi_render_premium',
+        'csv' => TRUE,
+      );
+    }
 
     return parent::info($result);
+  }
+
+  public function form() {
+    $form['asof_date'] = array(
+      '#type' => 'date_popup',
+      '#title' => t('As Of'),
+      '#attributes' => array(
+        'autocomplete' => 'off',
+      ),
+      '#date_format' => 'Y-m-d',
+      '#required' => TRUE,
+      '#default_value' => date('Y-m-d', strtotime('-1 month')),
+    );
+
+    $form['report_date'] = array(
+      '#title' => 'Report Date', 
+      '#type' => 'value', 
+      '#value' => date('Y-m-d'),
+    );
+
+    return $form;
+  }
+
+  public function render_parameters($parameters) {
+    $parameters = $parameters['parameters'];
+
+    $html = sirius_jsonfield_util_render_all_values_new(
+      $this->form(), 
+      $parameters, 
+      array(
+        'skip_empty' => TRUE,
+        'no_fieldsets' => TRUE,
+      )
+    );
+
+    return $html;
+  }
+
+  public function pks(&$form_state) {
+    $benefit_nid = $this->benefit_nid();
+    if (!$benefit_nid) { return array(); }
+
+    $asof_date = date('Y-m-d 00:00:00', strtotime($form_state['values']['parameters']['asof_date']));
+
+    $sql_args = array();
+    $sql = "select nid ";
+    $sql .= "from node ";
+    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_date_end on field_data_field_sirius_date_end.entity_type = 'node' and field_data_field_sirius_date_end.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_trust_benefit on field_data_field_sirius_trust_benefit.entity_type = 'node' and field_data_field_sirius_trust_benefit.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_trust_subscriber on field_data_field_sirius_trust_subscriber.entity_type = 'node' and field_data_field_sirius_trust_subscriber.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_contact_relation on field_data_field_sirius_contact_relation.entity_type = 'node' and field_data_field_sirius_contact_relation.entity_id = node.nid ";
+
+    $sql .= "where node.type = 'sirius_trust_worker_benefit' ";
+
+    $sql .= "and field_sirius_trust_benefit_target_id = :benefit_nid ";
+    $sql_args[':benefit_nid'] = $benefit_nid;
+
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = sirius_domain_nid();
+
+    $sql .= "and field_sirius_date_start_value <= :asof_date ";
+    $sql .= "and (field_sirius_date_end_value >= :asof_date or field_sirius_date_end_value is null) ";
+    $sql_args[':asof_date'] = $asof_date;
+
+    $sql .= "order by field_sirius_trust_subscriber_target_id, field_sirius_contact_relation_target_id ";
+
+    $stmt = sirius_sql_query($sql, $sql_args);
+
+    $pks = array();
+    while ($hr = $stmt->fetchAssoc()) {
+      $pks[] = $hr['nid'];
+    }
+    return array_chunk($pks, 100);
+  }
+
+  public function fields() {
+    $fields = $this->edi_global_fields();
+
+    if ($this->edi_output_format == 'fixed') {
+      $fields += array_combine(array_keys($this->edi_fixed_fields()), array_keys($this->edi_fixed_fields()));
+    } else {
+      $fields += array_combine(array_keys($this->edi_csv_fields()), array_keys($this->edi_csv_fields()));
+    }
+    return $fields;
+  }
+
+  public function edi_premium_amt($context) {
+    return 0; 
+  }
+
+  public function edi_premium_tier($context) {
+    return '';
+  }
+
+  public function edi_global_fields() {
+    return array(
+      'subscriber_nid' => 'Subscriber NID',
+      'worker_nid' => 'Worker NID',
+      'contact_nid' => 'Contact NID',
+      'edi_is_subscriber' => 'Subscriber?',
+      'edi_ssn' => 'SSN',
+      'edi_lastname' => 'Last Name',
+      'edi_firstname' => 'First Name',
+
+      'edi_premium_amt' => 'Premium Amt',
+      'edi_premium_tier' => 'Premium Tier',
+    );
+  }
+
+  public function edi_row($row, $context) {
+    foreach ($row as $key => $value) { $row[$key] = strtoupper($value); }
+
+    $row['worker_nid'] = $context['worker_node']->nid;
+    $row['subscriber_nid'] = $context['subscriber_node']->nid;
+    $row['contact_nid'] = $context['contact_node']->nid;
+    $row['edi_is_subscriber'] = $this->is_subscriber($context);
+    $row['edi_ssn'] = $this->ssn($context, 'worker_node');
+    $row['edi_lastname'] = $context['worker_node']->field_sirius_name['und'][0]['family'];
+    $row['edi_firstname'] = $context['worker_node']->field_sirius_name['und'][0]['given'];
+
+    $row['edi_premium_amt'] = $this->edi_premium_amt($context);
+    $row['edi_premium_tier'] = $this->edi_premium_tier($context);
+
+    return $row;
+  }
+
+  public function preview_links($row) {
+    $links = array();
+
+    if ($row['worker_nid']) { $links['node/' . $row['worker_nid']] = 'Dependent'; }
+    if ($row['subscriber_nid']) { $links['node/' . $row['subscriber_nid']] = 'Subscriber'; }
+
+    return $links;
+  }
+
+  public function load($report_id) {
+    $report_type = $this->type;
+    $query = db_select('report_cache');
+    $query->fields('report_cache');
+    $query->condition('report_id', $report_id);
+    $query->condition('report_type', $report_type);
+    $stmt = $query->execute();
+    $data = array();
+    while ($hr = $stmt->fetchAssoc()) {
+      $data[] = $this->row_decode($hr['report_data']);
+    }
+
+    return $data;
+  }
+
+  public function rowcount($report_id) {
+    $report_type = $this->type;
+    $query = db_select('report_cache');
+    $query->fields('report_cache');
+    $query->condition('report_id', $report_id);
+    $query->condition('report_type', $report_type);
+    $stmt = $query->execute();
+    $count = 0;
+    while ($hr = $stmt->fetchAssoc()) { ++$count; }
+    return $count;
+  }
+
+  public function edi_has_header() { return FALSE; }
+  public function edi_render_header($report_id, $output = 'page') { return '[Override this function]'; }
+  public function edi_has_footer() { return FALSE; }
+  public function edi_render_footer($report_id, $output = 'page') { return '[Override this function]'; }
+
+  public function edi_has_premium() { return FALSE; }
+
+  public function edi_carrier_name() { return 'DEFAULT'; }
+
+  public function edi_render_premium($report_id, $output = 'page') { 
+    $info = $this->info();
+    $parameters = $this->parameters($report_id);
+    $parameters = $parameters['parameters'];
+
+    $fields = array();
+    $fields['edi_carrier_name'] = 'CARRIER NAME';
+    $fields['edi_group_number'] = 'GROUP NUMBER';
+    $fields['edi_asof_month'] = 'COVERAGE MONTH';
+    $fields['edi_premium_tier'] = 'COVERAGE TIER';
+    $fields['edi_premium_amt'] = 'AMOUNT';
+    $fields['edi_ssn'] = 'SSN';
+    $fields['edi_lastname'] = 'LAST NAME';
+    $fields['edi_firstname'] = 'FIRST NAME';
+    $fields['edi_payment_month'] = 'PAYMENT MONTH';
+
+    $header = $fields;
+    $data = $this->load($report_id);
+
+    $rows = array();
+
+    $edi_asof_month = date('Y-m', strtotime($parameters['asof_date']));
+    $edi_payment_month = date('Y-m', strtotime('+1 month', strtotime($parameters['asof_date'])));
+
+    $total = 0;
+    foreach ($data as $hr) {
+      if (!$hr['edi_is_subscriber']) { continue; }
+      $row = array();
+      $row['edi_carrier_name'] = $info['edi_carrier_name'];
+      $row['edi_group_number'] = $info['edi_group_number'];
+      $row['edi_asof_month'] = $edi_asof_month;
+      $row['edi_premium_tier'] = $hr['edi_premium_tier'];
+      $row['edi_premium_amt'] = $hr['edi_premium_amt'];
+      $row['edi_ssn'] = $hr['edi_ssn'];
+      $row['edi_firstname'] = strtoupper($hr['edi_firstname']);
+      $row['edi_lastname'] = strtoupper($hr['edi_lastname']);
+      $row['edi_premium_amt'] = $hr['edi_premium_amt'];
+      $row['edi_payment_month'] = $edi_payment_month;
+      $rows[] = $row;
+
+      $total += $hr['edi_premium_amt'];
+    }
+
+    $row = array();
+    $row['edi_carrier_name'] = '';
+    $row['edi_group_number'] = '';
+    $row['edi_asof_month'] = '';
+    $row['edi_premium_tier'] = 'TOTAL';
+    $row['edi_premium_amt'] = $total;
+    $row['edi_ssn'] = '';
+    $row['edi_firstname'] = '';
+    $row['edi_lastname'] = '';
+    $row['edi_payment_month'] = '';
+    $rows[] = $row;
+
+    return array('header' => $header, 'rows' => $rows);
   }
 
 	public function edi_output_format() { return $this->edi_output_format; }
 
 	public function edi_fixed_fields() { return array(); }
 
-	public function edi_output_stream_fixed($fp, $report_id) {
+  public function edi_format_fixed_field($val, $field_data) {
+    if (!isset($val)) { $val = ''; }
+    $width = $field_data['width'];
+    $format = '%-' . $width . '.' . $width . 's';
+    return sprintf($format, $val);
+
+    //$result .= "[[val = $val / width = $width / format = $format]]\n";
+    //$result .= '[[';
+    //$result .= sprintf($format, $val);
+    //$result .= ']]';
+    //$result .= "\n";
+    //return $result;
+  }
+
+	public function edi_output_stream_fixed($fp, $report_id, $premium = FALSE) {
 		$report_type = $this->type;
 		$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 		$info = $this->info();
 
-		$query = db_select('report_cache');
-		$query->fields('report_cache');
-		$query->condition('report_type', $report_type);
-		$query->condition('report_id', $report_id);
-		$query->condition('report_domain_nid', $domain_nid);
-		$stmt = $query->execute();
+    if ($premium) {
+      fwrite($fp, '[Fixed-width premium output is not implemented]');
+      /*
+      $result = $this->edi_render_premium($report_id);
+      fputcsv($fp, array_values($result['header']));
+      foreach ($result['rows'] as $row) {
+        fputcsv($fp, array_values($row));
+      }
+      */
+    } else {
+  		$query = db_select('report_cache');
+  		$query->fields('report_cache');
+  		$query->condition('report_type', $report_type);
+  		$query->condition('report_id', $report_id);
+  		$query->condition('report_domain_nid', $domain_nid);
+  		$stmt = $query->execute();
 
-		$fields = $this->edi_fixed_fields();
-		while ($hr = $stmt->fetchAssoc()) {
-			$hr = $info['generator']->row_decode($hr['report_data']);
-			foreach ($fields as $field_name => $field_data) {
-				$width = $field_data['width'];
-				$val = $hr[$field_name];
-        $format = '%-' . $width . '.' . $width . 's';
-        // fwrite($fp, "$field_name: ($format): [");
-        fprintf($fp, $format, $val);
-        // fwrite($fp, "]\n");
-			}
-			fwrite($fp, "\n");
-		}
+      if ($this->edi_has_header()) {
+        $fields = $this->edi_fixed_fields('header');
+        $result = $this->edi_render_header($report_id);
+        foreach ($result['rows'] as $hr) {
+          foreach ($fields as $field_name => $field_data) {
+            fwrite($fp, $this->edi_format_fixed_field($hr[$field_name], $field_data));
+          }
+          fwrite($fp, "\n");
+        }
+      }
+
+  		$fields = $this->edi_fixed_fields();
+  		while ($hr = $stmt->fetchAssoc()) {
+  			$hr = $info['generator']->row_decode($hr['report_data']);
+  			foreach ($fields as $field_name => $field_data) {
+          fwrite($fp, $this->edi_format_fixed_field($hr[$field_name], $field_data));
+  			}
+  			fwrite($fp, "\n");
+  		}
+
+      if ($this->edi_has_footer()) {
+        $fields = $this->edi_fixed_fields('footer');
+        $result = $this->edi_render_footer($report_id);
+        foreach ($result['rows'] as $hr) {
+          foreach ($fields as $field_name => $field_data) {
+            fwrite($fp, $this->edi_format_fixed_field($hr[$field_name], $field_data));
+          }
+          fwrite($fp, "\n");
+        }
+      }
+    }
+
 		// fclose($fp);
 	}
 
-	public function edi_output_stream($fp, $report_id, $format = NULL) {
+	public function edi_output_stream($fp, $report_id, $format = NULL, $premium = FALSE) {
 		if (!$format || ($format == 'default')) {
 			$format = $this->edi_output_format();
 		}
 
 		if ($format == 'fixed') {
-			return $this->edi_output_stream_fixed($fp, $report_id);
+			return $this->edi_output_stream_fixed($fp, $report_id, $premium);
 		} else {
-			return $this->edi_output_stream_csv($fp, $report_id);
+			return $this->edi_output_stream_csv($fp, $report_id, $premium);
 		}
 	}
 
-	public function edi_output_stream_csv($fp, $report_id) {
+	public function edi_output_stream_csv($fp, $report_id, $premium = FALSE) {
 		$report_type = $this->type;
 
 		$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 
 		$info = $this->info();
 
-		$fields = $info['fields'];
+    if ($premium) {
+      $result = $this->edi_render_premium($report_id);
+      fputcsv($fp, array_values($result['header']));
+      foreach ($result['rows'] as $row) {
+        fputcsv($fp, array_values($row));
+      }
+    } else {
+  		$fields = $info['fields'];
 
-		fputcsv($fp, $fields);
+  		fputcsv($fp, $fields);
 
-		$query = db_select('report_cache');
-		$query->fields('report_cache');
-		$query->condition('report_type', $report_type);
-		$query->condition('report_id', $report_id);
-		$query->condition('report_domain_nid', $domain_nid);
-		$stmt = $query->execute();
+  		$query = db_select('report_cache');
+  		$query->fields('report_cache');
+  		$query->condition('report_type', $report_type);
+  		$query->condition('report_id', $report_id);
+  		$query->condition('report_domain_nid', $domain_nid);
+  		$stmt = $query->execute();
 
-		while ($hr = $stmt->fetchAssoc()) {
-			$hr = $info['generator']->row_decode($hr['report_data']);
-			$row = array();
-			foreach ($fields as $name => $prompt) {
-				$row[] = strip_tags($hr[$name]);
-			}
-			fputcsv($fp, $row);
-		}
+  		while ($hr = $stmt->fetchAssoc()) {
+  			$hr = $info['generator']->row_decode($hr['report_data']);
+  			$row = array();
+  			foreach ($fields as $name => $prompt) {
+  				$row[] = strip_tags($hr[$name]);
+  			}
+  			fputcsv($fp, $row);
+  		}
+    }
 	}
 
   public function context($wb_nid, $asof_date) {
@@ -152,6 +454,10 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     return ($context['employer_node']->field_sirius_id['und'][0]['value'] == 'COBRA');
   }
 
+  public function is_qmsco($context) {
+    return ($this->relationship_type($context['relationship_node']) == 'QMSCO');
+  }
+
   public function dependent_relationship_nodes($context) {
     if ($this->is_dependent($context)) { return array(); }
 
@@ -207,7 +513,11 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
   }
 
   public function phone($context, $which) {
-  	return preg_replace('/[^0-9]/', '', $context[$which]->field_sirius_phone['und'][0]['value']);
+    return preg_replace('/[^0-9]/', '', $context[$which]->field_sirius_phone['und'][0]['value']);
+  }
+
+  public function email($context, $which) {
+    return $context[$which]->field_sirius_email['und'][0]['value'];
   }
 
   public function dob($context, $which) {
@@ -216,7 +526,34 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
   	return date('Ymd', strtotime($date));
   }
 
+  public function lang($context) {
+
+  }
+
   public function ssn($context, $which) {
   	return preg_replace('/[^0-9]/', '', $context[$which]->field_sirius_ssn['und'][0]['value']);
+  }
+
+  public function medical_coverage_id($context) {
+    if (!$context['worker_node']) { return ''; }
+
+    $benefit_type = &drupal_static(__FUNCTION__);
+    if (!isset($benefit_type)) {
+      $benefit_type = Sirius_Trust_Cobra::getInstance()->cobra_benefit_type();
+      if (!$benefit_type) {
+        drupal_set_message("No COBRA benefit type has been set. (I'm assuming that the COBRA benefit type is the medical benefit.)", 'error');
+      }
+    }
+    if (!$benefit_type) { return ''; }
+
+    $search_params = array();
+    $search_params['worker_nid'] = $context['worker_node']->nid;
+    $search_params['ts'] = $context['asof_ts'];
+    $search_params['benefit_type'] = $benefit_type;
+    $wb_nodes = sirius_trust_worker_benefits_search($search_params);
+    if (!$wb_nodes) { return ''; }
+    $wb_node = reset($wb_nodes);
+    $benefit_node = node_load($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
+    return $benefit_node->field_sirius_id['und'][0]['value'];
   }
 }
