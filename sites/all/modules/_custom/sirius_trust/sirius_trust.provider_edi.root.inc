@@ -221,10 +221,18 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 	public function entity_push_form_submit($form, &$form_state) {
 		$form_state['rebuild'] = TRUE;
 		$plugin_uuid = $form_state['plugin_uuid'];
-		$entity_node = node_load($form_state['entity_nid']);
+		$entity_nid = $form_state['entity_nid'];
+		$report_id = $form_state['values']['report_id'];
+		return $this->entity_push($entity_nid, $plugin_uuid, $report_id);
+	}
 
+	public function entity_push($entity_nid, $plugin_uuid, $report_id) {
+	  sirius_minilog("Entity NID:  " . $entity_nid);
+	  sirius_minilog("Plugin UUID: " . $plugin_uuid);
+	  sirius_minilog("Report ID:   " . $report_id);
+
+		$entity_node = node_load($entity_nid);
 	  $report_type = $this->report_type($entity_node, $plugin_uuid);
-	  $report_id = $form_state['values']['report_id'];
 	  $info = report_cache_info($report_type);
 
 		// Get our settings
@@ -374,6 +382,10 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 		$report_options = $this->report_options($entity_node, $plugin_uuid);
 		if (!$report_options) { return sirius_form_error("This report has not been run yet."); }
 
+	  $report_type = $this->report_type($entity_node, $plugin_uuid);
+	  $info = report_cache_info($report_type);
+	  $generator = $info['generator'];
+
 		$form['report_id'] = array(
 			'#type' => 'select',
 			'#title' => 'Report',
@@ -391,6 +403,19 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 			'#required' => TRUE,
 		);
 
+		if ($generator->edi_has_premium()) {
+			$form['premium'] = array(
+				'#type' => 'select',
+				'#title' => 'Premium?',
+				'#options' => array(
+					FALSE => 'No, download the raw file',
+					TRUE => 'Yes, download the premium file',
+				),
+				'#required' => TRUE,
+			);
+		}
+
+
 		$form['submit'] = array(
 			'#type' => 'submit',
 			'#value' => t('Download'),
@@ -404,13 +429,15 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 		$plugin_uuid = $form_state['plugin_uuid'];
 		$entity_node = node_load($form_state['entity_nid']);
 
+		$premium = $form_state['values']['premium'];
+
 	  $report_type = $this->report_type($entity_node, $plugin_uuid);
 	  $report_id = $form_state['values']['report_id'];
 	  $info = report_cache_info($report_type);
 
 		$format = $form_state['values']['format'];
 
-		$filename = $this->filename($entity_node, $plugin_uuid);
+		$filename = $this->filename($entity_node, $plugin_uuid, $premium);
 
 		// A hack
 		if ($format == 'csv') { $filename = preg_replace('/\.txt/', '.csv', $filename); }
@@ -419,12 +446,12 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
 		$fp = fopen('php://output', 'w');
 
-	  $info['generator']->edi_output_stream($fp, $report_id, $format);
+	  $info['generator']->edi_output_stream($fp, $report_id, $format, $premium);
 
 	  exit();
 	}
 
-	public function filename($entity_node, $plugin_uuid) {
+	public function filename($entity_node, $plugin_uuid, $premium = FALSE) {
 		// Get our settings
 		$settings = $this->entity_settings($entity_node, $plugin_uuid);
 		$filename = $settings['filename'];
@@ -435,6 +462,8 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 		$aliases['entity_node'] = 'node';
 
 		$filename = token_replace($filename, $tokens, array('clear' => TRUE, 'aliases' => $aliases));
+
+		if ($premium) { $filename = "premium_" . $filename; }
 
 		/*
 		$filename = $entity_node->title;
@@ -474,106 +503,4 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 		return $dir;
 	}
 
-	/**
-	 * This is a copy that you can call from the command line for stupid debugging:
-	 * 
-	 * drush --user=1 php-eval "sirius_require('sirius_trust', 'sirius_trust.provider_edi.root.inc'); print_r(Sirius_Trust_Provider_Edi::getInstance()->whatever123());"
-	 */
-
-	public function whatever123() {
-		sirius_minilog_echo_active(TRUE);
-
-		$plugin_uuid = 'efe14263-dcdd-4a1d-9d7f-a7ff2e96ab0c';
-		$entity_node = node_load(13254605);
-	  $report_type = $this->report_type($entity_node, $plugin_uuid);
-	  $report_id = '2025-06-22 07:50:31';
-	  $info = report_cache_info($report_type);
-
-		// Get our settings
-		$settings = $this->entity_settings($entity_node, $plugin_uuid);
-
-		$host = $settings['sftp']['host'];
-		if (!$host) { return array('success' => FALSE, 'msg' => 'Please enter an SFTP host.'); }
-
-		$port = $settings['sftp']['port'];
-		if (!$port) { return array('success' => FALSE, 'msg' => 'Please enter an SFTP port.'); }
-
-		$username = $settings['sftp']['user'];
-		if (!$username) { return array('success' => FALSE, 'msg' => 'Please enter a user.'); }
-
-		// @todo: Password only for the moment
-		$password = $settings['sftp']['password'];
-		$public_key = $settings['sftp']['public_key'];
-		$private_key = $settings['sftp']['private_key'];
-
-		if (!$password && (!$public_key || !$private_key)) { return array('success' => FALSE, 'msg' => 'Please enter a password or a public and private key.'); }
-
-		$remote_directory = $settings['sftp']['directory'];
-		if (!$remote_directory) { $remote_directory = '/'; }
-
-		$filename = $this->filename($entity_node, $plugin_uuid);
-
-		// Write local (no longer necessary)
-		/*
-		$local_directory = $this->local_directory($entity_node, $plugin_uuid);
-		$local_path = "$local_directory/$filename";
-		sirius_minilog("Writing to $local_path");
-
-		$fp = fopen($local_path, 'w');
-		if (!$fp) { return array('success' => FALSE, 'msg' => "Unable to open $local_path"); }
-		$info['generator']->edi_output_stream($fp, $report_id);
-		$size = filesize($local_path);
-		sirius_minilog("... wrote " . format_size($size) . " bytes.");
-		*/
-
-		// Connect
-		sirius_minilog("Connecting to $host:$port ...");
-		$conn = ssh2_connect($host, $port);
-		if (!$conn) { return array('success' => FALSE, 'msg' => "SFTP Connection to $host port $port failed."); }
-		sirius_minilog("... Connection ok");
-
-		// Login
-		sirius_minilog("Authenticating as $username ...");
-		if ($public_key) {
-			sirius_minilog("... Using public key authentication");
-			$public_path = $this->local_keypath($entity_node, $plugin_uuid, 'public_key');
-			$private_path = $this->local_keypath($entity_node, $plugin_uuid, 'private_key');
-			$result = ssh2_auth_pubkey_file($conn, $username, $public_path, $private_path, '');
-		} else { 
-			sirius_minilog("... Using password authentication");
-			$result = ssh2_auth_password($conn, $username, $password);
-		}
-
-		if (!$result) {
-			return array('success' => FALSE, 'msg' => "Login to $host / $port as $username failed.");
-		}
-		sirius_minilog("... Authentication ok");
-
-		// Get an SFTP object
-		$sftp = ssh2_sftp($conn);
-
-		// Handle relative remote directory
-		if (!preg_match('/^\//', $remote_directory)) {
-			$remote_directory = ssh2_sftp_realpath($sftp, ".") . '/' . $remote_directory;
-		}
-		$remote_path = "ssh2.sftp://" . intval($sftp) . "$remote_directory/$filename";
-		sirius_minilog("Opening a stream to $remote_path ...");
-		$output_stream = fopen($remote_path, 'w');
-		if (!$output_stream) { return array('success' => FALSE, 'msg' => "Unable to open connection to $remote_path"); }
-		sirius_minilog("... stream opened");
-
-		sirius_minilog("Writing data ...");
-		$info['generator']->edi_output_stream($output_stream, $report_id);
-		sirius_minilog("... upload complete");
-		if ($output_stream) {
-			$fstat = fstat($output_stream);
-			sirius_minilog("Wrote " . format_size($fstat['size']));
-		}
-
-		sirius_minilog("Disconnecting.");
-		fclose($output_stream);
-		ssh2_disconnect($conn);
-
-		return array('success' => TRUE, 'msg' => "Uploaded file $filename");
-	}
 }
