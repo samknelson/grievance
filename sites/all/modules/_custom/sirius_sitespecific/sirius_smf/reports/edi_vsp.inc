@@ -169,7 +169,7 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
       $row['Subscriber Record ID'] = 'MEM';
       $row['Full Replacement Files'] = 'R';
       $row['Control Number'] = 52638;
-      $row['Subscriber ID'] = $context['subscriber_node']->field_sirius_id['und'][0]['value'];
+      $row['Subscriber ID'] = ''; // $context['subscriber_node']->field_sirius_id['und'][0]['value'];
       $row['Subscriber SSN'] = $this->ssn($context, 'subscriber_node');
       $row['Alternate Subscriber ID'] = '';
       $row['Previous Subscriber ID'] = '';
