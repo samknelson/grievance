@@ -123,18 +123,18 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
       $fields['Relationship Code'] = array('width' => 1);
       $fields['Client Group ID'] = array('width' => 18);
       $fields['PCP ID'] = array('width' => 18);
-      $fields['Reserved'] = array('width' => 8);
+      $fields['Reserved1'] = array('width' => 8);
       $fields['Filler1'] = array('width' => 18);
-      $fields['Reserved'] = array('width' => 8);
+      $fields['Reserved2'] = array('width' => 8);
       $fields['Transaction Date'] = array('width' => 8);
       $fields['Participant Expiration Date'] = array('width' => 8);
       $fields['Insurance Code'] = array('width' => 20);
-      $fields['Reserved'] = array('width' => 1);
-      $fields['Reserved'] = array('width' => 7);
+      $fields['Reserved3'] = array('width' => 1);
+      $fields['Reserved4'] = array('width' => 7);
       $fields['Filler2'] = array('width' => 1);
       $fields['Medicare ID'] = array('width' => 12);
-      $fields['Reserved'] = array('width' => 1);
-      $fields['Reserved'] = array('width' => 7);
+      $fields['Reserved5'] = array('width' => 1);
+      $fields['Reserved6'] = array('width' => 7);
       $fields['Copay Waiver Flag'] = array('width' => 1);
       $fields['Coverage Code Status'] = array('width' => 1);
       $fields['Print ID Card Flag'] = array('width' => 1);
@@ -142,7 +142,7 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
       $fields['Admin Hold Exp Date'] = array('width' => 8);
       $fields['COB Indicator/ Primary Carrier Flag'] = array('width' => 1);
       $fields['Client Specific Data'] = array('width' => 62);
-      $fields['Reserved'] = array('width' => 1);
+      $fields['Reserved7'] = array('width' => 1);
       $fields['Member Level Address Type'] = array('width' => 1);
       $fields['Hospice Indicator'] = array('width' => 1);
       $fields['Suspense Indicator'] = array('width' => 1);
@@ -310,18 +310,18 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
       $row['Relationship Code'] = $this->relationship_code($context);
       $row['Client Group ID'] = $this->client_group_id($context);
       $row['PCP ID'] = '';
-      $row['Reserved'] = '';
+      $row['Reserved1'] = '';
       $row['Filler1'] = '';
-      $row['Reserved'] = '';
+      $row['Reserved2'] = '';
       $row['Transaction Date'] = '';
       $row['Participant Expiration Date'] = $this->coverage_end_date($context);
       $row['Insurance Code'] = '';
-      $row['Reserved'] = '';
-      $row['Reserved'] = '';
+      $row['Reserved3'] = '';
+      $row['Reserved4'] = '';
       $row['Filler2'] = '';
       $row['Medicare ID'] = '';
-      $row['Reserved'] = '';
-      $row['Reserved'] = '';
+      $row['Reserved5'] = '';
+      $row['Reserved6'] = '';
       $row['Copay Waiver Flag'] = '';
       $row['Coverage Code Status'] = '';
       $row['Print ID Card Flag'] = '';
@@ -329,7 +329,7 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
       $row['Admin Hold Exp Date'] = '';
       $row['COB Indicator/ Primary Carrier Flag'] = '';
       $row['Client Specific Data'] = '';
-      $row['Reserved'] = '';
+      $row['Reserved7'] = '';
       $row['Member Level Address Type'] = $this->member_level_address_type($context);
       $row['Hospice Indicator'] = '';
       $row['Suspense Indicator'] = '';
@@ -460,3 +460,4 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
     if ($this->is_qmsco($context)) { return 'C'; }
   }
 }
+
