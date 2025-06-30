@@ -503,4 +503,109 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 		return $dir;
 	}
 
+	/**
+	 * This is a copy that you can call from the command line for stupid debugging:
+	 * 
+	 * drush --user=1 php-eval "sirius_require('sirius_trust', 'sirius_trust.provider_edi.root.inc'); print_r(Sirius_Trust_Provider_Edi::getInstance()->whatever123());"
+	 */
+
+	public function whatever123() {
+		sirius_minilog_echo_active(TRUE);
+
+		$plugin_uuid = '2c5e144c-fa34-4ca9-97dd-0c20e31fc7d8';
+		$entity_node = node_load(15283174);
+	  $report_type = $this->report_type($entity_node, $plugin_uuid);
+	  $report_id = '2025-06-23 07:45:33';
+	  $info = report_cache_info($report_type);
+
+	  sirius_domain($entity_node->field_sirius_domain['und'][0]['target_id']);
+
+		// Get our settings
+		$settings = $this->entity_settings($entity_node, $plugin_uuid);
+
+		$host = $settings['sftp']['host'];
+		if (!$host) { return array('success' => FALSE, 'msg' => 'Please enter an SFTP host.'); }
+
+		$port = $settings['sftp']['port'];
+		if (!$port) { return array('success' => FALSE, 'msg' => 'Please enter an SFTP port.'); }
+
+		$username = $settings['sftp']['user'];
+		if (!$username) { return array('success' => FALSE, 'msg' => 'Please enter a user.'); }
+
+		// @todo: Password only for the moment
+		$password = $settings['sftp']['password'];
+		$public_key = $settings['sftp']['public_key'];
+		$private_key = $settings['sftp']['private_key'];
+
+		if (!$password && (!$public_key || !$private_key)) { return array('success' => FALSE, 'msg' => 'Please enter a password or a public and private key.'); }
+
+		$remote_directory = $settings['sftp']['directory'];
+		if (!$remote_directory) { $remote_directory = '/'; }
+
+		$filename = $this->filename($entity_node, $plugin_uuid);
+
+		// Write local (no longer necessary)
+		/*
+		$local_directory = $this->local_directory($entity_node, $plugin_uuid);
+		$local_path = "$local_directory/$filename";
+		sirius_minilog("Writing to $local_path");
+
+		$fp = fopen($local_path, 'w');
+		if (!$fp) { return array('success' => FALSE, 'msg' => "Unable to open $local_path"); }
+		$info['generator']->edi_output_stream($fp, $report_id);
+		$size = filesize($local_path);
+		sirius_minilog("... wrote " . format_size($size) . " bytes.");
+		*/
+
+		// Connect
+		sirius_minilog("Connecting to $host:$port ...");
+		$conn = ssh2_connect($host, $port);
+		if (!$conn) { return array('success' => FALSE, 'msg' => "SFTP Connection to $host port $port failed."); }
+		sirius_minilog("... Connection ok");
+
+		// Login
+		sirius_minilog("Authenticating as $username ...");
+		if ($public_key) {
+			sirius_minilog("... Using public key authentication");
+			$public_path = $this->local_keypath($entity_node, $plugin_uuid, 'public_key');
+			$private_path = $this->local_keypath($entity_node, $plugin_uuid, 'private_key');
+			$private_key_password = $settings['sftp']['private_key_password'];
+			if (!$private_key_password) { $private_key_password = ''; }
+			$result = ssh2_auth_pubkey_file($conn, $username, $public_path, $private_path, $private_key_password);
+		} else { 
+			sirius_minilog("... Using password authentication");
+			$result = ssh2_auth_password($conn, $username, $password);
+		}
+
+		if (!$result) {
+			return array('success' => FALSE, 'msg' => "Login to $host / $port as $username failed.");
+		}
+		sirius_minilog("... Authentication ok");
+
+		// Get an SFTP object
+		$sftp = ssh2_sftp($conn);
+
+		// Handle relative remote directory
+		if (!preg_match('/^\//', $remote_directory)) {
+			$remote_directory = ssh2_sftp_realpath($sftp, ".") . '/' . $remote_directory;
+		}
+		$remote_path = "ssh2.sftp://" . intval($sftp) . "$remote_directory/$filename";
+		sirius_minilog("Opening a stream to $remote_path ...");
+		$output_stream = fopen($remote_path, 'w');
+		// $output_stream = fopen('php://output', 'w');
+		if (!$output_stream) { return array('success' => FALSE, 'msg' => "Unable to open connection to $remote_path"); }
+		sirius_minilog("... stream opened");
+
+		sirius_minilog("Writing data ...");
+		$info['generator']->edi_output_stream($output_stream, $report_id);
+		sirius_minilog("... upload complete");
+		if ($output_stream) {
+			$fstat = fstat($output_stream);
+			sirius_minilog("Wrote " . format_size($fstat['size']));
+		}
+
+		sirius_minilog("Disconnecting.");
+		fclose($output_stream);
+		ssh2_disconnect($conn);
+	}
 }
