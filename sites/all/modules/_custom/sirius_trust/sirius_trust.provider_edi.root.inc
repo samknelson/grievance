@@ -483,11 +483,13 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 	public function whatever123() {
 		sirius_minilog_echo_active(TRUE);
 
-		$plugin_uuid = 'efe14263-dcdd-4a1d-9d7f-a7ff2e96ab0c';
-		$entity_node = node_load(13254605);
+		$plugin_uuid = '2c5e144c-fa34-4ca9-97dd-0c20e31fc7d8';
+		$entity_node = node_load(15283174);
 	  $report_type = $this->report_type($entity_node, $plugin_uuid);
-	  $report_id = '2025-06-22 07:50:31';
+	  $report_id = '2025-06-23 07:45:33';
 	  $info = report_cache_info($report_type);
+
+	  sirius_domain($entity_node->field_sirius_domain['und'][0]['target_id']);
 
 		// Get our settings
 		$settings = $this->entity_settings($entity_node, $plugin_uuid);
@@ -538,7 +540,9 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 			sirius_minilog("... Using public key authentication");
 			$public_path = $this->local_keypath($entity_node, $plugin_uuid, 'public_key');
 			$private_path = $this->local_keypath($entity_node, $plugin_uuid, 'private_key');
-			$result = ssh2_auth_pubkey_file($conn, $username, $public_path, $private_path, '');
+			$private_key_password = $settings['sftp']['private_key_password'];
+			if (!$private_key_password) { $private_key_password = ''; }
+			$result = ssh2_auth_pubkey_file($conn, $username, $public_path, $private_path, $private_key_password);
 		} else { 
 			sirius_minilog("... Using password authentication");
 			$result = ssh2_auth_password($conn, $username, $password);
@@ -559,6 +563,7 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 		$remote_path = "ssh2.sftp://" . intval($sftp) . "$remote_directory/$filename";
 		sirius_minilog("Opening a stream to $remote_path ...");
 		$output_stream = fopen($remote_path, 'w');
+		// $output_stream = fopen('php://output', 'w');
 		if (!$output_stream) { return array('success' => FALSE, 'msg' => "Unable to open connection to $remote_path"); }
 		sirius_minilog("... stream opened");
 
@@ -573,7 +578,5 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 		sirius_minilog("Disconnecting.");
 		fclose($output_stream);
 		ssh2_disconnect($conn);
-
-		return array('success' => TRUE, 'msg' => "Uploaded file $filename");
 	}
 }
