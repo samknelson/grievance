@@ -4,6 +4,8 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
   public $type = 'sirius-smf-edi-kaiser';
   public $edi_output_format = 'fixed';
 
+  public function benefit_nid() { return $this->benefit_nid_from_id('K'); }
+
   public function info($result = array()) {
     $result = array(
       'name' => t('EDI - Kaiser'),
@@ -85,51 +87,6 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
     $fields['Additional Eligibility Grid Information'] = array('width' => 160);
     $fields['FILLER22'] = array('width' => 36);
     return $fields;
-  }
-
-  public function fields() {
-    return array_combine(array_keys($this->edi_fixed_fields()), array_keys($this->edi_fixed_fields()));
-  }
-
-  public function preview_links($row) {
-    $links = array();
-    $links['node/' . $row['worker_nid'] . '/sirius_worker_hours'] = 'Worker';
-    $links['node/' . $row['payperiod_nid'] . '/sirius_payperiod_simple'] = 'Payperiod';
-    return $links;
-  }
-
-  public function form() {
-    $form['asof_date'] = array(
-      '#type' => 'date_popup',
-      '#title' => t('As Of'),
-      '#attributes' => array(
-        'autocomplete' => 'off',
-      ),
-      '#date_format' => 'Y-m-d',
-      '#required' => TRUE,
-      '#default_value' => date('Y-m-d', strtotime('-1 month')),
-    );
-
-    return $form;
-  }
-
-  public function render_parameters($parameters) {
-    $parameters = $parameters['parameters'];
-
-    $html = sirius_jsonfield_util_render_all_values_new(
-      $this->form(), 
-      $parameters, 
-      array(
-        'skip_empty' => TRUE,
-        'no_fieldsets' => TRUE,
-      )
-    );
-
-    return $html;
-  }
-
-  public function benefit_nid() {
-    return $this->benefit_nid_from_id('K');
   }
 
   public function pks(&$form_state) {
@@ -226,9 +183,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       $row['Eligibility Status'] = '';
       $row['Additional Eligibility Grid Information'] = '';
 
-      foreach ($row as $key => $value) {
-        $row[$key] = strtoupper($value);
-      }
+      $row = $this->edi_row($row, $context);
 
       $rows[$context['pk']] = $row;
     }

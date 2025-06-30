@@ -4,6 +4,9 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
   public $type = 'sirius-smf-edi-vsp';
   public $edi_output_format = 'fixed';
 
+  public function benefit_nid_standard() { return $this->benefit_nid_from_id('3'); }
+  public function benefit_nid_enhanced() { return $this->benefit_nid_from_id('3E'); }
+
   public function info($result = array()) {
     $result = array(
       'name' => t('EDI - VSP'),
@@ -68,50 +71,6 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
       'Filler2' => array('width' => 34),
     );
   }
-
-  public function fields() {
-    return array_combine(array_keys($this->edi_fixed_fields()), array_keys($this->edi_fixed_fields()));
-  }
-
-  public function preview_links($row) {
-    $links = array();
-    $links['node/' . $row['worker_nid'] . '/sirius_worker_hours'] = 'Worker';
-    $links['node/' . $row['payperiod_nid'] . '/sirius_payperiod_simple'] = 'Payperiod';
-    return $links;
-  }
-
-  public function form() {
-    $form['asof_date'] = array(
-      '#type' => 'date_popup',
-      '#title' => t('As Of'),
-      '#attributes' => array(
-        'autocomplete' => 'off',
-      ),
-      '#date_format' => 'Y-m-d',
-      '#required' => TRUE,
-      '#default_value' => date('Y-m-d', strtotime('-1 month')),
-    );
-
-    return $form;
-  }
-
-  public function render_parameters($parameters) {
-    $parameters = $parameters['parameters'];
-
-    $html = sirius_jsonfield_util_render_all_values_new(
-      $this->form(), 
-      $parameters, 
-      array(
-        'skip_empty' => TRUE,
-        'no_fieldsets' => TRUE,
-      )
-    );
-
-    return $html;
-  }
-
-  public function benefit_nid_standard() { return $this->benefit_nid_from_id('3'); }
-  public function benefit_nid_enhanced() { return $this->benefit_nid_from_id('3E'); }
 
   public function pks(&$form_state) {
     $benefit_nid_standard = $this->benefit_nid_standard();
@@ -247,9 +206,7 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
       $row['Subscriber Medicare Plan Code'] = '';
       $row['Filler2'] = '';
 
-      foreach ($row as $key => $value) {
-        $row[$key] = strtoupper($value);
-      }
+      $row = $this->edi_row($row, $context);
 
       $rows[$context['pk']] = $row;
     }

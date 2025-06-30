@@ -3,6 +3,8 @@
 class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Generator {
   public $type = 'sirius-smf-edi-hinge';
 
+  public function benefit_nid() { return $this->benefit_nid_from_id('HINGEPT'); }
+
   public function info($result = array()) {
     $result = array(
       'name' => t('EDI - Hinge'),
@@ -38,53 +40,6 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
     $fields = array();
     foreach ($field_names as $field_name) { $fields[$field_name] = $field_name; }
     return $fields;
-  }
-
-  public function preview_links($row) {
-    $links = array();
-    $links['node/' . $row['worker_nid'] . '/sirius_worker_hours'] = 'Worker';
-    $links['node/' . $row['payperiod_nid'] . '/sirius_payperiod_simple'] = 'Payperiod';
-    return $links;
-  }
-
-  public function form() {
-    $form['asof_date'] = array(
-      '#type' => 'date_popup',
-      '#title' => t('As Of'),
-      '#attributes' => array(
-        'autocomplete' => 'off',
-      ),
-      '#date_format' => 'Y-m-d',
-      '#required' => TRUE,
-      '#default_value' => date('Y-m-d', strtotime('-1 month')),
-    );
-
-    return $form;
-  }
-
-  public function render_parameters($parameters) {
-    $parameters = $parameters['parameters'];
-
-    $html = sirius_jsonfield_util_render_all_values_new(
-      $this->form(), 
-      $parameters, 
-      array(
-        'skip_empty' => TRUE,
-        'no_fieldsets' => TRUE,
-      )
-    );
-
-    return $html;
-  }
-
-  public function benefit_nid() {
-    $benefit_id = 'HINGEPT';
-    $result = sirius_feed_lookup_by_field('sirius_trust_benefit', 'field_data_field_sirius_id', 'field_sirius_id_value', $benefit_id);
-    if (!$result['success']) {
-      drupal_set_message("Please make sure that there is a benefit with the ID $benefit_id.", 'error');
-      return NULL;
-    }
-    return $result['nid'];
   }
 
   public function pks(&$form_state) {
@@ -127,28 +82,15 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
   public function batch($wb_nids, $values, &$batch_context) {
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
-      $pk = $wb_nid;
-
-      $wb_node = node_load($wb_nid);
-      if (!$wb_node) { continue; }
-
-      $worker_node = node_load($wb_node->field_sirius_worker['und'][0]['target_id']);
-      if (!$worker_node) { continue; }
-
-      $relationship_node = node_load($wb_node->field_sirius_contact_relation['und'][0]['target_id']);
-
-      $contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+      $context = $this->context($wb_nid, $asof_date);
 
       $row = array();
-      $row['subscriber_id'] = $worker_node->field_sirius_id['und'][0]['value'];
-      $row['first_name'] = $worker_node->field_sirius_name['und'][0]['given'];
-      $row['last_name']  = $worker_node->field_sirius_name['und'][0]['family'];
+      $row['subscriber_id'] = $context['worker_node']->field_sirius_id['und'][0]['value'];
+      $row['first_name'] = $context['worker_node']->field_sirius_name['und'][0]['given'];
+      $row['last_name']  = $context['worker_node']->field_sirius_name['und'][0]['family'];
+      $row['dob'] = $this->dob($context, 'worker_node');
 
-      $dob = $worker_node->field_sirius_dob['und'][0]['value'];
-      if ($dob) { $dob = date('Ymd', strtotime($dob)); }
-      $row['dob'] = $dob;
-
-      $sex = $worker_node->field_sirius_gender['und'][0]['tid'];
+      $sex = $context['worker_node']->field_sirius_gender['und'][0]['tid'];
       if ($sex) {
         $sex_term = taxonomy_term_load($sex);
         $sex = $sex_term->field_sirius_name_short['und'][0]['value'];
@@ -158,8 +100,8 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
       }
       $row['sex'] = $sex;
 
-      if ($relationship_node) {
-        $reltype_tid = $relationship_node->field_sirius_contact_reltype['und'][0]['tid'];
+      if ($context['relationship_node']) {
+        $reltype_tid = $context['relationship_node']->field_sirius_contact_reltype['und'][0]['tid'];
         $reltype_term = taxonomy_term_load($reltype_tid);
         $reltype_id = $reltype_term->field_sirius_id['und'][0]['value'];
 
@@ -175,26 +117,21 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
       }
       $row['relationship'] = $relationship;
 
-      $row['address1'] = $worker_node->field_sirius_address['und'][0]['thoroughfare'];
-      $row['address2'] = $worker_node->field_sirius_address['und'][0]['premise'];
-      $row['city'] = $worker_node->field_sirius_address['und'][0]['locality'];
-      $row['state'] = $worker_node->field_sirius_address['und'][0]['administrative_area'];
-      $row['zip'] = $worker_node->field_sirius_address['und'][0]['postal_code'];
-      $row['email'] = $worker_node->field_sirius_email['und'][0]['value'];
+      $this->is_qmsco($context);
 
-      $row['start_date'] = date('Ymd', strtotime($wb_node->field_sirius_date_start['und'][0]['value']));
+      $row['address1'] = $context['worker_node']->field_sirius_address['und'][0]['thoroughfare'];
+      $row['address2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
+      $row['city'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
+      $row['state'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
+      $row['zip'] = $context['worker_node']->field_sirius_address['und'][0]['postal_code'];
+      $row['email'] = $context['worker_node']->field_sirius_email['und'][0]['value'];
+      $row['start_date'] = $this->coverage_start_date($context);
+      $row['term_date'] = $this->coverage_end_date($context);
+      $row['language'] = $this->lang($context);
 
-      $term_date = $wb_node->field_sirius_date_end['und'][0]['value'];
-      if ($term_date) { $term_date = date('Ymd', strtotime($term_date)); }
-      $row['term_date'] = $term_date;
+      $row = $this->edi_row($row, $context);
 
-      $row['language'] = $contact_node->field_sirius_lang['und'][0]['value'];
-
-      foreach ($row as $key => $value) {
-        $row[$key] = strtoupper($value);
-      }
-
-      $rows[$pk] = $row;
+      $rows[$context['pk']] = $row;
     }
 
     return array('is_multiple' => TRUE, 'rows' => $rows);

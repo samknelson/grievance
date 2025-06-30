@@ -4,6 +4,8 @@ class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Gen
   public $type = 'sirius-smf-edi-carelon';
   public $edi_output_format = 'fixed';
 
+  public function benefit_nid() { return $this->benefit_nid_from_id('CARELONEAP'); }
+
   public function info($result = array()) {
     $result = array(
       'name' => t('EDI - Carelon'),
@@ -43,51 +45,6 @@ class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Gen
     $fields['ALTNUM'] = array('width' => 15);
     $fields['CLIDEF'] = array('width' => 295);
     return $fields;
-  }
-
-  public function fields() {
-    return array_combine(array_keys($this->edi_fixed_fields()), array_keys($this->edi_fixed_fields()));
-  }
-
-  public function preview_links($row) {
-    $links = array();
-    $links['node/' . $row['worker_nid'] . '/sirius_worker_hours'] = 'Worker';
-    $links['node/' . $row['payperiod_nid'] . '/sirius_payperiod_simple'] = 'Payperiod';
-    return $links;
-  }
-
-  public function form() {
-    $form['asof_date'] = array(
-      '#type' => 'date_popup',
-      '#title' => t('As Of'),
-      '#attributes' => array(
-        'autocomplete' => 'off',
-      ),
-      '#date_format' => 'Y-m-d',
-      '#required' => TRUE,
-      '#default_value' => date('Y-m-d', strtotime('-1 month')),
-    );
-
-    return $form;
-  }
-
-  public function render_parameters($parameters) {
-    $parameters = $parameters['parameters'];
-
-    $html = sirius_jsonfield_util_render_all_values_new(
-      $this->form(), 
-      $parameters, 
-      array(
-        'skip_empty' => TRUE,
-        'no_fieldsets' => TRUE,
-      )
-    );
-
-    return $html;
-  }
-
-  public function benefit_nid() {
-    return $this->benefit_nid_from_id('CARELONEAP');
   }
 
   public function pks(&$form_state) {
@@ -164,9 +121,7 @@ class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Gen
       $row['ALTNUM'] = '';
       $row['CLIDEF'] = '';
 
-      foreach ($row as $key => $value) {
-        $row[$key] = strtoupper($value);
-      }
+      $row = $this->edi_row($row, $context);
 
       $rows[$context['pk']] = $row;
     }

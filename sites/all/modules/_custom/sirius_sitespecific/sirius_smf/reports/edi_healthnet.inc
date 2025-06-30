@@ -4,6 +4,8 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
   public $type = 'sirius-smf-edi-healthnet';
   public $edi_output_format = 'fixed';
 
+  public function benefit_nid() { return $this->benefit_nid_from_id('H'); }
+
   public function info($result = array()) {
     $result = array(
       'name' => t('EDI - Healthnet'),
@@ -12,6 +14,8 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
       'module' => 'sirius_smf',
       'file' => 'reports/edi_healthnet.inc',
       'row_encoding' => 'json',
+      'edi_carrier_name' => 'HEALTHNET',
+      'edi_group_number' => '',
     );
 
     return parent::info($result);
@@ -76,86 +80,10 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
     );
   }
 
-  public function fields() {
-    return array_combine(array_keys($this->edi_fixed_fields()), array_keys($this->edi_fixed_fields()));
-  }
+  public function edi_has_premium() { return TRUE; }
 
-  public function preview_links($row) {
-    $links = array();
-    $links['node/' . $row['worker_nid'] . '/sirius_worker_hours'] = 'Worker';
-    $links['node/' . $row['payperiod_nid'] . '/sirius_payperiod_simple'] = 'Payperiod';
-    return $links;
-  }
-
-  public function form() {
-    $form['asof_date'] = array(
-      '#type' => 'date_popup',
-      '#title' => t('As Of'),
-      '#attributes' => array(
-        'autocomplete' => 'off',
-      ),
-      '#date_format' => 'Y-m-d',
-      '#required' => TRUE,
-      '#default_value' => date('Y-m-d', strtotime('-1 month')),
-    );
-
-    return $form;
-  }
-
-  public function render_parameters($parameters) {
-    $parameters = $parameters['parameters'];
-
-    $html = sirius_jsonfield_util_render_all_values_new(
-      $this->form(), 
-      $parameters, 
-      array(
-        'skip_empty' => TRUE,
-        'no_fieldsets' => TRUE,
-      )
-    );
-
-    return $html;
-  }
-
-  public function benefit_nid() { return $this->benefit_nid_from_id('H'); }
-
-  public function pks(&$form_state) {
-    $benefit_nid = $this->benefit_nid();
-    if (!$benefit_nid) { return array(); }
-
-    $asof_date = date('Y-m-d 00:00:00', strtotime($form_state['values']['parameters']['asof_date']));
-
-    $sql_args = array();
-    $sql = "select nid ";
-    $sql .= "from node ";
-    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_date_end on field_data_field_sirius_date_end.entity_type = 'node' and field_data_field_sirius_date_end.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_trust_benefit on field_data_field_sirius_trust_benefit.entity_type = 'node' and field_data_field_sirius_trust_benefit.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_trust_subscriber on field_data_field_sirius_trust_subscriber.entity_type = 'node' and field_data_field_sirius_trust_subscriber.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_contact_relation on field_data_field_sirius_contact_relation.entity_type = 'node' and field_data_field_sirius_contact_relation.entity_id = node.nid ";
-
-    $sql .= "where node.type = 'sirius_trust_worker_benefit' ";
-
-    $sql .= "and field_sirius_trust_benefit_target_id = :benefit_nid ";
-    $sql_args[':benefit_nid'] = $benefit_nid;
-
-    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
-    $sql_args[':domain_nid'] = sirius_domain_nid();
-
-    $sql .= "and field_sirius_date_start_value <= :asof_date ";
-    $sql .= "and (field_sirius_date_end_value >= :asof_date or field_sirius_date_end_value is null) ";
-    $sql_args[':asof_date'] = $asof_date;
-
-    $sql .= "order by field_sirius_trust_subscriber_target_id, field_sirius_contact_relation_target_id ";
-
-    $stmt = sirius_sql_query($sql, $sql_args);
-
-    $pks = array();
-    while ($hr = $stmt->fetchAssoc()) {
-      $pks[] = $hr['nid'];
-    }
-    return array_chunk($pks, 100);
+  public function edi_premium_amt($context) {
+    return '777.77';
   }
 
   public function batch($wb_nids, $values, &$batch_context) {
@@ -169,7 +97,7 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
 
       $row = array();
 
-      $row['Health Net Group Number'] = '132501278';
+      $row['Health Net Group Number'] = 'LB391A';
       $row['Reserved 1'] = '';
       $row['File Date'] = date('Ymd');
       $row['Transaction Type (Activity Flag)'] = '';
@@ -224,9 +152,7 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
       $row['Retroactive Credit Amount'] = '';
       $row['Record End Designator'] = 'HNPES';
 
-      foreach ($row as $key => $value) {
-        $row[$key] = strtoupper($value);
-      }
+      $row = $this->edi_row($row, $context);
 
       $rows[$context['pk']] = $row;
     }
@@ -252,20 +178,15 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
     if (!$reltype_id) { return 'M'; }
 
     if (in_array($reltype_id, array('DP'))) { return 'P'; }
-    if (in_array($reltype_id, array('C', 'AC', 'H', 'QMSCO', 'SC', 'G'))) { return 'D'; }
+    if (in_array($reltype_id, array('C', 'AC', 'H', 'SC', 'G'))) { return 'D'; }
     if (in_array($reltype_id, array('SP'))) { return 'S'; }
+    if (in_array($reltype_id, array('QMSCO'))) { return 'Q'; }
   }
 
   public function gender($context) {
-    $lookup = &drupal_static(__FUNCTION__);
-    if (!isset($lookup)) {
-      $lookup = sirius_taxonomy_load('sirius_gender', 'tid', 'full');
-    }
-
-    $tid = $context['worker_node']->field_sirius_gender['und'][0]['tid'];
-    $term = $lookup[$tid];
-    if ($term->field_sirius_id['und'][0]['value'] == 'F') { return 'F'; }
-    if ($term->field_sirius_id['und'][0]['value'] == 'M') { return 'M'; }
+    $id = $this->gender_id($context['worker_node']);
+    if ($id == 'F') { return 'F'; }
+    if ($id == 'M') { return 'M'; }
     return '';
   }
 

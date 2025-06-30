@@ -238,6 +238,12 @@ function sirius_smf_report_cache_info() {
   sirius_require('sirius_smf', 'reports/edi_healthnet.inc');
   sirius_require('sirius_smf', 'reports/edi_kaiser.inc');
   sirius_require('sirius_smf', 'reports/edi_carelon.inc');
+  sirius_require('sirius_smf', 'reports/edi_expressscripts.inc');
+  sirius_require('sirius_smf', 'reports/edi_expressscripts_qmsco.inc');
+  sirius_require('sirius_smf', 'reports/edi_delta.inc');
+  sirius_require('sirius_smf', 'reports/edi_dentwell.inc');
+  sirius_require('sirius_smf', 'reports/edi_liberty.inc');
+  sirius_require('sirius_smf', 'reports/edi_mlk.inc');
 
   Sirius_Smf_Report_Empstatus::getInstance()->setInfo($items);
   Sirius_Smf_Report_Emprates::getInstance()->setInfo($items);
@@ -251,6 +257,12 @@ function sirius_smf_report_cache_info() {
   Sirius_Smf_Report_Edi_Healthnet::getInstance()->setInfo($items);
   Sirius_Smf_Report_Edi_Kaiser::getInstance()->setInfo($items);
   Sirius_Smf_Report_Edi_Carelon::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_ExpressScripts::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_ExpressScripts_QMSCO::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Delta::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Dentwell::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Liberty::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_MLK::getInstance()->setInfo($items);
 
   return $items;
 }

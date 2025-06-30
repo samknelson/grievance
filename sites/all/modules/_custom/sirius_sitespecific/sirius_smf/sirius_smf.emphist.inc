@@ -169,7 +169,7 @@ function sirius_smf_emphist_from_hours_employer($worker_nid, $employer_nid) {
     $data[$ym]['total'] += $hr['h'];
     $data[$ym][$hr['hours_type_tid']] += $hr['h'];
   }
-  sirius_minilog("Comuting from $first_ym through $last_ym");
+  sirius_minilog("Computing from $first_ym through $last_ym");
 
   // Get a list of months
   $ym = $first_ym;
@@ -278,7 +278,7 @@ function sirius_smf_emphist_from_hours_employer($worker_nid, $employer_nid) {
 
     if ($is_bad) { 
       sirius_minilog("Deleting existing dispatch " . $dispatch_node->title . " ($dispatch_nid) because: $is_bad");
-      // node_delete($dispatch_nid);
+      node_delete($dispatch_nid);
       unset($existing_dispatches[$dispatch_nid]);
     }
   }
