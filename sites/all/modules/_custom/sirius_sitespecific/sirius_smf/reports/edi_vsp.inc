@@ -125,7 +125,7 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
       $context = $this->context($wb_nid, $asof_date);
 
       $row = array();
-      $row['Subscriber Record ID'] = 'MEM';
+      $row['Subscriber Record ID'] = $this->record_id($context);
       $row['Full Replacement Files'] = 'R';
       $row['Control Number'] = 52638;
       $row['Subscriber ID'] = ''; // $context['subscriber_node']->field_sirius_id['und'][0]['value'];
@@ -222,22 +222,50 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
     if ($this->is_cobra($context)) { return 'C'; } else { return 'A'; }
   }
 
-  public function family_indicator($context) {
-    $has_spouse = $has_child = FALSE;
-    foreach ($context['dependent_relationship_nodes'] as $relationship_nid => $relationship_node) {
-      $reltype_id = $this->relationship_type($relationship_node);
-      if (in_array($reltype_id, array('DP', 'ES', 'SP'))) { $has_spouse = TRUE; }
-      if (in_array($reltype_id, array('C', 'AC', 'H', 'QMSCO', 'SC'))) { $has_child = TRUE; }
-    }
+  public function record_id($context) {
+    if ($this->is_dependent($context)) { return 'DEP'; } else { return 'MEM'; }
+  }
 
-    if ($has_spouse && $has_child) {
-      $indicator = 'A';
-    } else if ($has_spouse && !$has_child) {
-      $indicator = 'B';
-    } else if (!$has_spouse && $has_child) {
-      $indicator = 'D';
+  public function family_indicator($context) {
+    if ($this->is_dependent($context)) {
+      // For dependents:
+      // S = Spouse
+      // P = Domestic Partner (only if the plan supports it)
+      // C = Child, Adopted Child, Step Child, Protected Person, QMSCO Dependent
+      // H = Handicapped Child
+
+      $reltype_id = $this->relationship_type($context['relationship_node']);
+      if (in_array($reltype_id, array('SP')))                       { $indicator = 'S'; }
+      if (in_array($reltype_id, array('DP', 'ES')))                 { $indicator = 'P'; }
+      if (in_array($reltype_id, array('C', 'AC', 'QMSCO', 'SC')))   { $indicator = 'C'; }
+      if (in_array($reltype_id, array('H')))                        { $indicator = 'H'; }
     } else {
-      $indicator = 'C';
+      // For members:
+      // IF  NOT HasSpousePartner  AND  NOT HasChild
+      //  ⇒ Family-Indicator = 'C'     # Employee only
+      // ELSE IF  HasSpousePartner  AND  NOT HasChild
+      //  ⇒ Family-Indicator = 'B'     # Employee + Spouse (no kids yet)
+      // ELSE IF  NOT HasSpousePartner  AND  HasChild
+      //  ⇒ Family-Indicator = 'D'     # Employee + Child / Children
+      // ELSE                              # Has both spouse/partner AND ≥1 child
+      //  ⇒ Family-Indicator = 'A'     # Family (all dependents)
+
+      $has_spouse = $has_child = FALSE;
+      foreach ($context['dependent_relationship_nodes'] as $relationship_nid => $relationship_node) {
+        $reltype_id = $this->relationship_type($relationship_node);
+        if (in_array($reltype_id, array('DP', 'ES', 'SP'))) { $has_spouse = TRUE; }
+        if (in_array($reltype_id, array('C', 'AC', 'H', 'QMSCO', 'SC'))) { $has_child = TRUE; }
+      }
+
+      if ($has_spouse && $has_child) {
+        $indicator = 'A';
+      } else if ($has_spouse && !$has_child) {
+        $indicator = 'B';
+      } else if (!$has_spouse && $has_child) {
+        $indicator = 'D';
+      } else {
+        $indicator = 'C';
+      }
     }
 
     return $indicator;
