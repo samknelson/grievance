@@ -102,6 +102,20 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 			'#title' => t('Filename'),
 		);
 
+
+	  $report_type = $this->report_type($entity_node, $plugin_uuid);
+	  if ($report_type) {
+		  $info = report_cache_info($report_type);
+		  $form['settings']['report_parameters'] = $info['generator']->form();
+		  unset($form['settings']['report_parameters']['asof_date']);
+		  unset($form['settings']['report_parameters']['report_date']);
+
+		  if ($form['settings']['report_parameters']) {
+			  $form['settings']['report_parameters']['#type'] = 'fieldset';
+		  	$form['settings']['report_parameters']['#title'] = t('Report Settings');
+			}
+		}
+
 		$form['settings']['sftp'] = array(
 			'#type' => 'fieldset',
 			'#title' => 'SFTP',
@@ -353,6 +367,8 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 	}
 
 	public function entity_generate_form($form, &$form_state, $entity_node, $plugin_uuid) {
+		$settings = $this->entity_settings($entity_node, $plugin_uuid);
+
 		$form_state['plugin_uuid'] = $plugin_uuid;
 		$form_state['entity_nid'] = $entity_node->nid;
 
@@ -367,12 +383,12 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 	  unset($form['report_cache']);
 	  $form['report_type'] = array('#type' => 'value', '#value' => $report_type);
 
-	  // Instead of displaying the parameters form, we set them ourself.
+	  // Generate the form, with some deafults
 		$form['parameters'] = $info['generator']->form();
-		$form['parameters']['employer']['#type'] = 'value';
-		$form['parameters']['employer']['#value'] = $employer_node->nid;
+		sirius_jsonfield_util_set_defaults($form['parameters'], $settings['report_parameters']);
 		$form['parameters']['entity_nid'] = array('#type' => 'value', '#value' => $form_state['entity_nid']);
 		$form['parameters']['plugin_uuid'] = array('#type' => 'value', '#value' => $form_state['plugin_uuid']);
+
 
 	  $form['submit'] = array(
 	    '#type' => 'submit',
