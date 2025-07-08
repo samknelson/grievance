@@ -14,12 +14,16 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
       'module' => 'sirius_smf',
       'file' => 'reports/edi_expressscripts.inc',
       'row_encoding' => 'json',
+      'edi_tiers' => array('blended'),
     );
 
     return parent::info($result);
   }
 
-  public function is_qmsco_only() { return FALSE; }
+  public function edi_premium_tier($context) {
+    if (!($this->is_subscriber($context))) { return NULL; }
+    return 'blended';
+  }
 
   public function edi_has_header() { return TRUE; }
 
@@ -47,7 +51,7 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
     $row['PDP Indicator'] = '';
     $row['Filler3'] = '';
 
-    $header = array_keys($this->edi_fixed_fields('header'));
+    $header = array_keys($this->edi_fields('header'));
 
     return array('header' => $header, 'rows' => array($row));
   }
@@ -66,11 +70,11 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
     $row['Reserved /PDP Indicator'] = '';
     $row['Filler2'] = '';
 
-    $header = array_keys($this->edi_fixed_fields('footer'));
+    $header = array_keys($this->edi_fields('footer'));
 
     return array('header' => $header, 'rows' => array($row));
   }
-  public function edi_fixed_fields($which = '') {
+  public function edi_fields($which = '') {
     $fields = array();
 
     if ($which == 'header') {
@@ -218,6 +222,7 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
 
   public function form() {
     $form = parent::form();
+
     $form['mode'] = array(
       '#type' => 'select',
       '#title' => t('Mode'),
@@ -226,6 +231,15 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
         'T' => 'T -- Test Data',
       ),
       '#description' => t('This will appear in the header row as "production / test indicator"'),
+    );
+
+    $form['qmsco'] = array(
+      '#type' => 'select',
+      '#title' => t('QMSCO'),
+      '#options' => array(
+        'exclude' => t('Exclude QMSCO'),
+        'include' => t('Include QMSCO Only'),
+      ),
     );
 
     return $form;
@@ -274,11 +288,11 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
     $benefit_nid = $this->benefit_nid();
 
     $asof_date = date('Y-m-d 00:00:00', strtotime($values['parameters']['asof_date']));
-    $is_qmsco_only = $this->is_qmsco_only();
+    $is_qmsco_only = ($values['parameters']['qmsco'] == 'include');
 
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
-      $context = $this->context($wb_nid, $asof_date);
+      $context = $this->context($wb_nid, $asof_date, $values['parameters']);
 
       // Separate feeds, one without qmsco and one with only qmsco.
       $is_qmsco = $this->is_qmsco($context);

@@ -14,12 +14,18 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
       'module' => 'sirius_smf',
       'file' => 'reports/edi_mlk.inc',
       'row_encoding' => 'json',
+      'edi_tiers' => array('blended'),
     );
 
     return parent::info($result);
   }
 
-  public function edi_csv_fields() {
+  public function edi_premium_tier($context) {
+    if (!($this->is_subscriber($context))) { return NULL; }
+    return 'blended';
+  }
+
+  public function edi_fields() {
     $fields = array();
     $fields['POLICY'] = array();
     $fields['PLAN'] = array();
@@ -59,7 +65,7 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
 
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
-      $context = $this->context($wb_nid, $asof_date);
+      $context = $this->context($wb_nid, $asof_date, $values['parameters']);
 
       $row = array();
 

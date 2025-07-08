@@ -33,7 +33,7 @@ function sirius_smf_emphist_from_hours($worker_nid) {
   // Get the member status TID for each special member status
   if (!isset($lookups['ms_map'])) {
     $ms_map = array();
-    foreach (array('H60', 'P100', 'E60', 'E80', 'E100') as $id) {
+    foreach (array('H60', 'P100', 'E60', 'E80', 'E100', 'R60') as $id) {
       $ms_map[$id] = sirius_taxonomy_lookup_by_anything('sirius_member_status', $id);
       if (!$ms_map[$id]) {
         sirius_minilog("No member status found with ID $id.", 'error');
@@ -46,7 +46,7 @@ function sirius_smf_emphist_from_hours($worker_nid) {
 
 
   if (!isset($lookups['industry_map'])) {
-    foreach (array('H', 'P', 'E') as $id) {
+    foreach (array('H', 'P', 'E', 'R') as $id) {
       $industry_map[$id] = sirius_taxonomy_lookup_by_anything('sirius_industry', $id);
       if (!$industry_map[$id]) {
         sirius_minilog("No industry found with ID $id.", 'error');
@@ -83,39 +83,67 @@ function sirius_smf_emphist_from_hours($worker_nid) {
   sirius_minilog("Computing member status");
   sirius_minilog_indent();
   foreach ($industry_map as $industry_id => $industry_tid) {
-    if (!$first_hours_by_industry[$industry_tid]) {
-      sirius_minilog("For industry $industry_id, no hours found. Skipping.");
-      continue;
-    }
-
-    if ($industry_id == 'H') {
-      $ms_id = 'H60';
-    } else if ($industry_id == 'P') {
-      $ms_id = 'P100';
-    } else if ($industry_id == 'E') {
+    // Never touch E60
+    if ($industry_id == 'E') {
       if (in_array($ms_map['E60'], sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid'))) {
         sirius_minilog("For industry $industry_id, the member already has member status E60. Skipping.");
         continue; 
       }
-
-      if (time() - strtotime($first_hours_by_industry[$industry_tid]) > 60*60*24*365*5) {
-        $ms_id = 'E80';
-      } else {
-        $ms_id = 'E100';
-      }
-    } else {
-      continue; 
     }
 
-    $memo = "For industry $industry_id, Setting member status $ms_id because first hours was $first_hours_by_industry[$industry_tid]";
-    sirius_minilog($memo);
-    $result = sirius_worker_member_status_set($worker_node, taxonomy_term_load($ms_map[$ms_id]), TRUE, $memo);
-    if ($result['success']) {
-      sirius_minilog("... Result: " . $result['msg']);
+    if ($first_hours_by_industry[$industry_tid]) {
+      // We have hours in this industry. Add an appropriate member status
+
+      $ms_id = NULL;
+      if ($industry_id == 'H') {
+        $ms_id = 'H60';
+      } else if ($industry_id == 'P') {
+        $ms_id = 'P100';
+      } else if ($industry_id == 'R') {
+        $ms_id = 'R60';
+      } else if ($industry_id == 'E') {
+        if (time() - strtotime($first_hours_by_industry[$industry_tid]) > 60*60*24*365*5) {
+          $ms_id = 'E80';
+        } else {
+          $ms_id = 'E100';
+        }
+      }
+
+      $memo = "For industry $industry_id, Setting member status $ms_id because first hours was $first_hours_by_industry[$industry_tid]";
+      sirius_minilog($memo);
+      $result = sirius_worker_member_status_set($worker_node, taxonomy_term_load($ms_map[$ms_id]), TRUE, $memo);
+      if ($result['success']) {
+        sirius_minilog("... Result: " . $result['msg']);
+      } else {
+        sirius_minilog("... Result: " . $result['msg'], 'warning');
+      }
+
     } else {
-      sirius_minilog("... Result: " . $result['msg'], 'warning');
+      // We do not have hours in this industry. Remove all member statuses
+
+      if ($industry_id == 'H') {
+        $ms_ids = array('H60');
+      } else if ($industry_id == 'P') {
+        $ms_ids = array('P100');
+      } else if ($industry_id == 'R') {
+        $ms_ids = array('R60');
+      } else if ($industry_id == 'E') {
+        $ms_ids = array('E80', 'E100');
+      }
+
+      foreach ($ms_ids as $ms_id) {
+        $memo = "For industry $industry_id, removing member status $ms_id because there are no hours in that industry.";
+        sirius_minilog($memo);
+        $result = sirius_worker_member_status_set($worker_node, taxonomy_term_load($ms_map[$ms_id]), FALSE, $memo);
+        if ($result['success']) {
+          sirius_minilog("... Result: " . $result['msg']);
+        } else {
+          sirius_minilog("... Result: " . $result['msg'], 'warning');
+        }
+      }
     }
   }
+
   sirius_minilog_outdent();
   sirius_minilog("Work status history and member status computations complete.");
 }

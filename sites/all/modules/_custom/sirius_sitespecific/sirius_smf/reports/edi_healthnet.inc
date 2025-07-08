@@ -16,12 +16,23 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
       'row_encoding' => 'json',
       'edi_carrier_name' => 'HEALTHNET',
       'edi_group_number' => '',
+      'edi_tiers' => array('blended'),
+      'edi_tiers' => array('single', 'single+1', 'family'),
     );
 
     return parent::info($result);
   }
 
-  public function edi_fixed_fields() {
+  public function edi_premium_tier($context) {
+    if (!($this->is_subscriber($context))) { return NULL; }
+
+    $count = count($context['dependent_relationship_nodes']);
+    if ($count == 0) { return 'single'; }
+    if ($count == 1) { return 'single+1'; }
+    return 'family';
+  }
+
+  public function edi_fields() {
     return array(
       'Health Net Group Number' => array('width' => 6),
       'Reserved 1' => array('width' => 2),
@@ -82,10 +93,6 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
 
   public function edi_has_premium() { return TRUE; }
 
-  public function edi_premium_amt($context) {
-    return '777.77';
-  }
-
   public function batch($wb_nids, $values, &$batch_context) {
     $benefit_nid = $this->benefit_nid();
 
@@ -93,7 +100,7 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
 
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
-      $context = $this->context($wb_nid, $asof_date);
+      $context = $this->context($wb_nid, $asof_date, $values['parameters']);
 
       $row = array();
 
@@ -101,7 +108,7 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
       $row['Reserved 1'] = '';
       $row['File Date'] = date('Ymd');
       $row['Transaction Type (Activity Flag)'] = '';
-      $row['Coverage Begin Date'] = date('Ymd', strtotime($wb_node->field_sirius_date_start['und'][0]['value']));
+      $row['Coverage Begin Date'] = $this->coverage_start_date($context);
       $row['Subscriber SSN'] = $this->ssn($context, 'subscriber_node');
       $row['Dependent SSN'] = $this->ssn($context, 'worker_node');
       $row['Member Type'] = $this->member_type($context);
@@ -230,35 +237,19 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
     return count($context['dependent_relationship_nodes']) + 1;
   }
 
+  /*
+  -Single: If coverage is for Member Only, then ContractType = 1
+  -Two-Party: If coverage is for Member + One Dependent (regardless of whether the dependent is a spouse, child, or other), then ContractType = 2
+  -Family: If coverage includes Member + More Than One Dependent, then ContractType = 3
+  */
+
   public function contract_type($context) {
     if ($this->is_dependent($context)) { return ''; }
 
-    $reltypes = &drupal_static(__FUNCTION__);
-    if (!isset($$reltypes)) { $reltypes = sirius_taxonomy_load('sirius_contact_relationship_types', 'tid', 'full'); }
+    $count = count($context['dependent_relationship_nodes']);
 
-    $has_spouse = $has_child = FALSE;
-    foreach ($context['dependent_relationship_nodes'] as $relationship_nid => $relationship_node) {
-      $reltype_tid = $relationship_node->field_sirius_contact_reltype['und'][0]['tid'];
-      if (!$reltype_tid) { continue; }
-      $reltype_term = $reltypes[$reltype_tid];
-      if (!$reltype_term) { continue; }
-      $reltype_id = $reltype_term->field_sirius_id['und'][0]['value'];
-      if (!$reltype_id) { continue; }
-
-      if (in_array($reltype_id, array('DP', 'ES', 'SP'))) { $has_spouse = TRUE; }
-      if (in_array($reltype_id, array('C', 'AC', 'H', 'QMSCO', 'SC'))) { $has_child = TRUE; }
-    }
-
-    if ($has_spouse && $has_child) {
-      $indicator = '3';
-    } else if ($has_spouse && !$has_child) {
-      $indicator = '2';
-    } else if (!$has_spouse && $has_child) {
-      $indicator = '4';
-    } else {
-      $indicator = '1';
-    }
-
-    return $indicator;
+    if ($count == 0) { return '1'; }
+    if ($count == 1) { return '2'; }
+    return '3';
   }
 }

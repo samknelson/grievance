@@ -13,9 +13,15 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
       'module' => 'sirius_smf',
       'file' => 'reports/edi_hinge.inc',
       'row_encoding' => 'json',
+      'edi_tiers' => array('blended'),
     );
 
     return parent::info($result);
+  }
+
+  public function edi_premium_tier($context) {
+    if (!($this->is_subscriber($context))) { return NULL; }
+    return 'blended';
   }
 
   public function fields() {
@@ -82,7 +88,7 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
   public function batch($wb_nids, $values, &$batch_context) {
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
-      $context = $this->context($wb_nid, $asof_date);
+      $context = $this->context($wb_nid, $asof_date, $values['parameters']);
 
       $row = array();
       $row['subscriber_id'] = $context['worker_node']->field_sirius_id['und'][0]['value'];

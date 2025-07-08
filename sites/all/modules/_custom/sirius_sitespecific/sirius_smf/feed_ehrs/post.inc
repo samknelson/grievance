@@ -22,6 +22,19 @@ function sirius_smf_feed_ehrs_post_form($form, &$form_state, $info, $data, $wiza
 		$rows[] = $row;
 	}
 
+	if ($data['term_proposed']) {
+		foreach ($data['term_proposed'] as $worker_nid) {
+			$worker_node = node_load($worker_nid);
+			$row = array();
+			$row[] = $worker_node->field_sirius_ssn['und'][0]['value'];
+			$row[] = $worker_node->field_sirius_name['und'][0]['given'];
+			$row[] = $worker_node->field_sirius_name['und'][0]['family'];
+			$row[] = 'term';
+			$row[] = 0;
+			$rows[] = $row;
+		}
+	}
+
 	if ($rows) {
 		$total_row = array();
 		$total_row[] = '<strong>' . t('Total') . '</strong>';
@@ -76,20 +89,28 @@ function sirius_smf_feed_ehrs_post_form_submit($form, &$form_state) {
 
 	$operations = array();
 	foreach ($data['records']['rows'] as $delta => $row) {
-		$operations[] = array('sirius_smf_feed_ehrs_post_form_submit_batch', array($wizard_node, $info, $data, $current_step, $delta));
+		$operations[] = array('sirius_smf_feed_ehrs_post_form_hrs_batch', array($wizard_node, $info, $data, $current_step, $delta));
+	}
+	if ($data['term_proposed']) {
+		foreach ($data['term_proposed'] as $delta => $ignore) {
+			$operations[] = array('sirius_smf_feed_ehrs_post_form_term_batch', array($wizard_node, $info, $data, $current_step, $delta));
+		}
 	}
 	$operations[] = array('sirius_smf_feed_ehrs_post_form_submit_complete', array($wizard_node, $info, $data, $current_step));
-	
+
 	$batch = array('operations' => $operations, 'file' => drupal_get_path('module', 'sirius_smf') . '/feed_ehrs/post.inc');
 	batch_set($batch);
 }
 
 function sirius_smf_feed_ehrs_post_form_submit_complete($wizard_node, $info, $data, $current_step, &$context) {
+	sirius_require('sirius_smf', 'sirius_smf.ehrs.inc');
+	sirius_smf_feed_ehrs_load_includes();
+
 	drupal_set_message("Hour upload saved.");
 	sirius_wizard_submit($info, $data, $wizard_node, $current_step, "Hours upload has been confirmed, and charges have been generated.", array('nonsequential' => FALSE, 'feed_status' => 'complete'));
 }
 
-function sirius_smf_feed_ehrs_post_form_submit_batch($wizard_node, $info, $data, $current_step, $delta, &$context) {
+function sirius_smf_feed_ehrs_post_form_hrs_batch($wizard_node, $info, $data, $current_step, $delta, &$context) {
 	// Load all our include files
 	sirius_require('sirius_smf', 'sirius_smf.ehrs.inc');
 	sirius_smf_feed_ehrs_load_includes();
@@ -272,6 +293,73 @@ function sirius_smf_feed_ehrs_post_form_submit_batch($wizard_node, $info, $data,
 	$entry['department'] = $dept_tid;
 	$entry['hour_type'] = $row['hour_type'];
 	$entry['qty'] = $row['hrs'];
+	$entry['note'] = '';
+	$entry['comment'] = '';
+
+	$payperiod_json['entries']['upload']['rows'] = array($entry);
+
+	$payperiod_node->field_sirius_active['und'][0]['value'] = 'Yes';
+	sirius_hour_payperiod_compute($payperiod_json);
+	sirius_json_set($payperiod_node, $payperiod_json);
+	node_save($payperiod_node);
+}
+
+function sirius_smf_feed_ehrs_post_form_term_batch($wizard_node, $info, $data, $current_step, $delta, &$context) {
+	// Load all our include files
+	sirius_require('sirius_smf', 'sirius_smf.ehrs.inc');
+	sirius_smf_feed_ehrs_load_includes();
+
+	// Don't denormalize in realtime
+	sirius_denorm_realtime(FALSE);
+
+	$eup_node = sirius_smf_feed_ehrs_get_eup($wizard_node);
+	if (!$eup_node) {
+		drupal_set_message("This feed is not associated with an employer upload.", 'error');
+		return;
+	}
+
+	$eup = Sirius_Smf_Ehrs_Monthly::getInstance();
+	$year = $eup->get_year($eup_node);
+	$month = $eup->get_month($eup_node);
+	$day = 1;
+	$employer_node = $eup->get_employer($eup_node);
+	$employer_nid = $employer_node->nid;
+	if (!$year || !$month || !$employer_nid) {
+		drupal_set_message("Unable to find the year, the month, or the employer. Please check the employer upload node.", 'error');
+		return;
+	}
+	$domain_nid = sirius_domain_nid();
+
+	$worker_nid = $data['term_proposed'][$delta];
+
+	// 
+	// Generate hours entries
+	// 
+
+	$dept_tid = sirius_taxonomy_lookup_by_anything('grievance_department', 'default');
+  if (!$dept_tid) {
+  	drupal_set_mesasge("No department found with ID='default'.", 'error');
+  	return;
+  }
+
+	$hour_type_tid = sirius_taxonomy_lookup_by_anything('sirius_hour_type', 'terminated');
+  if (!$hour_type_tid) {
+  	drupal_set_mesasge("No hour type found with ID='terminated'.", 'error');
+  	return;
+  }
+
+	$payperiod_node = sirius_hour_payperiod_load($domain_nid, $worker_nid, $employer_nid, $year, $month, $day, TRUE);
+	$payperiod_json = sirius_json_get($payperiod_node);
+
+	$payperiod_json['entries'] = array();
+	$payperiod_json['entries']['upload']['source_name'] = 'Employer Upload';
+	$payperiod_json['entries']['upload']['status'] = 'live';
+
+	$entry = array();
+	$entry['day'] = 1;
+	$entry['department'] = $dept_tid;
+	$entry['hour_type'] = $hour_type_tid;
+	$entry['qty'] = 0;
 	$entry['note'] = '';
 	$entry['comment'] = '';
 

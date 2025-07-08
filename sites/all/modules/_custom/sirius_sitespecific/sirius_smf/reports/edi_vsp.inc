@@ -15,12 +15,18 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
       'module' => 'sirius_smf',
       'file' => 'reports/edi_vsp.inc',
       'row_encoding' => 'json',
+      'edi_tiers' => array('blended'),
     );
 
     return parent::info($result);
   }
 
-  public function edi_fixed_fields() {
+  public function edi_premium_tier($context) {
+    if (!($this->is_subscriber($context))) { return NULL; }
+    return 'blended';
+  }
+
+  public function edi_fields() {
     return array(
       'Subscriber Record ID' => array('width' => 3),
       'Full Replacement Files' => array('width' => 1),
@@ -72,48 +78,6 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
     );
   }
 
-  public function pks(&$form_state) {
-    $benefit_nid_standard = $this->benefit_nid_standard();
-    if (!$benefit_nid_standard) { return array(); }
-
-    $benefit_nid_enhanced = $this->benefit_nid_enhanced();
-    if (!$benefit_nid_enhanced) { return array(); }
-
-    $asof_date = date('Y-m-d 00:00:00', strtotime($form_state['values']['parameters']['asof_date']));
-
-    $sql_args = array();
-    $sql = "select nid ";
-    $sql .= "from node ";
-    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_date_end on field_data_field_sirius_date_end.entity_type = 'node' and field_data_field_sirius_date_end.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_trust_benefit on field_data_field_sirius_trust_benefit.entity_type = 'node' and field_data_field_sirius_trust_benefit.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_trust_subscriber on field_data_field_sirius_trust_subscriber.entity_type = 'node' and field_data_field_sirius_trust_subscriber.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_contact_relation on field_data_field_sirius_contact_relation.entity_type = 'node' and field_data_field_sirius_contact_relation.entity_id = node.nid ";
-
-    $sql .= "where node.type = 'sirius_trust_worker_benefit' ";
-
-    $sql .= "and field_sirius_trust_benefit_target_id in (:benefit_nids) ";
-    $sql_args[':benefit_nids'] = array($benefit_nid_standard, $benefit_nid_enhanced);
-
-    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
-    $sql_args[':domain_nid'] = sirius_domain_nid();
-
-    $sql .= "and field_sirius_date_start_value <= :asof_date ";
-    $sql .= "and (field_sirius_date_end_value >= :asof_date or field_sirius_date_end_value is null) ";
-    $sql_args[':asof_date'] = $asof_date;
-
-    $sql .= "order by field_sirius_trust_subscriber_target_id, field_sirius_contact_relation_target_id ";
-
-    $stmt = sirius_sql_query($sql, $sql_args);
-
-    $pks = array();
-    while ($hr = $stmt->fetchAssoc()) {
-      $pks[] = $hr['nid'];
-    }
-    return array_chunk($pks, 100);
-  }
-
   public function batch($wb_nids, $values, &$batch_context) {
     $benefit_nid_standard = $this->benefit_nid_standard();
     $benefit_nid_enhanced = $this->benefit_nid_enhanced();
@@ -122,7 +86,7 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
 
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
-      $context = $this->context($wb_nid, $asof_date);
+      $context = $this->context($wb_nid, $asof_date, $values['parameters']);
 
       $row = array();
       $row['Subscriber Record ID'] = $this->record_id($context);
@@ -240,32 +204,13 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
       if (in_array($reltype_id, array('C', 'AC', 'QMSCO', 'SC')))   { $indicator = 'C'; }
       if (in_array($reltype_id, array('H')))                        { $indicator = 'H'; }
     } else {
-      // For members:
-      // IF  NOT HasSpousePartner  AND  NOT HasChild
-      //  ⇒ Family-Indicator = 'C'     # Employee only
-      // ELSE IF  HasSpousePartner  AND  NOT HasChild
-      //  ⇒ Family-Indicator = 'B'     # Employee + Spouse (no kids yet)
-      // ELSE IF  NOT HasSpousePartner  AND  HasChild
-      //  ⇒ Family-Indicator = 'D'     # Employee + Child / Children
-      // ELSE                              # Has both spouse/partner AND ≥1 child
-      //  ⇒ Family-Indicator = 'A'     # Family (all dependents)
-
-      $has_spouse = $has_child = FALSE;
-      foreach ($context['dependent_relationship_nodes'] as $relationship_nid => $relationship_node) {
-        $reltype_id = $this->relationship_type($relationship_node);
-        if (in_array($reltype_id, array('DP', 'ES', 'SP'))) { $has_spouse = TRUE; }
-        if (in_array($reltype_id, array('C', 'AC', 'H', 'QMSCO', 'SC'))) { $has_child = TRUE; }
-      }
-
-      if ($has_spouse && $has_child) {
-        $indicator = 'A';
-      } else if ($has_spouse && !$has_child) {
-        $indicator = 'B';
-      } else if (!$has_spouse && $has_child) {
-        $indicator = 'D';
-      } else {
-        $indicator = 'C';
-      }
+      // Subscriber only IF MEMBER ONLY ⇒ Family-Indicator = ‘C’
+      // Sub + 1 ELSE IF MEMBER PLUS ONE DEP ⇒ Family-Indicator = ‘B’
+      // Family (more than 1 dependent)ELSE ⇒ Family-Indicator = ‘A’
+      $count = count($context['dependent_relationship_nodes']);
+      if ($count == 0) { return 'C'; }
+      if ($count == 1) { return 'B'; }
+      return 'A';
     }
 
     return $indicator;

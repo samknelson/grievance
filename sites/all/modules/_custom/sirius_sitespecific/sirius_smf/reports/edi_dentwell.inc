@@ -2,7 +2,7 @@
 
 class Sirius_Smf_Report_Edi_Dentwell extends Sirius_Trust_Provider_Edi_Report_Generator {
   public $type = 'sirius-smf-edi-dentwell';
-  public $edi_output_format = 'fixed';
+  public $edi_output_format = 'csv';
 
   public function benefit_nid() { return $this->benefit_nid_from_id('D'); }
 
@@ -14,9 +14,15 @@ class Sirius_Smf_Report_Edi_Dentwell extends Sirius_Trust_Provider_Edi_Report_Ge
       'module' => 'sirius_smf',
       'file' => 'reports/edi_dentwell.inc',
       'row_encoding' => 'json',
+      'edi_tiers' => array('blended'),
     );
 
     return parent::info($result);
+  }
+
+  public function edi_premium_tier($context) {
+    if (!($this->is_subscriber($context))) { return NULL; }
+    return 'blended';
   }
 
   public function edi_has_header() { return TRUE; }
@@ -26,12 +32,11 @@ class Sirius_Smf_Report_Edi_Dentwell extends Sirius_Trust_Provider_Edi_Report_Ge
     $parameters = $this->parameters($report_id);
     $parameters = $parameters['parameters'];
 
-    $header = array_keys($this->edi_fixed_fields('header'));
+    $header = array_keys($this->edi_fields('header'));
 
     $row['Record Type'] = 'H';
     $row['Group ID'] = '';
     $row['Report Date'] = date('Ymd', strtotime($parameters['asof_date']));
-    $row['Filler'] = '';
 
     return array('header' => $header, 'rows' => array($row));
   }
@@ -43,24 +48,29 @@ class Sirius_Smf_Report_Edi_Dentwell extends Sirius_Trust_Provider_Edi_Report_Ge
     $parameters = $this->parameters($report_id);
     $rowcount = $this->rowcount($report_id);
 
-    $row['Record Type'] = 'T';
-    $row['Subscriber Count'] = ''; // @todo
-    $row['Dependent Count'] = ''; // @todo
-    $row['Filler'] = '';
+    $data = $this->load($report_id);
 
-    $header = array_keys($this->edi_fixed_fields('footer'));
+    $subscriber_count = $dependent_count = 0;
+    foreach ($data as $record) {
+      if ($record['edi_is_subscriber']) { ++$subscriber_count; } else { ++$dependent_count; }
+    }
+
+    $row['Record Type'] = 'T';
+    $row['Subscriber Count'] = $subscriber_count;
+    $row['Dependent Count'] = $dependent_count;
+
+    $header = array_keys($this->edi_fields('footer'));
 
     return array('header' => $header, 'rows' => array($row));
   }
 
-  public function edi_fixed_fields($which = '') {
+  public function edi_fields($which = '') {
     $fields = array();
 
     if ($which == 'header') {
       $fields['Record Type'] = array('width' => 1);
       $fields['Group ID'] = array('width' => 1);
       $fields['Report Date'] = array('width' => 1);
-      $fields['Filler'] = array('width' => 1);
     } else if ($which != 'footer') {
       $fields['Record Type'] = array('width' => 1);
       $fields['SubscriberNumber'] = array('width' => 30);
@@ -85,7 +95,6 @@ class Sirius_Smf_Report_Edi_Dentwell extends Sirius_Trust_Provider_Edi_Report_Ge
       $fields['Record Type'] = array('width' => 1);
       $fields['Subscriber Count'] = array('width' => 1);
       $fields['Dependent Count'] = array('width' => 1);
-      $fields['Filler'] = array('width' => 1);
     }
 
     return $fields;
@@ -98,7 +107,7 @@ class Sirius_Smf_Report_Edi_Dentwell extends Sirius_Trust_Provider_Edi_Report_Ge
 
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
-      $context = $this->context($wb_nid, $asof_date);
+      $context = $this->context($wb_nid, $asof_date, $values['parameters']);
 
       $row = array();
 

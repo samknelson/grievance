@@ -16,16 +16,18 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
       'row_encoding' => 'json',
       'edi_carrier_name' => 'DELTA',
       'edi_group_number' => '17975',
+      'edi_tiers' => array('blended'),
     );
 
     return parent::info($result);
   }
 
-  public function edi_has_premium() { return TRUE; }
-
-  public function edi_premium_amt($context) {
-    return '777.77';
+  public function edi_premium_tier($context) {
+    if (!($this->is_subscriber($context))) { return NULL; }
+    return 'blended';
   }
+
+  public function edi_has_premium() { return TRUE; }
 
   public function edi_has_header() { return TRUE; }
 
@@ -34,7 +36,7 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
     $parameters = $this->parameters($report_id);
     $parameters = $parameters['parameters'];
 
-    $header = array_keys($this->edi_fixed_fields('header'));
+    $header = array_keys($this->edi_fields('header'));
 
     $row['Record Type'] = '10';
     $row['Group ID'] = '17975';
@@ -60,12 +62,12 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
     $row['Record Count'] = $this->rowcount($report_id) + 2;
     $row['Filler'] = '';
 
-    $header = array_keys($this->edi_fixed_fields('footer'));
+    $header = array_keys($this->edi_fields('footer'));
 
     return array('header' => $header, 'rows' => array($row));
   }
   
-  public function edi_fixed_fields($which = '') {
+  public function edi_fields($which = '') {
     $fields = array();
 
     if ($which == 'header') {
@@ -197,7 +199,7 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
 
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
-      $context = $this->context($wb_nid, $asof_date);
+      $context = $this->context($wb_nid, $asof_date, $values['parameters']);
 
       $row = array();
 

@@ -14,12 +14,22 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       'module' => 'sirius_smf',
       'file' => 'reports/edi_kaiser.inc',
       'row_encoding' => 'json',
+      'edi_tiers' => array('single', 'single+1', 'family'),
     );
 
     return parent::info($result);
   }
 
-  public function edi_fixed_fields() {
+  public function edi_premium_tier($context) {
+    if (!($this->is_subscriber($context))) { return NULL; }
+
+    $count = count($context['dependent_relationship_nodes']);
+    if ($count == 0) { return 'single'; }
+    if ($count == 1) { return 'single+1'; }
+    return 'family';
+  }
+
+  public function edi_fields() {
     $fields = array();
     $fields['Region Code'] = array('width' => 3);
     $fields['Record Type'] = array('width' => 1);
@@ -135,7 +145,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
 
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
-      $context = $this->context($wb_nid, $asof_date);
+      $context = $this->context($wb_nid, $asof_date, $values['parameters']);
 
       $row = array();
 
