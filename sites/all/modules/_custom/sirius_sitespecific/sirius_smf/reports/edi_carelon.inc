@@ -55,45 +55,6 @@ class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Gen
     return $fields;
   }
 
-  public function pks(&$form_state) {
-    $benefit_nid = $this->benefit_nid();
-    if (!$benefit_nid) { return array(); }
-
-    $asof_date = date('Y-m-d 00:00:00', strtotime($form_state['values']['parameters']['asof_date']));
-
-    $sql_args = array();
-    $sql = "select nid ";
-    $sql .= "from node ";
-    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_date_end on field_data_field_sirius_date_end.entity_type = 'node' and field_data_field_sirius_date_end.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_trust_benefit on field_data_field_sirius_trust_benefit.entity_type = 'node' and field_data_field_sirius_trust_benefit.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_trust_subscriber on field_data_field_sirius_trust_subscriber.entity_type = 'node' and field_data_field_sirius_trust_subscriber.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_contact_relation on field_data_field_sirius_contact_relation.entity_type = 'node' and field_data_field_sirius_contact_relation.entity_id = node.nid ";
-
-    $sql .= "where node.type = 'sirius_trust_worker_benefit' ";
-
-    $sql .= "and field_sirius_trust_benefit_target_id = :benefit_nid ";
-    $sql_args[':benefit_nid'] = $benefit_nid;
-
-    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
-    $sql_args[':domain_nid'] = sirius_domain_nid();
-
-    $sql .= "and field_sirius_date_start_value <= :asof_date ";
-    $sql .= "and (field_sirius_date_end_value >= :asof_date or field_sirius_date_end_value is null) ";
-    $sql_args[':asof_date'] = $asof_date;
-
-    $sql .= "order by field_sirius_trust_subscriber_target_id, field_sirius_contact_relation_target_id ";
-
-    $stmt = sirius_sql_query($sql, $sql_args);
-
-    $pks = array();
-    while ($hr = $stmt->fetchAssoc()) {
-      $pks[] = $hr['nid'];
-    }
-    return array_chunk($pks, 100);
-  }
-
   public function batch($wb_nids, $values, &$batch_context) {
     $benefit_nid = $this->benefit_nid();
 
