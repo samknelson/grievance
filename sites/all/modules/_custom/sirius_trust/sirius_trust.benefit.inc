@@ -1,5 +1,7 @@
 <?php
 
+sirius_require('sirius_trust', 'sirius_trust.wb_scan_changelog.inc');
+
 function sirius_trust_benefits($active = TRUE) {
 	$query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
@@ -354,7 +356,6 @@ function sirius_trust_worker_benefit_start_ts($worker_node, $benefit_nids, $ts =
 
 
 
-
 function sirius_trust_wb_scan_worker($mode, $worker_node, $options = array()) {
 	sirius_minilog("Worker Benefit Scan: " . $worker_node->title);
 
@@ -413,12 +414,25 @@ function sirius_trust_wb_scan_worker_start($mode, $worker_node, $options = array
 }
 
 function sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, $worker_node, $relationship_node, $benefit_node, $options = array()) {
+	$change_data = array(
+		'mode' => $mode, 
+		'employer_nid' => $employer_node->nid, 
+		'policy_nid' => $policy_node->nid,
+		'relationship_nid' => $relationship_node->nid,
+		'benefit_nid' => $benefit_node->nid,
+		'scan' => 'start',
+		'subscriber_worker_nid' => $worker_node->nid,
+	);
+
 	// Find the dependent.
 	if ($relationship_node) {
 		$dependent_contact_nid = $relationship_node->field_sirius_contact_alt['und'][0]['target_id'];
 		if (!$dependent_contact_nid) { return array('success' => FALSE, 'msg' => 'The relationship does not reference a contact.'); }
 		$dependent_worker_nid = sirius_worker_get_by_contact_nid($dependent_contact_nid, TRUE);
 		if (!$dependent_worker_nid) { return array('success' => FALSE, 'msg' => 'The contact is not associated with a worker.'); }
+		$change_data['dependent_worker_nid'] = $dependent_worker_nid;
+	} else {
+		$change_data['dependent_worker_nid'] = $worker_node->nid;
 	}
 
 	// Find out if the benefit is already active
@@ -433,6 +447,9 @@ function sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, 
 	}
 	$probe = sirius_trust_worker_benefits_search($search_params);
 	if ($probe) {
+		$change_data['msg'] = 'Benefit is already active';
+		$change_data['action'] = 'ok';
+		Sirius_Trust_Wb_Scan_Changelog::getInstance()->log($change_data);
 		return array('success' => TRUE, 'msg' => 'Benefit is already active.');
 	}
 
@@ -453,6 +470,9 @@ function sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, 
 
 	$eligibility = sirius_trust_eligibility_plugin_check_all($params);
 	if (!$eligibility['success']) {
+		$change_data['msg'] = 'Not eligible: ' . $eligibility['msg'];
+		$change_data['action'] = 'ok';
+		Sirius_Trust_Wb_Scan_Changelog::getInstance()->log($change_data);
 		return array("success" => TRUE, 'msg' => "Not eligible: " . $eligibility['msg'], 'eligibility' => $eligibility);
 	}
 
@@ -467,11 +487,17 @@ function sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, 
 	// $search_params['ts'] = strtotime('-1 month', strtotime(date('Y-m-15')));
 	$probe = sirius_trust_worker_benefits_search($search_params);
 	if ($probe) {
+		$change_data['msg'] = 'The worker had the benefit last month.';
+		$change_data['action'] = 'extend';
+
 		sirius_minilog("The worker had the benefit last month. Extending.");
 		$wb_nid = reset($probe);
 		$wb_node = node_load($wb_nid);
 		unset($wb_node->field_sirius_date_end['und']);
 	} else {
+		$change_data['msg'] = 'The worker did not have the benefit last month.';
+		$change_data['action'] = 'start';
+
 		sirius_minilog("The worker did not have the benefit last month. Starting.");
 
 		global $user;
@@ -505,8 +531,25 @@ function sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, 
 		sirius_minilog("(mode = $mode, record not saved.)");
 	}
 
+	Sirius_Trust_Wb_Scan_Changelog::getInstance()->log($change_data);
 	return array('success' => TRUE, 'msg' => 'Benefit started.', 'eligibility' => $eligibility);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function sirius_trust_wb_scan_worker_stop($mode, $worker_node, $options = array()) {
 	$search_params['subscriber_nid'] = $worker_node->nid;
@@ -524,6 +567,11 @@ function sirius_trust_wb_scan_worker_stop($mode, $worker_node, $options = array(
 }
 
 function sirius_trust_wb_scan_record_stop($mode, $wb_node, $options = array()) {
+	$change_data = array(
+		'mode' => $mode,
+		'wb_nid' => $wb_node->nid,
+		'scan' => 'stop',
+	);
 
 	$wb_json = sirius_json_get($wb_node);
 	$wb_json_orig = $wb_json;
@@ -532,23 +580,30 @@ function sirius_trust_wb_scan_record_stop($mode, $wb_node, $options = array()) {
 
 	$subscriber_worker_node  = node_load($wb_node->field_sirius_trust_subscriber['und'][0]['target_id']);
 	if (!$subscriber_worker_node) { return array('success' => FALSE, 'msg' => 'No subscriber worker record.'); }
+	$change_data['subscriber_worker_nid'] = $subscriber_worker_node->nid;
 
 	$employer_node = node_load($wb_node->field_grievance_shop['und'][0]['target_id']);
 
 	$policy_node = sirius_ledger_policy_lookup($subscriber_worker_node, $employer_node);
 	if (!$policy_node) { return array('success' => FALSE, 'msg' => 'No policy record.'); }
 
-	$relationship_node = node_load($form_state['values']['relationship_nid']);
+	$relationship_node = node_load($wb_node->field_sirius_contact_relation['und'][0]['target_id']);
 	if ($relationship_node) {
 		$dependent_contact_nid = $relationship_node->field_sirius_contact_alt['und'][0]['target_id'];
 		$dependent_worker_node = sirius_worker_get_by_contact_nid($dependent_contact_nid);
+		$change_data['relationship_nid'] = $relationship_node->nid;
 	} else {
 		$dependent_worker_node = $subscriber_worker_node;
 	}
+
+	$change_data['dependent_worker_nid'] = $dependent_worker_node->nid;
+
 	if (!$dependent_worker_node) { return array('success' => FALSE, 'msg' => 'No dependent worker record.'); }
 
 	$benefit_node = node_load($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
 	if (!$benefit_node) { return array('success' => FALSE, 'msg' => 'No benefit record.'); }
+
+	$change_data['benefit_nid'] = $benefit_node->nid;
 
 	$params = array();
 	$params['policy_node'] = $policy_node;
@@ -562,6 +617,9 @@ function sirius_trust_wb_scan_record_stop($mode, $wb_node, $options = array()) {
 	if (!$result['success']) {
 		sirius_minilog("No longer eligible: " . $result['msg']);
 		sirius_minilog("The benefit will be expired.");
+
+		$change_data['msg'] = "No longer eligible: " . $result['msg'];
+		$change_data['action'] = 'terminated';
 
 		$date = gmdate('Y-m-1');
 		$wb_node->field_sirius_date_end['und'][0]['value'] = $date;
@@ -581,8 +639,13 @@ function sirius_trust_wb_scan_record_stop($mode, $wb_node, $options = array()) {
 	} else if ($result['warning']) {
 		sirius_minilog("Worker is eligible for the benefit, but with a warning: " . $result['msg']);
 		$wb_node['scan']['warnings'] = $result['msg'];
+
+		$change_data['msg'] = "Warning: " . $result['msg'];
+		$change_data['action'] = 'warning';
 	} else {
 		sirius_minilog("Worker is still eligible for the benefit.");
+
+		$change_data['action'] = 'ok';
 	}
 
 	if (sirius_revision_changed_impl($wb_json, $wb_json_orig, 10) || sirius_revision_changed_impl($wb_json_orig, $wb_json, 10)) {
@@ -598,6 +661,8 @@ function sirius_trust_wb_scan_record_stop($mode, $wb_node, $options = array()) {
 			sirius_minilog("(Test mode, worker benefit not saved.)");
 		}
 	}
+
+	Sirius_Trust_Wb_Scan_Changelog::getInstance()->log($change_data);
 
 	return array('success' => TRUE);
 }

@@ -225,6 +225,15 @@ function sirius_trust_sirius_cron_scan_info() {
   );
   */
 
+  $items['trust_wb_scan_changelog_purge'] = array(
+    'title' => 'Trust WB Scan Changelog',
+    'description' => 'Purge old scan changelog entries',
+    'schedule' => 'daily',
+    'callback' => 'sirius_trust_wb_scan_changelog_purge_cron',
+    'multidomain' => FALSE,
+    'component' => 'trust',
+  );
+
   return $items;
 }
 
