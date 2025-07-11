@@ -23,6 +23,7 @@ class Sirius_Smf_Report_Edi_Local11 extends Report_Cache_Report_Generator {
       'module' => 'sirius_smf',
       'file' => 'reports/edi_local11.inc',
       'row_encoding' => 'json',
+      'edi_output_format' => 'csv',
     );
 
     return parent::info($result);

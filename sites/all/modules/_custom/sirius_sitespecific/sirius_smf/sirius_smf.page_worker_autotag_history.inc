@@ -80,7 +80,7 @@ function sirius_smf_node_tab_worker_autotag_history($worker_node) {
 	$policy_lookup = $employer_lookup = $benefit_lookup = array();
 	foreach ($months as $col1_ym => $col1_record) {
 		$col1_ts = strtotime("$col1_ym-15");
-		$col2_ts = strtotime('-4 months', $col1_ts);
+		$col2_ts = strtotime('-3 months', $col1_ts);
 		$col2_ym = date('Y-m', $col2_ts);
 		$col2_record = $months[$col2_ym];
 

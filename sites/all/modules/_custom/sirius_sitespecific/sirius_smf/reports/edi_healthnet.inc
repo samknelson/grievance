@@ -2,7 +2,6 @@
 
 class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_Generator {
   public $type = 'sirius-smf-edi-healthnet';
-  public $edi_output_format = 'fixed';
 
   public function benefit_nid() { return $this->benefit_nid_from_id('H'); }
 
@@ -18,6 +17,8 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
       'edi_group_number' => '',
       'edi_tiers' => array('blended'),
       'edi_tiers' => array('single', 'single+1', 'family'),
+      'edi_group_number' => 'LB391A',
+      'edi_output_format' => 'fixed',
     );
 
     return parent::info($result);
@@ -104,7 +105,7 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
 
       $row = array();
 
-      $row['Health Net Group Number'] = 'LB391A';
+      $row['Health Net Group Number'] = $this->info()['edi_group_number'];
       $row['Reserved 1'] = '';
       $row['File Date'] = date('Ymd');
       $row['Transaction Type (Activity Flag)'] = '';

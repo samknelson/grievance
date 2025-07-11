@@ -14,6 +14,7 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
       'file' => 'reports/edi_hinge.inc',
       'row_encoding' => 'json',
       'edi_tiers' => array('blended'),
+      'edi_output_format' => 'fixed',
     );
 
     return parent::info($result);

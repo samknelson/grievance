@@ -2,7 +2,6 @@
 
 class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Generator {
   public $type = 'sirius-smf-edi-kaiser';
-  public $edi_output_format = 'fixed';
 
   public function benefit_nid() { return $this->benefit_nid_from_id('K'); }
 
@@ -15,6 +14,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       'file' => 'reports/edi_kaiser.inc',
       'row_encoding' => 'json',
       'edi_tiers' => array('single', 'single+1', 'family'),
+      'edi_output_format' => 'fixed',
     );
 
     return parent::info($result);

@@ -2,7 +2,6 @@
 
 class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Generator {
   public $type = 'sirius-smf-edi-carelon';
-  public $edi_output_format = 'fixed';
 
   public function benefit_nid() { return $this->benefit_nid_from_id('CARELONEAP'); }
 
@@ -14,7 +13,8 @@ class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Gen
       'module' => 'sirius_smf',
       'file' => 'reports/edi_carelon.inc',
       'row_encoding' => 'json',
-      'edi_tiers' => array('blended'),
+      'edi_tiers' => array('mlk', 'other'),
+      'edi_output_format' => 'csv',
     );
 
     return parent::info($result);
@@ -22,7 +22,9 @@ class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Gen
 
   public function edi_premium_tier($context) {
     if (!($this->is_subscriber($context))) { return NULL; }
-    return 'blended';
+
+    if ($this->medical_coverage_id($context) == 'M') { return 'mlk'; }
+    return 'other';
   }
 
   public function edi_fields() {

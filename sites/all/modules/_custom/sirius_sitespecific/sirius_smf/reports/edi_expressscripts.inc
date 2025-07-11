@@ -2,7 +2,6 @@
 
 class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Report_Generator {
   public $type = 'sirius-smf-edi-expressscripts';
-  public $edi_output_format = 'fixed';
 
   public function benefit_nid() { return $this->benefit_nid_from_id('EXPRESSSCRIPTS'); }
 
@@ -15,6 +14,7 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
       'file' => 'reports/edi_expressscripts.inc',
       'row_encoding' => 'json',
       'edi_tiers' => array('blended'),
+      'edi_output_format' => 'fixed',
     );
 
     return parent::info($result);

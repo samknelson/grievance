@@ -2,7 +2,6 @@
 
 class Sirius_Smf_Report_Edi_Liberty extends Sirius_Trust_Provider_Edi_Report_Generator {
   public $type = 'sirius-smf-edi-liberty';
-  public $edi_output_format = 'fixed';
 
   public function benefit_nid() { return $this->benefit_nid_from_id('L'); }
 
@@ -17,6 +16,7 @@ class Sirius_Smf_Report_Edi_Liberty extends Sirius_Trust_Provider_Edi_Report_Gen
       'edi_carrier_name' => 'LIBERTY',
       'edi_group_number' => 'SMUHH',
       'edi_tiers' => array('blended'),
+      'edi_output_format' => 'csv',
     );
 
     return parent::info($result);

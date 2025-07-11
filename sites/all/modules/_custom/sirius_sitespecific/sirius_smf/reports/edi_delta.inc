@@ -2,7 +2,6 @@
 
 class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Generator {
   public $type = 'sirius-smf-edi-delta';
-  public $edi_output_format = 'fixed';
 
   public function benefit_nid() { return $this->benefit_nid_from_id('D'); }
 
@@ -17,6 +16,7 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
       'edi_carrier_name' => 'DELTA',
       'edi_group_number' => '17975',
       'edi_tiers' => array('blended'),
+      'edi_output_format' => 'fixed',
     );
 
     return parent::info($result);
@@ -302,7 +302,7 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
   /**
     Relationship type:
     10 = Self (subscriber)
-    12 = Child, Adopted Child, Step Child, QMSCO Child
+    30 = Child, Adopted Child, Step Child, QMSCO Child
     20 = Spouse
     21 = Domestic Partner
     32 = Handicapped Child
@@ -312,7 +312,7 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
   public function member_classification($context) {
     $reltype_id = $this->relationship_type($context['relationship_node']);
     if (!$reltype_id) { return '10'; }
-    if (in_array($reltype_id, array('C', 'G', 'AC', 'QMSCO'))) { return '12'; }
+    if (in_array($reltype_id, array('C', 'G', 'AC', 'QMSCO'))) { return '30'; }
     if (in_array($reltype_id, array('SP'))) { return '20'; }
     if (in_array($reltype_id, array('DP'))) { return '21'; }
     if (in_array($reltype_id, array('H'))) { return '32'; }

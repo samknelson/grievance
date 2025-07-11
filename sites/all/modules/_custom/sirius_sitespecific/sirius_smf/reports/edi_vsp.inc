@@ -2,7 +2,6 @@
 
 class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generator {
   public $type = 'sirius-smf-edi-vsp';
-  public $edi_output_format = 'fixed';
 
   public function benefit_nid_standard() { return $this->benefit_nid_from_id('3'); }
   public function benefit_nid_enhanced() { return $this->benefit_nid_from_id('3E'); }
@@ -16,6 +15,7 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
       'file' => 'reports/edi_vsp.inc',
       'row_encoding' => 'json',
       'edi_tiers' => array('blended'),
+      'edi_output_format' => 'fixed',
     );
 
     return parent::info($result);

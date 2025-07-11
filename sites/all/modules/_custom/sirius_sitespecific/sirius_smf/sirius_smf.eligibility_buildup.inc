@@ -114,6 +114,7 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 			$stmt = sirius_sql_query($sql, array(':worker_nid' => $worker_nid, ':y' => $y, ':m' => $m));
 			$hr = $stmt->fetchAssoc();
 			$hrs = $hr['c'];
+			if (!$hrs) { $hrs = 0; }
 
 			// Eligibility month
 			if ($m == $threemonthsprev_month && $y == $threemonthsprev_year) {

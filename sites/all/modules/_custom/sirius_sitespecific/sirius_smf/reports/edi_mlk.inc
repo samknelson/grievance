@@ -2,7 +2,6 @@
 
 class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generator {
   public $type = 'sirius-smf-edi-mlk';
-  public $edi_output_format = 'csv';
 
   public function benefit_nid() { return $this->benefit_nid_from_id('M'); }
 
@@ -15,6 +14,7 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
       'file' => 'reports/edi_mlk.inc',
       'row_encoding' => 'json',
       'edi_tiers' => array('blended'),
+      'edi_output_format' => 'csv',
     );
 
     return parent::info($result);
