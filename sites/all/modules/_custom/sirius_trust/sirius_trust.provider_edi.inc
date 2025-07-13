@@ -603,7 +603,7 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     while ($hr = $stmt->fetchAssoc()) {
       $relationship_nids[] = $hr['field_sirius_contact_relation_target_id'];
     }
-    return node_load_multiple($relationship_nids);
+    return node_load_multiple(array_filter($relationship_nids));
   }
 
   public function coverage_start_date($context) {
