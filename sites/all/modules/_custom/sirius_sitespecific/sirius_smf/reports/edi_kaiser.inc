@@ -144,7 +144,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       $row['Effective Date'] = $this->benefit_start_date($context);
       $row['Termination Date'] = $this->benefit_end_date($context);
       $row['Current Eligibility Status'] = '';
-      $row['Current Dues Amount'] = '';
+      $row['Current Dues Amount'] = $this->kaiser_encode_number($this->edi_premium_amt($context));
       $row['Current Rate Code'] = '';
       $row['Retroactivity Date'] = '';
       $row['Retroactive Dues Amount'] = '';
@@ -296,5 +296,46 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
     }
 
     return $indicator;
+  }
+
+  public function kaiser_encode_number($val) {
+    $val = round(100 * $val);
+    $indicator = $val % 10;
+
+    if ($val >= 0) {
+      $map = array(
+        0 => '{',
+        1 => 'A',
+        2 => 'B', 
+        3 => 'C', 
+        4 => 'D', 
+        5 => 'E', 
+        6 => 'F', 
+        7 => 'G', 
+        8 => 'H', 
+        9 => 'I', 
+      );
+    } else {
+      $map = array(
+        0 => '}',
+        1 => 'J',
+        2 => 'K', 
+        3 => 'L', 
+        4 => 'M', 
+        5 => 'N', 
+        6 => 'O', 
+        7 => 'P', 
+        8 => 'Q', 
+        9 => 'R', 
+      );
+    }
+
+    $val = abs($val);
+    $indicator = $map[$val % 10];
+
+    $val = preg_replace('/.$/', $indicator, $val);
+    while (strlen($val) < 7) { $val = "0$val"; }
+
+    return $val;
   }
 }
