@@ -53,6 +53,7 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
       $context = $this->context($wb_nid, $asof_date, $values['parameters']);
+      if (!$context['worker_node']) { continue; }
 
       $row = array();
       $row['subscriber_id'] = $context['worker_node']->field_sirius_id['und'][0]['value'];

@@ -80,6 +80,7 @@ class Sirius_Smf_Report_Edi_Liberty extends Sirius_Trust_Provider_Edi_Report_Gen
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
       $context = $this->context($wb_nid, $asof_date, $values['parameters']);
+      if (!$context['worker_node']) { continue; }
 
       $row = array();
 

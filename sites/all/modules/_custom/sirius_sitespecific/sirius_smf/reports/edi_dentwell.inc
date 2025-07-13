@@ -3,7 +3,7 @@
 class Sirius_Smf_Report_Edi_Dentwell extends Sirius_Trust_Provider_Edi_Report_Generator {
   public $type = 'sirius-smf-edi-dentwell';
 
-  public function benefit_nid() { return $this->benefit_nid_from_id('D'); }
+  public function benefit_nid() { return $this->benefit_nid_from_id('LADC'); }
 
   public function info($result = array()) {
     $result = array(
@@ -108,6 +108,7 @@ class Sirius_Smf_Report_Edi_Dentwell extends Sirius_Trust_Provider_Edi_Report_Ge
     $rows = array();
     foreach ($wb_nids as $wb_nid) {
       $context = $this->context($wb_nid, $asof_date, $values['parameters']);
+      if (!$context['worker_node']) { continue; }
 
       $row = array();
 
