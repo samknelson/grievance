@@ -200,10 +200,10 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
       // H = Handicapped Child
 
       $reltype_id = $this->relationship_type($context['relationship_node']);
-      if (in_array($reltype_id, array('SP')))                       { $indicator = 'S'; }
-      if (in_array($reltype_id, array('DP', 'ES')))                 { $indicator = 'P'; }
-      if (in_array($reltype_id, array('C', 'AC', 'QMSCO', 'SC')))   { $indicator = 'C'; }
-      if (in_array($reltype_id, array('H')))                        { $indicator = 'H'; }
+      if (in_array($reltype_id, array('SP')))                           { $indicator = 'S'; }
+      if (in_array($reltype_id, array('DP', 'ES')))                     { $indicator = 'P'; }
+      if (in_array($reltype_id, array('C', 'AC', 'QMSCO', 'SC', 'G')))  { $indicator = 'C'; }
+      if (in_array($reltype_id, array('H')))                            { $indicator = 'H'; }
     } else {
       // Subscriber only IF MEMBER ONLY ⇒ Family-Indicator = ‘C’
       // Sub + 1 ELSE IF MEMBER PLUS ONE DEP ⇒ Family-Indicator = ‘B’
