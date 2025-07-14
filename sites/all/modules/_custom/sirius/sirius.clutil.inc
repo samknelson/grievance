@@ -82,3 +82,43 @@ function sirius_clutil_log_purge($mode, $category, $type = NULL, $handler_nid = 
 		print "\n";
 	}
 }
+
+// while true ; do  drush --user=1 php-eval "sirius_require('sirius', 'sirius.clutil.inc'); sirius_clutil_delete_all_revisions(10000);" ; sleep 10 ; done
+function sirius_clutil_delete_all_revisions($limit = 1000) {
+
+	$sql = "select count(node_revision.vid) as c ";
+	$sql .= "from node, node_revision ";
+	$sql .= "where node.nid = node_revision.nid ";
+	$sql .= "and node.vid != node_revision.vid ";
+	$stmt = db_query($sql, array());
+	$hr = $stmt->fetchAssoc();
+	$grand_total = $hr['c'];
+
+	$sql = "select node_revision.vid ";
+	$sql .= "from node, node_revision ";
+	$sql .= "where node.nid = node_revision.nid ";
+	$sql .= "and node.vid != node_revision.vid ";
+	$sql .= "order by node_revision.vid limit $limit ";
+	$stmt = db_query($sql, array());
+
+	$vids = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$vids[] = $hr['vid'];
+	}
+
+	$total = count($vids);
+	$start_ts = time();
+	foreach ($vids as $vid) {
+		++$count;
+		$result = node_revision_delete($vid);
+
+		$now_ts = time();
+		$elapsed_ts = $now_ts - $start_ts;
+		if ($count) {
+			$per_ts = $elapsed_ts / $count;
+			$remain_ts = ($total - $count) * $per_ts;
+			$str = "Elapsed " . format_interval($elapsed_ts) . " remaining " . format_interval($remain_ts);
+		}
+		print "Deleted: $count / $total / $grand_total: $vid ($result) $str\n";
+	}
+}
