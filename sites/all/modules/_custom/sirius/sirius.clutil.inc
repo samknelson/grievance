@@ -3,6 +3,7 @@
 // drush --user=1 php-eval "require(drupal_get_path('module', 'sirius') . '/sirius.clutil.inc'); sirius_minilog_echo_active(TRUE); sirius_clutil_optimize_all();"
 
 function sirius_clutil_optimize_all() {
+	sirius_minilog_echo_active(TRUE);
 	$sql = "show tables";
 	$stmt = db_query($sql, array());
 	$tables = array();
@@ -84,7 +85,7 @@ function sirius_clutil_log_purge($mode, $category, $type = NULL, $handler_nid = 
 }
 
 // while true ; do  drush --user=1 php-eval "sirius_require('sirius', 'sirius.clutil.inc'); sirius_clutil_delete_all_revisions(10000);" ; sleep 10 ; done
-function sirius_clutil_delete_all_revisions($limit = 1000) {
+function sirius_clutil_delete_all_revisions($limit = 10000, $offeset = 0) {
 
 	$sql = "select count(node_revision.vid) as c ";
 	$sql .= "from node, node_revision ";
@@ -98,7 +99,7 @@ function sirius_clutil_delete_all_revisions($limit = 1000) {
 	$sql .= "from node, node_revision ";
 	$sql .= "where node.nid = node_revision.nid ";
 	$sql .= "and node.vid != node_revision.vid ";
-	$sql .= "order by node_revision.vid limit $limit ";
+	$sql .= "order by node_revision.vid limit $limit offset $offeset";
 	$stmt = db_query($sql, array());
 
 	$vids = array();
