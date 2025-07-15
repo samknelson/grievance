@@ -123,9 +123,9 @@ function sirius_clutil_delete_all_revisions($limit = 10000, $offeset = 0) {
 		if ($count) {
 			$per_ts = $elapsed_ts / $count;
 			$remain_ts = ($total - $count) * $per_ts;
-			$str = "Elapsed " . format_interval($elapsed_ts) . " remaining " . format_interval($remain_ts);
+			$str = "Estimate " . format_interval($elapsed_ts + $remain_ts) . " remaining " . format_interval($remain_ts);
 		}
-		if (!($count % 10)) {
+		if (!($count % 25)) {
 			print "Deleted: $count / $total / $grand_total: $vid ($result) $str\n";
 		}
 	}
