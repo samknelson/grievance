@@ -85,7 +85,7 @@ function sirius_clutil_log_purge($mode, $category, $type = NULL, $handler_nid = 
 }
 
 // while true ; do  drush --user=1 php-eval "sirius_require('sirius', 'sirius.clutil.inc'); sirius_clutil_delete_all_revisions(10000);" ; sleep 10 ; done
-function sirius_clutil_delete_all_revisions($limit = 10000, $offeset = 0) {
+function sirius_clutil_delete_all_revisions($limit = 10000, $offeset = 0, $prefix = 'NOPREFIX') {
 
 	$sql = "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;";
 	$stmt = db_query($sql, array());
@@ -123,10 +123,10 @@ function sirius_clutil_delete_all_revisions($limit = 10000, $offeset = 0) {
 		if ($count) {
 			$per_ts = $elapsed_ts / $count;
 			$remain_ts = ($total - $count) * $per_ts;
-			$str = "Estimate " . format_interval($elapsed_ts + $remain_ts) . " remaining " . format_interval($remain_ts);
+			$str = "Estimate " . format_interval($elapsed_ts + $remain_ts);
 		}
 		if (!($count % 25)) {
-			print "Deleted: $count / $total / $grand_total: $vid ($result) $str\n";
+			print "$prefix: $count / $total / $grand_total: $vid ($result) $str\n";
 		}
 	}
 }
