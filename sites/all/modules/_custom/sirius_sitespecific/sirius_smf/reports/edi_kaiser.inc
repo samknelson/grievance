@@ -141,8 +141,8 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       $row['ZIP Code'] = $context['worker_node']->field_sirius_address['und'][0]['postal_code'];
       $row['ZIP Plus 4'] = '';
       $row['Enrollment  Reason'] = '';
-      $row['Effective Date'] = $this->benefit_start_date($context);
-      $row['Termination Date'] = $this->benefit_end_date($context);
+      $row['Effective Date'] = $this->coverage_start_date($context);
+      $row['Termination Date'] = $this->coverage_end_date($context);
       $row['Current Eligibility Status'] = '';
       $row['Current Dues Amount'] = $this->kaiser_encode_number($this->edi_premium_amt($context));
       $row['Current Rate Code'] = '';
@@ -219,18 +219,6 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
     return '03';
   }
 
-  public function benefit_start_date($context) {
-    $date = $context['wb_node']->field_sirius_date_start['und'][0]['value'];
-    if (!$date) { return ''; }
-    return date('Ymd', strtotime($date));
-  }
-
-  public function benefit_end_date($context) {
-    $date = $context['wb_node']->field_sirius_date_end['und'][0]['value'];
-    if (!$date) { return ''; }
-    return date('Ymd', strtotime($date));
-  }
-
   public function hire_date($context) {
     if ($this->is_dependent($context)) { return ''; }
     if (!$context['worker_node']) { return ''; }
@@ -299,6 +287,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
   }
 
   public function kaiser_encode_number($val) {
+    if (!$val) { $val = 0; }
     $val = round(100 * $val);
     $indicator = $val % 10;
 
