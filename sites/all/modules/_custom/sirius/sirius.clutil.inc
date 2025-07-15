@@ -126,7 +126,7 @@ function sirius_clutil_delete_all_revisions($limit = 10000, $offeset = 0, $prefi
 			$str = "Estimate " . format_interval($elapsed_ts + $remain_ts);
 		}
 		if (!($count % 100)) {
-			print "$prefix: $count / $total / $grand_total: $vid ($result) $str\n";
+			print "$prefix: $count / $total / " . number_format($grand_total, 0) . ": $vid ($result) $str\n";
 		}
 	}
 }
