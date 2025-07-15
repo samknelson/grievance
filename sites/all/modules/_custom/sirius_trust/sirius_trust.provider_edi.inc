@@ -55,7 +55,7 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
       ),
       '#date_format' => 'Y-m-d',
       '#required' => TRUE,
-      '#default_value' => date('Y-m-d', strtotime('-1 month')),
+      '#default_value' => date('Y-m-d'),
     );
 
     $form['report_date'] = array(
@@ -314,7 +314,7 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
       $row['edi_payment_month'] = $edi_payment_month;
       $rows[] = $row;
 
-      $total += $hr['edi_premium_amt'];
+      if ($total) { $total += $hr['edi_premium_amt']; }
     }
 
     $row = array();
