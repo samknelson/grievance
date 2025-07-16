@@ -108,7 +108,8 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     $sql = "select node.nid as wb_nid, node.title as title, ";
     $sql .= "field_sirius_trust_subscriber_target_id as subscriber_nid, ";
     $sql .= "field_sirius_worker_target_id as worker_nid, ";
-    $sql .= "field_sirius_date_end_value as end_date ";
+    $sql .= "field_sirius_date_end_value as end_date, ";
+    $sql .= "field_sirius_contact_relation_target_id as relationship_nid ";
     $sql .= "from node ";
     $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
     $sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
@@ -116,6 +117,7 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     $sql .= "left join field_data_field_sirius_trust_benefit on field_data_field_sirius_trust_benefit.entity_type = 'node' and field_data_field_sirius_trust_benefit.entity_id = node.nid ";
     $sql .= "left join field_data_field_sirius_trust_subscriber on field_data_field_sirius_trust_subscriber.entity_type = 'node' and field_data_field_sirius_trust_subscriber.entity_id = node.nid ";
     $sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_contact_relation on field_data_field_sirius_contact_relation.entity_type = 'node' and field_data_field_sirius_contact_relation.entity_id = node.nid ";
 
     $sql .= "where node.type = 'sirius_trust_worker_benefit' ";
 
@@ -146,13 +148,15 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
       // Generate "fake" end dates for sorting
       if (!$hr['end_date']) { $hr['end_date'] = '2100-01-01 00:00:00'; }
       $hr['is_subscriber'] = ($hr['worker_nid'] == $hr['subscriber_nid']);
+      $hr['dependent_relationship_nids'] = array();
+      
       $workers[$hr['worker_nid']][] = $hr;
     }
 
     // Dedupe. If a worker has multiple records:
     // - Active beats inactive.
     // - Subscriber beats dependent
-    $wb_nids = array();
+    $pks = array();
     foreach ($workers as $worker_nid => $records) {
       $best = 0;
 
@@ -170,10 +174,16 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
         }
       }
 
-      $wb_nids[] = $records[$best]['wb_nid'];
+      $workers[$worker_nid] = $records[$best];
     }
 
-    return array_chunk($wb_nids, 100);
+    // Count the subscribers and dependents
+    foreach ($workers as $worker_nid => $worker) {
+      if ($worker['is_subscriber']) { continue; }
+      $workers[$worker['subscriber_nid']]['dependent_relationship_nids'][] = $worker['relationship_nid']; 
+    }
+
+    return array_chunk($workers, 100);
   }
 
   public function fields() {
@@ -493,7 +503,9 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     }
 	}
 
-  public function context($wb_nid, $asof_date, $parameters) {
+  public function context($worker, $asof_date, $parameters) {
+    $wb_nid = $worker['wb_nid'];
+
     $wb_node = node_load($wb_nid);
     $worker_node = node_load($wb_node->field_sirius_worker['und'][0]['target_id']);
     $subscriber_node = node_load($wb_node->field_sirius_trust_subscriber['und'][0]['target_id']);
@@ -516,7 +528,7 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     $context['asof_date'] = $asof_date;
     $context['asof_ts'] = strtotime($asof_date);
     $context['contact_node'] = $contact_node;
-    $context['dependent_relationship_nodes'] = $this->dependent_relationship_nodes($context);
+    $context['dependent_relationship_nodes'] = node_load_multiple($worker['dependent_relationship_nids']);
 
     return $context;
   }
@@ -562,48 +574,6 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
 
   public function is_qmsco($context) {
     return ($this->relationship_type($context['relationship_node']) == 'QMSCO');
-  }
-
-  public function dependent_relationship_nodes($context) {
-    if ($this->is_dependent($context)) { return array(); }
-
-    $sql_args = array();
-
-    $sql = "select field_sirius_contact_relation_target_id ";
-    $sql .= "from node ";
-    $sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_date_end on field_data_field_sirius_date_end.entity_type = 'node' and field_data_field_sirius_date_end.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_trust_subscriber on field_data_field_sirius_trust_subscriber.entity_type = 'node' and field_data_field_sirius_trust_subscriber.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_contact_relation on field_data_field_sirius_contact_relation.entity_type = 'node' and field_data_field_sirius_contact_relation.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_trust_benefit on field_data_field_sirius_trust_benefit.entity_type = 'node' and field_data_field_sirius_trust_benefit.entity_id = node.nid ";
-
-    $sql .= "where node.type = 'sirius_trust_worker_benefit' ";
-
-    $benefit_nid = $this->benefit_nid($context);
-    if (is_array($benefit_nid)) {
-      $sql .= "and field_sirius_trust_benefit_target_id in (:benefit_nid) ";
-      $sql_args[':benefit_nid'] = $benefit_nid;
-    } else {
-      $sql .= "and field_sirius_trust_benefit_target_id = :benefit_nid ";
-      $sql_args[':benefit_nid'] = $benefit_nid;
-    }
-
-    $sql .= "and field_sirius_date_start_value <= :asof_date ";
-    $sql .= "and (field_sirius_date_end_value >= :asof_date or field_sirius_date_end_value is null) ";
-    $sql_args[':asof_date'] = $context['asof_date'];
-
-    $sql .= "and field_sirius_trust_subscriber_target_id = :subscriber_nid ";
-    $sql_args[':subscriber_nid'] = $context['subscriber_node']->nid;
-
-    $sql .= "order by field_sirius_trust_subscriber_target_id, field_sirius_contact_relation_target_id ";
-
-    $stmt = sirius_sql_query($sql, $sql_args);
-
-    $relationship_nids = array();
-    while ($hr = $stmt->fetchAssoc()) {
-      $relationship_nids[] = $hr['field_sirius_contact_relation_target_id'];
-    }
-    return node_load_multiple(array_filter($relationship_nids));
   }
 
   public function coverage_start_date($context) {
