@@ -245,15 +245,16 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
     return $form;
   }
 
-  public function batch($wb_nids, $values, &$batch_context) {
+  public function batch($workers, $values, &$batch_context) {
     $benefit_nid = $this->benefit_nid();
 
     $asof_date = date('Y-m-d 00:00:00', strtotime($values['parameters']['asof_date']));
     $is_qmsco_only = ($values['parameters']['qmsco'] == 'include');
 
     $rows = array();
-    foreach ($wb_nids as $wb_nid) {
-      $context = $this->context($wb_nid, $asof_date, $values['parameters']);
+    foreach ($workers as $worker_nid => $worker) {
+      $wb_nid = $worker['wb_nid'];
+      $context = $this->context($worker, $asof_date, $values['parameters']);
       if (!$context['worker_node']) { continue; }
 
       // Separate feeds, one without qmsco and one with only qmsco.

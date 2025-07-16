@@ -78,15 +78,16 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
     );
   }
 
-  public function batch($wb_nids, $values, &$batch_context) {
+  public function batch($workers, $values, &$batch_context) {
     $benefit_nid_standard = $this->benefit_nid_standard();
     $benefit_nid_enhanced = $this->benefit_nid_enhanced();
 
     $asof_date = date('Y-m-d 00:00:00', strtotime($values['parameters']['asof_date']));
 
     $rows = array();
-    foreach ($wb_nids as $wb_nid) {
-      $context = $this->context($wb_nid, $asof_date, $values['parameters']);
+    foreach ($workers as $worker_nid => $worker) {
+      $wb_nid = $worker['wb_nid'];
+      $context = $this->context($worker, $asof_date, $values['parameters']);
       if (!$context['worker_node']) { continue; }
 
       $row = array();

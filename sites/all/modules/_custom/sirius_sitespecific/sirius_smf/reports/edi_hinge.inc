@@ -49,10 +49,11 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
     return $fields;
   }
 
-  public function batch($wb_nids, $values, &$batch_context) {
+  public function batch($workers, $values, &$batch_context) {
     $rows = array();
-    foreach ($wb_nids as $wb_nid) {
-      $context = $this->context($wb_nid, $asof_date, $values['parameters']);
+    foreach ($workers as $worker_nid => $worker) {
+      $wb_nid = $worker['wb_nid'];
+      $context = $this->context($worker, $asof_date, $values['parameters']);
       if (!$context['worker_node']) { continue; }
 
       $row = array();

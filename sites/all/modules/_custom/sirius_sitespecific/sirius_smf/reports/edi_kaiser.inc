@@ -99,14 +99,15 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
     return $fields;
   }
 
-  public function batch($wb_nids, $values, &$batch_context) {
+  public function batch($workers, $values, &$batch_context) {
     $benefit_nid = $this->benefit_nid();
 
     $asof_date = date('Y-m-d 00:00:00', strtotime($values['parameters']['asof_date']));
 
     $rows = array();
-    foreach ($wb_nids as $wb_nid) {
-      $context = $this->context($wb_nid, $asof_date, $values['parameters']);
+    foreach ($workers as $worker_nid => $worker) {
+      $wb_nid = $worker['wb_nid'];
+      $context = $this->context($worker, $asof_date, $values['parameters']);
       if (!$context['worker_node']) { continue; }
 
       $row = array();
