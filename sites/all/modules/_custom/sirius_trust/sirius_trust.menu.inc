@@ -296,6 +296,70 @@ function sirius_trust_menu() {
     'file' => 'sirius_trust.page_benefits.inc'
   );
 
+  $items['sirius/trust/benefits/benefits'] = array(
+    'title' => 'Benefits',
+    'page callback' => 'sirius_trust_page_benefits',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius trust admin',
+        'component' => 'trust',
+      ),
+    ),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+    'file' => 'sirius_trust.page_benefits.inc',
+  );
+
+  $items['sirius/trust/benefits/scan'] = array(
+    'title' => 'Scan',
+    'page callback' => 'sirius_trust_page_wb_scan_status',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius trust admin',
+        'component' => 'trust',
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+    'file' => 'sirius_trust.page_wb_scan_status.inc',
+  );
+
+  $items['sirius/trust/benefits/scan/status'] = array(
+    'title' => 'Status',
+    'page callback' => 'sirius_trust_page_wb_scan_status',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius trust admin',
+        'component' => 'trust',
+      ),
+    ),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+    'file' => 'sirius_trust.page_wb_scan_status.inc',
+  );
+
+  $items['sirius/trust/benefits/scan/changelog'] = array(
+    'title' => 'Change Log',
+    'page callback' => 'sirius_trust_page_wb_scan_changelog',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius trust admin',
+        'component' => 'trust',
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+    'file' => 'sirius_trust.page_wb_scan_changelog.inc',
+  );
+
   /*
   $items['sirius/trust/election/wizard/launch'] = array(
     'title' => 'Create an Election',
@@ -369,21 +433,6 @@ function sirius_trust_menu() {
     ),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'sirius_trust.page_changequeue.inc',
-  );
-
-  $items['sirius/trust/wb-scan-changelog'] = array(
-    'title' => 'Benefit Scan Changelog',
-    'page callback' => 'sirius_trust_page_wb_scan_changelog',
-    'page arguments' => array(),
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'permission' => 'sirius trust admin',
-        'component' => 'trust',
-      ),
-    ),
-    'type' => MENU_NORMAL_ITEM,
-    'file' => 'sirius_trust.page_wb_scan_changelog.inc',
   );
 
   $items['sirius/trust/geog/tester'] = array(
