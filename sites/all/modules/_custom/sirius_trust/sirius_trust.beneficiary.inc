@@ -77,13 +77,22 @@ class Sirius_Trust_Beneficiary extends Sirius_Singleton {
 
 				if (!$form_state['values']['beneficiaries'][$key][$i]['name']) { form_set_error("beneficiaries][$key][$i][name", "Please enter a name."); }
 
-				if (!$form_state['values']['beneficiaries'][$key][$i]['ssn']) { form_set_error("beneficiaries][$key][$i][ssn", "Please enter an SSN"); }
-				else if (!sirius_ssn_validate($form_state['values']['beneficiaries'][$key][$i]['ssn'])) { form_set_error("beneficiaries][$key][$i][ssn", "Please enter a valid SSN"); }
+				if (!$form_state['values']['beneficiaries'][$key][$i]['ssn']) {
+					// form_set_error("beneficiaries][$key][$i][ssn", "Please enter an SSN");
+				} else if (!sirius_ssn_validate($form_state['values']['beneficiaries'][$key][$i]['ssn'])) {
+					form_set_error("beneficiaries][$key][$i][ssn", "Please enter a valid SSN");
+				}
 
-				if (!$form_state['values']['beneficiaries'][$key][$i]['phone']) { form_set_error("beneficiaries][$key][$i][phone", "Please enter a phone number"); }
-				else if (!sirius_phone_validate($form_state['values']['beneficiaries'][$key][$i]['phone'])) { form_set_error("beneficiaries][$key][$i][phone", "Please enter a valid phone number."); }
+				if (!$form_state['values']['beneficiaries'][$key][$i]['phone']) {
+					form_set_error("beneficiaries][$key][$i][phone", "Please enter a phone number");
+				}
+				else if (!sirius_phone_validate($form_state['values']['beneficiaries'][$key][$i]['phone'])) {
+					form_set_error("beneficiaries][$key][$i][phone", "Please enter a valid phone number.");
+				}
 
-				if (!$form_state['values']['beneficiaries'][$key][$i]['address']) { form_set_error("beneficiaries][$key][$i][address", "Please enter an address"); }
+				if (!$form_state['values']['beneficiaries'][$key][$i]['address']) {
+					// form_set_error("beneficiaries][$key][$i][address", "Please enter an address");
+				}
 
 				$pct = $form_state['values']['beneficiaries'][$key][$i]['pct'];
 				if (!is_numeric($pct) || ($pct < 1) || $pct > 100) { form_set_error("beneficiaries][$key][$i][pct", "Please enter a valid percentage."); }
