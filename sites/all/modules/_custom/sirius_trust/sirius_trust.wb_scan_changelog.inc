@@ -56,6 +56,37 @@ class Sirius_Trust_Wb_Scan_Changelog extends Sirius_Singleton {
 		return array('success' => TRUE, 'rowcount' => $stmt->rowcount(), 'msg' => "Purged " . $stmt->rowcount() . " records.");
 	}
 
+	public function count() {
+		$sql = "select count(*) as c from sirius_trust_wb_scan_changelog";
+		$stmt = sirius_sql_query($sql, array());
+		$hr = $stmt->fetchAssoc();
+		return $hr['c'];
+	}
+
+	public function latest_record() {
+		$sql = "select * from sirius_trust_wb_scan_changelog order by log_nid desc limit 1";
+		$stmt = sirius_sql_query($sql, array());
+		$hr = $stmt->fetchAssoc();
+		return $hr;
+	}
+
+	public function render_record($change_data) {
+		$html = '<div class="sirius_trust_wb_scan_changelog_entry">';
+
+		$html .= sirius_fakerender_field('Log ID:', $change_data['log_nid']);
+		$html .= sirius_fakerender_field('Date:', date('c', $change_data['ts']));
+		$html .= sirius_fakerender_field('Mode:', $change_data['mode']);
+		$html .= sirius_fakerender_field('WB:', l(sirius_node_title($change_data['wb_nid']), 'node/' . $change_data['wb_nid']));
+		$html .= sirius_fakerender_field('Subscriber:', l(sirius_node_title($change_data['subscriber_worker_nid']), 'node/' . $change_data['subscriber_worker_nid']));
+		$html .= sirius_fakerender_field('Dependent:', l(sirius_node_title($change_data['dependent_worker_nid']), 'node/' . $change_data['dependent_worker_nid']));
+		$html .= sirius_fakerender_field('Benefit:', sirius_node_title($change_data['benefit_nid']));
+		$html .= sirius_fakerender_field('Action:', $change_data['action']);
+		$html .= sirius_fakerender_field('Message:', $change_data['msg']);
+
+		$html .= '</div>';
+		return $html;
+	}
+
 	public function output_stream($fp) {
 		$sql = "select sirius_trust_wb_scan_changelog.*, ";
 		$sql .= "wb_node.title as wb, ";
