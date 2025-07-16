@@ -194,16 +194,14 @@ function sirius_trust_sirius_config_links_alter(&$links) {
  */
 
 function sirius_trust_sirius_cron_scan_info() {
-  /*
   $items['trust_benefit'] = array(
     'title' => 'Trust Worker Benefit Scan',
     'description' => 'Check eligibility for all worker benefits',
-    'schedule' => 'daily',
+    'schedule' => 'always',
     'callback' => 'sirius_trust_worker_benefit_scan',
     'multidomain' => TRUE,
     'component' => 'trust',
   );
-  */
 
   $items['trust_election'] = array(
     'title' => 'Trust Worker Election Scan',
