@@ -45,6 +45,30 @@ function sirius_clutil_optimize_all() {
 // drush --user=1 php-eval "require(drupal_get_path('module', 'sirius') . '/sirius.clutil.inc'); sirius_clutil_log_purge('test', 'worker:member_status', NULL, 2468132);"
 
 function sirius_clutil_log_purge($mode, $category, $type = NULL, $handler_nid = NULL) {
+	sirius_minilog_echo_active(TRUE);
+
+	$sql_args = array();
+	$sql = "select count(distinct nid) as c from node ";
+	$sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_log_handler on field_data_field_sirius_log_handler.entity_type = 'node' and field_data_field_sirius_log_handler.entity_id = node.nid ";
+	$sql .= "where type = 'sirius_log' ";
+	$sql .= "and field_sirius_category_value = :category ";
+	$sql_args[':category'] = $category;
+	if ($type) {
+		$sql .= "and field_sirius_type_value = :type ";
+		$sql_args[':type'] = $type;
+	}
+	if ($handler_nid) {
+		$sql .= "and field_sirius_log_handler_target_id = :handler_nid ";
+		$sql_args[':handler_nid'] = $handler_nid;
+	}
+	$stmt = db_query($sql, $sql_args);
+	$hr = $stmt->fetchAssoc();
+	$grand_total = $hr['c'];
+	sirius_minilog("Grand total: " . number_format($grand_total, 0));
+
+
 	$sql_args = array();
 	$sql = "select distinct nid from node ";
 	$sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
@@ -73,14 +97,12 @@ function sirius_clutil_log_purge($mode, $category, $type = NULL, $handler_nid = 
 	$count_total = count($nids);
 	foreach ($nids as $nid) {
 		++$count;
-		print "Deleting $count / $count_total: $nid... ";
+		sirius_minilog("Deleting $count / $count_total / $grand_total: $nid... ");
 		if ($mode == 'live') {
 			node_delete($nid);
-			print "Ok.";
 		} else {
-			print " [test mode]";
+			sirius_minilog("... Skipping because mode = $mode");
 		}
-		print "\n";
 	}
 }
 
