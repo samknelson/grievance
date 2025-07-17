@@ -85,7 +85,7 @@ function sirius_clutil_log_purge($mode, $category, $type = NULL, $handler_nid = 
 		$sql .= "and field_sirius_log_handler_target_id = :handler_nid ";
 		$sql_args[':handler_nid'] = $handler_nid;
 	}
-	$sql .= "order by nid limit 1000 ";
+	$sql .= "order by nid limit 4000 ";
 
 	$nids = array();
 	$stmt = db_query($sql, $sql_args);
