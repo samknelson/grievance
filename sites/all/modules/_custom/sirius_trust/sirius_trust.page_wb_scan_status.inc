@@ -55,7 +55,7 @@ function sirius_trust_page_wb_scan_status_form($form, &$form_state) {
 	$form['settings'] = array(
 		'#type' => 'fieldset',
 		'#title' => 'Settings',
-		'#description' => t('Use the form below to configure the scan settnigs.'),
+		'#description' => t('Use the form below to configure the scan settings.'),
 	);
 
 	$form['settings']['limit'] = array(
