@@ -177,6 +177,14 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
       $workers[$worker_nid] = $records[$best];
     }
 
+    // Remove any dependents with a termination date (always)
+    foreach ($workers as $worker_nid => $worker) {
+      if ($worker['is_subscriber']) { continue; }
+      if (!$worker['end_date']) { continue; }
+      if ($worker['end_date'] > $asof_date) { continue; }
+      unset($workers[$worker_nid]);
+    }
+
     // Count the subscribers and dependents
     foreach ($workers as $worker_nid => $worker) {
       if ($worker['is_subscriber']) { continue; }
