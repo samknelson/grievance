@@ -616,6 +616,10 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
   	return preg_replace('/[^0-9]/', '', $context[$which]->field_sirius_ssn['und'][0]['value']);
   }
 
+  public function zip($context, $which) {
+    return substr(trim($context[$which]->field_sirius_address['und'][0]['postal_code']), 0, 5);
+  }
+
   public function medical_coverage_id($context) {
     if (!$context['worker_node']) { return ''; }
 
