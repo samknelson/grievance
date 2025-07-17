@@ -85,7 +85,7 @@ function sirius_clutil_log_purge($mode, $category, $type = NULL, $handler_nid = 
 		$sql .= "and field_sirius_log_handler_target_id = :handler_nid ";
 		$sql_args[':handler_nid'] = $handler_nid;
 	}
-	$sql .= "order by nid limit 4000 ";
+	$sql .= "order by nid limit 10000 ";
 
 	$nids = array();
 	$stmt = db_query($sql, $sql_args);
@@ -97,7 +97,7 @@ function sirius_clutil_log_purge($mode, $category, $type = NULL, $handler_nid = 
 	$count_total = count($nids);
 	foreach ($nids as $nid) {
 		++$count;
-		sirius_minilog("Deleting $count / $count_total / $grand_total: $nid... ");
+		sirius_minilog("Deleting $count / $count_total / " . number_format($grand_total, 0) . ": $nid... ");
 		if ($mode == 'live') {
 			node_delete($nid);
 		} else {
