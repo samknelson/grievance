@@ -143,7 +143,7 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
       $row['Subscriber Residence Address Line 2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
       $row['Subscriber Residence City'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
       $row['Subscriber Residence State Code'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['Subscriber Residence ZIP Code'] = $context['worker_node']->field_sirius_address['und'][0]['postal_code'];
+      $row['Subscriber Residence ZIP Code'] = $this->zip($context, 'worker_node');
       $row['Subscriber Residence Phone Number'] = preg_replace('/[^0-9]/', '', $context['worker_node']->field_sirius_phone['und'][0]['value']);
       $row['Subscriber Residence Country'] = $context['worker_node']->field_sirius_address['und'][0]['country'];
 
@@ -154,7 +154,7 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
       $row['Subscriber Mailing Address Line 2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
       $row['Subscriber Mailing City'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
       $row['Subscriber Mailing State'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['Subscriber Mailing ZIP Code'] = $context['worker_node']->field_sirius_address['und'][0]['postal_code'];
+      $row['Subscriber Mailing ZIP Code'] = $this->zip($context, 'worker_node');
       $row['Subscriber Mailing Country'] = $context['worker_node']->field_sirius_address['und'][0]['country'];
 
       $row['Subscriber Work Phone Number'] = $this->phone($context, 'subscriber_node');

@@ -77,7 +77,7 @@ class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Gen
       $row['ADRLN2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
       $row['CITYCD'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
       $row['STACOD'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['ZIPCOD'] = $context['worker_node']->field_sirius_address['und'][0]['postal_code'];
+      $row['ZIPCOD'] = $this->zip($context, 'worker_node');
       $row['HOMPHN'] = $this->phone($context, 'worker_node');
       $row['WRKPHN'] = '';
       $row['BTHDAT'] = $this->dob($context, 'worker_node');

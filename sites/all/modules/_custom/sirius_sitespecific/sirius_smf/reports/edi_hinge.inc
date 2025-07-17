@@ -95,7 +95,7 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
       $row['address2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
       $row['city'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
       $row['state'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['zip'] = $context['worker_node']->field_sirius_address['und'][0]['postal_code'];
+      $row['zip'] = $this->zip($context, 'worker_node');
       $row['email'] = $context['worker_node']->field_sirius_email['und'][0]['value'];
       $row['start_date'] = $this->coverage_start_date($context);
       $row['term_date'] = $this->coverage_end_date($context);

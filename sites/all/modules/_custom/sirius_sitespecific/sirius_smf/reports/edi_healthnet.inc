@@ -125,7 +125,7 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
       $row['Address Line 2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
       $row['City'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
       $row['State'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['Zip Code'] = $context['worker_node']->field_sirius_address['und'][0]['postal_code'];
+      $row['Zip Code'] = $this->zip($context, 'worker_node');
       $row['Zip Code +4 Extension'] = '';
       $row['Work Telephone'] = $this->phone($context, 'subscriber_node');
       $row['Residence Telephone'] = '';

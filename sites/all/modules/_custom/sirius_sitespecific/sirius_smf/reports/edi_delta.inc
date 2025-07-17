@@ -240,7 +240,7 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
       $row['Mailing Address 3'] = '';
       $row['Mailing Address City'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
       $row['Mailing Address State'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['Mailing Address Zip Code'] = $context['worker_node']->field_sirius_address['und'][0]['postal_code'];
+      $row['Mailing Address Zip Code'] = $this->zip($context, 'worker_node');
       $row['Mailing Address Country'] = '';
       $row['Service Area'] = '';
       $row['Residence Address 1'] = '';

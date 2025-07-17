@@ -96,7 +96,7 @@ class Sirius_Smf_Report_Edi_Liberty extends Sirius_Trust_Provider_Edi_Report_Gen
       $row['Address2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
       $row['City'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
       $row['State'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['Zip'] = $context['worker_node']->field_sirius_address['und'][0]['postal_code'];
+      $row['Zip'] = $this->zip($context, 'worker_node');
       $row['County'] = '';
       $row['HomePhone'] = $this->phone($context, 'worker_node');
       $row['Email'] = $this->email($context, 'worker_node');

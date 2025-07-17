@@ -278,7 +278,7 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
       $row['Address #4'] = '';
       $row['City'] =  $context['worker_node']->field_sirius_address['und'][0]['locality'];
       $row['State'] =  $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['Zip Code'] =  $context['worker_node']->field_sirius_address['und'][0]['postal_code'];
+      $row['Zip Code'] = $this->zip($context, 'worker_node');
       $row['Zip Reserve'] = '';
       $row['Date of Birth'] = $this->dob($context, 'worker_node');
       $row['Gender Code'] = $this->gender($context);

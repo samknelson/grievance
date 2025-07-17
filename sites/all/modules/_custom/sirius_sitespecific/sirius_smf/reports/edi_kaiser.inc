@@ -139,7 +139,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       $row['Address Line 2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
       $row['City'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
       $row['State'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['ZIP Code'] = $context['worker_node']->field_sirius_address['und'][0]['postal_code'];
+      $row['ZIP Code'] = $this->zip($context, 'worker_node');
       $row['ZIP Plus 4'] = '';
       $row['Enrollment  Reason'] = '';
       $row['Effective Date'] = $this->coverage_start_date($context);
