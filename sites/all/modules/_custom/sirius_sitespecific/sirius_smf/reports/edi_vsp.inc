@@ -124,7 +124,7 @@ class Sirius_Smf_Report_Edi_Vsp extends Sirius_Trust_Provider_Edi_Report_Generat
       $row['Vision Coverage End Date'] = $this->coverage_end_date($context);
       $row['Family Indicator Change Effective Date'] = '';
 
-      $is_enhanced = ($wb_node->field_sirius_trust_benefit['und'][0]['target_id'] == $benefit_nid_enhanced);
+      $is_enhanced = ($context['wb_node']->field_sirius_trust_benefit['und'][0]['target_id'] == $benefit_nid_enhanced);
       $is_cobra = $this->is_cobra($context);
       if ($is_enhanced && $is_cobra) {
         $division_code = 2002;
