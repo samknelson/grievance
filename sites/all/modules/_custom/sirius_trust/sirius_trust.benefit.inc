@@ -953,3 +953,37 @@ function sirius_trust_render_worker_benefits($worker_node, $direction, $wb_nodes
 
 	return sirius_table_render($header, $rows, array('class' => array('sirius_table_align')));
 }
+
+function sirius_trust_wb_scan_dashboard_data($prefs, $options = array()) {
+	$status = sirius_domain_variable_get('sirius_trust_wb_scan_status', array());
+	if (!$status) { return array(); }
+
+	if ($status['total']) {
+		$pct = 100 * round($status['complete'] / $status['total'], 2);
+ 	}
+
+
+	$msg .= "Month: <strong>$status[ym] ($pct%)</strong><br />";
+	$msg .= "Records: " . number_format($status['total'], 0) . "<br />";
+	$msg .= "Complete: " . number_format($status['complete']) . "<br />";
+	$msg .= "Pending: " . number_format($status['pending']) . "<br />";
+	$msg .= "[mode = $status[mode]]";
+
+	$tools = l(
+		'Details', 
+		'sirius/trust/benefits/scan', 
+		array(
+			'attributes' => array('class' => array('tool-button')),
+		)
+	);
+
+	$row = array(
+		'count' => $total,
+		'tools' => $tools,
+		'details' => $msg,
+	);
+	$rows[] = $row;
+
+	return $rows;
+}
+
