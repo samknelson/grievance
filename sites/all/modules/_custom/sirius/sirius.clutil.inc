@@ -14,6 +14,7 @@ function sirius_clutil_optimize_all() {
 	$total_reduction = 0;
 	foreach ($tables as $table) {
 		sirius_minilog("Examining table: $table");
+		$start_ts = time();
 
 		$sql = "SELECT data_length, index_length FROM information_schema.TABLES where table_name = '$table'";
 		$stmt = db_query($sql, array());
@@ -33,10 +34,12 @@ function sirius_clutil_optimize_all() {
 		$new_data_length = round($hr['data_length'] / (1024*1024), 2);
 		$new_index_length = round($hr['data_length'] / (1024*1024), 2);
 		$new_total_length = $new_data_length + $new_index_length;
-		$reduction = ($data_length - $new_data_length);
+		$reduction = ($total_length - $new_total_length);
 		$total_reduction += $reduction;
 		sirius_minilog("... After optimize: $new_total_length MB ($new_data_length data and $new_index_length index)");
 		sirius_minilog("... Size reduction: $reduction (Total $total_reduction)");
+		$elapsed_ts = time() - $start_ts;
+		sirius_minilog("... Elapsed time: " . format_interval($elapsed_ts, 2));
 	}
 
 	sirius_minilog("=== TOTAL REDUCTION $total_reduction ===");
@@ -95,9 +98,19 @@ function sirius_clutil_log_purge($mode, $category, $type = NULL, $handler_nid = 
 
 	$count = 0;
 	$count_total = count($nids);
+	$start_ts = time();
 	foreach ($nids as $nid) {
 		++$count;
-		sirius_minilog("Deleting $count / $count_total / " . number_format($grand_total, 0) . ": $nid... ");
+
+		if ($count && (!($count % 10))) {
+			$now_ts = time();
+			$elapsed_ts = $now_ts - $start_ts;
+			$per_ts = $elapsed_ts / $count;
+			$remain_ts = ($count_total - $count) * $per_ts;
+			$str = "Estimate " . format_interval($elapsed_ts + $remain_ts);
+		}
+		sirius_minilog("Deleting $count / $count_total / " . number_format($grand_total, 0) . ": $nid: $str");
+
 		if ($mode == 'live') {
 			node_delete($nid);
 		} else {
