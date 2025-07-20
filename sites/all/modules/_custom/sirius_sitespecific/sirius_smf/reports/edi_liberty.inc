@@ -82,6 +82,7 @@ class Sirius_Smf_Report_Edi_Liberty extends Sirius_Trust_Provider_Edi_Report_Gen
       $wb_nid = $worker['wb_nid'];
       $context = $this->context($worker, $asof_date, $values['parameters']);
       if (!$context['worker_node']) { continue; }
+      $this->qmsco_context($context);
 
       $row = array();
 
@@ -108,18 +109,18 @@ class Sirius_Smf_Report_Edi_Liberty extends Sirius_Trust_Provider_Edi_Report_Gen
       $row['ReinstatementDate'] = '';
       $row['PrimaryLanguage'] = '';
       $row['Ethnicity'] = '';
-      $row['RPLastName'] = '';
-      $row['RPFirstName'] = '';
-      $row['RPMiddleName'] = '';
-      $row['RPAddress1'] = '';
-      $row['RPAddress2'] = '';
-      $row['RPCity'] = '';
-      $row['RPState'] = '';
-      $row['RPZip'] = '';
-      $row['RPHomePhone'] = '';
-      $row['RPEmail'] = '';
-      $row['RPGender'] = '';
-      $row['RPDateOfBirth'] = '';
+      $row['RPLastName'] = $context['qmsco_rp_worker_node']->field_sirius_name['und'][0]['family'];
+      $row['RPFirstName'] = $context['qmsco_rp_worker_node']->field_sirius_name['und'][0]['given'];
+      $row['RPMiddleName'] = $context['qmsco_rp_worker_node']->field_sirius_name['und'][0]['middle'];
+      $row['RPAddress1'] = $context['qmsco_rp_worker_node']->field_sirius_address['und'][0]['thoroughfare'];
+      $row['RPAddress2'] = $context['qmsco_rp_worker_node']->field_sirius_address['und'][0]['premise'];
+      $row['RPCity'] = $context['qmsco_rp_worker_node']->field_sirius_address['und'][0]['locality'];
+      $row['RPState'] = $context['qmsco_rp_worker_node']->field_sirius_address['und'][0]['administrative_area'];
+      $row['RPZip'] = $this->zip($context, 'qmsco_rp_worker_node');
+      $row['RPHomePhone'] = $this->phone($context, 'qmsco_rp_worker_node');
+      $row['RPEmail'] = $this->email($context, 'qmsco_rp_worker_node');
+      $row['RPGender'] = $this->gender($context, 'qmsco_rp_worker_node');
+      $row['RPDateOfBirth'] = $this->dob($context, 'qmsco_rp_worker_node');
       $row['Custom Field'] = '';
 
       $row = $this->edi_row($row, $context);
@@ -156,7 +157,7 @@ class Sirius_Smf_Report_Edi_Liberty extends Sirius_Trust_Provider_Edi_Report_Gen
     return '';
   }
 
-  public function gender($context) {
+  public function gender($context, $which = 'worker_node') {
     $id = $this->gender_id($context['worker_node']);
     if ($id == 'M') { return 'M'; }
     if ($id == 'F') { return 'F'; }

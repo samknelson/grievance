@@ -202,6 +202,7 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
       $wb_nid = $worker['wb_nid'];
       $context = $this->context($worker, $asof_date, $values['parameters']);
       if (!$context['worker_node']) { continue; }
+      $this->qmsco_context($context);
 
       $row = array();
 
@@ -314,7 +315,8 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
   public function member_classification($context) {
     $reltype_id = $this->relationship_type($context['relationship_node']);
     if (!$reltype_id) { return '10'; }
-    if (in_array($reltype_id, array('C', 'G', 'AC', 'QMSCO'))) { return '30'; }
+    if (in_array($reltype_id, array('QMSCO'))) { return '13'; }
+    if (in_array($reltype_id, array('C', 'G', 'AC'))) { return '30'; }
     if (in_array($reltype_id, array('SP'))) { return '20'; }
     if (in_array($reltype_id, array('DP'))) { return '21'; }
     if (in_array($reltype_id, array('H'))) { return '32'; }
