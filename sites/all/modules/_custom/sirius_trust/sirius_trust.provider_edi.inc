@@ -584,6 +584,12 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     return ($this->relationship_type($context['relationship_node']) == 'QMSCO');
   }
 
+  public function qmsco_context(&$context) {
+    if (!$this->is_qmsco($context)) { return; }
+    $qmsco = Sirius_Trust_Qmsco::getInstance();
+    $context['qmsco_rp_worker_node'] = $qmsco->rp_worker_node($context['worker_node']);
+  }
+
   public function coverage_start_date($context) {
     if (!$context['wb_node']) { return ''; }
     if (!$context['wb_node']->field_sirius_date_start['und'][0]['value']) { return ''; }
