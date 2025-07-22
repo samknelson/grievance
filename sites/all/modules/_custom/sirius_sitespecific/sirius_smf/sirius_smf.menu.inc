@@ -82,6 +82,26 @@ function sirius_smf_node_tabs() {
     'weight' => 12,
   );
 
+  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_dentwell_election'] = array(
+    'title' => 'Oneoff Dentwell Election',
+    'callback' => 'sirius_smf_node_tab_worker_oneoff_dentwell_election',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_dentwell_election.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+
+  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_election_relationships'] = array(
+    'title' => 'Oneoff Election Relationships',
+    'callback' => 'sirius_smf_node_tab_worker_oneoff_election_relationships',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_election_relationships.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+
   $node_tabs['sirius_worker']['sirius_worker_contact/smf_autotag'] = array(
     'title' => 'Autotag',
     'callback' => 'sirius_smf_node_tab_worker_autotag',
