@@ -202,6 +202,31 @@ function sirius_trust_worker_benefits($worker_node, $ts = NULL) {
 	return $wb_nodes;
 }
 
+function sirius_trust_worker_benefits_sort_by_date($wb_nodes) {
+  uksort($wb_nodes, function($a, $b) use ($wb_nodes) {
+    $active_a = $wb_nodes[$a]->field_sirius_active['und'][0]['value'];
+    $active_b = $wb_nodes[$b]->field_sirius_active['und'][0]['value'];
+
+    $start_a = $wb_nodes[$a]->field_sirius_date_start['und'][0]['value'];
+    $start_b = $wb_nodes[$b]->field_sirius_date_start['und'][0]['value'];
+
+    $end_a = $wb_nodes[$a]->field_sirius_date_end['und'][0]['value'];
+    $end_b = $wb_nodes[$b]->field_sirius_date_end['und'][0]['value'];
+
+    // drupal_set_message("Comparing: $start_a / $end_a / $active_a to $start_b / $end_b / $active_b");
+
+    if ( ($active_a == 'Yes') && ($active_b != 'Yes') ) { return -1; }
+    if ( ($active_a != 'Yes') && ($active_b == 'Yes') ) { return 1; }
+
+    $result = -1 * strcmp($end_a, $end_b);
+    if ($result) { return $result; }
+
+    return strcmp($start_a, $start_b);
+  });
+
+  return $wb_nodes;
+}
+
 function sirius_trust_worker_benefit_node_presave($wb_node) {
 	// Benefit is active only if it started before now, and it either hasn't ended yet, or it ended after now.
 	$start_ts = sirius_fieldval($wb_node, 'field_sirius_date_start', 'ts');
