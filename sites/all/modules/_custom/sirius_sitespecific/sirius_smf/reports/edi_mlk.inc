@@ -94,7 +94,7 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
       $row['ZIP'] = $this->zip($context, 'worker_node');
       $row['EFF DT'] = $this->coverage_start_date($context);
       $row['TERM DT'] =  $this->coverage_end_date($context);
-      $row['PCP'] = '0000000000';
+      $row['PCP'] = '';
       $row['LOB'] = 'COMMERCIAL';
       $row['ERN'] = 'C0991';
       $row['EMPLOYER'] = '';
