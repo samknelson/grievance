@@ -315,6 +315,10 @@ function sirius_worker_node_presave($worker_node) {
 
   $worker_node->field_sirius_name['und'][0] = sirius_worker_name_canonicalize($worker_node->field_sirius_name['und'][0]);
 
+  if ($worker_node->field_sirius_address['und'][0]) {
+    $worker_node->field_sirius_address['und'][0] = sirius_worker_address_canonicalize($worker_node->field_sirius_address['und'][0]);
+  }
+
   // Only on insert
   if ($worker->nid) { return; }
 
@@ -628,6 +632,14 @@ function sirius_worker_contact_get($worker_node) {
 function sirius_worker_name_canonicalize($value) {
   foreach (array('given', 'family', 'middle') as $key) {
     $value[$key] = sirius_worker_name_canonicalize_part($value[$key]);
+  }
+  return $value;
+}
+
+function sirius_worker_address_canonicalize($value) {
+  $cols = array_keys(sirius_addr_cols());
+  foreach ($cols as $key) {
+    $value[$key] = strtoupper($value[$key]);
   }
   return $value;
 }
