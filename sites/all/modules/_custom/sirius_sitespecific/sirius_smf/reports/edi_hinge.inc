@@ -79,8 +79,10 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
 
         if (in_array($reltype_id, array('DB', 'ES', 'SP'))) {
           $relationship = 'Spouse';
-        } else if (in_array($reltype_id, array('G', 'C', 'AC', 'H', 'QMSCO', 'SC'))) {
+        } else if (in_array($reltype_id, array('G', 'C', 'AC', 'H', 'SC'))) {
           $relationship = 'Child';
+        } else if (in_array($reltype_id, array('QMSCO'))) {
+          $relationship = 'Q';
         } else {
           $relationship = 'Other';
         }
