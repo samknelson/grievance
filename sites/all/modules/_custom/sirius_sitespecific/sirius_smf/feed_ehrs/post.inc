@@ -121,6 +121,8 @@ function sirius_smf_feed_ehrs_post_form_hrs_batch($wizard_node, $info, $data, $c
 
 	$row = $data['records']['rows'][$delta];
 
+	// if ($delta > 2) { return;}
+
 	$eup_node = sirius_smf_feed_ehrs_get_eup($wizard_node);
 	if (!$eup_node) {
 		drupal_set_message("This feed is not associated with an employer upload.", 'error');
@@ -194,8 +196,19 @@ function sirius_smf_feed_ehrs_post_form_hrs_batch($wizard_node, $info, $data, $c
 	// Queue any name, address, or phone changes
 	// 
 
+	$worker_node_orig = clone $worker_node;
+
 	sirius_require('sirius_trust', 'sirius_trust.changequeue.inc');
 	$cq = Sirius_Trust_Changequeue::getInstance();
+
+	$newval = sirius_worker_name_canonicalize(
+		array(
+			'given' => $row['name_first'],
+			'family' => $row['name_last'],
+			'middle' => $row['name_middle'],
+		)
+	);
+
 	$item = array();
 	$item['type'] = 'node_field';
 	$item['msg'] = $eup_node->title;
@@ -203,72 +216,112 @@ function sirius_smf_feed_ehrs_post_form_hrs_batch($wizard_node, $info, $data, $c
 	$item['node_field'] = array();
 	$item['node_field']['nid'] = $worker_node->nid;
 	$item['node_field']['field_name'] = 'field_sirius_name';
-	$item['node_field']['val'] = array(
-		'given' => $row['name_first'],
-		'family' => $row['name_last'],
-		'middle' => $row['name_middle'],
-	);
+	$item['node_field']['val'] = $newval;
 	$result = SiriusResult::create($cq->queue($item));
 	if (!$result->success()) { $result->drupalSetMessage(); }
 
 	if ($row['phone']) {
-		$item = array();
-		$item['type'] = 'node_field';
-		$item['msg'] = $eup_node->title;
-		$item['handler_nids'] = array($eup_node->nid);
-		$item['node_field'] = array();
-		$item['node_field']['nid'] = $worker_node->nid;
-		$item['node_field']['field_name'] = 'field_sirius_phone';
-		$item['node_field']['val'] = array('value' => $row['phone']);
-		$result = SiriusResult::create($cq->queue($item));
-		if (!$result->success()) { $result->drupalSetMessage(); }
+  	$newval = array('value' => $row['phone']);
+
+  	if (!$worker_node->field_sirius_phone['und'][0]['value']) {
+  		$worker_node->field_sirius_phone['und'][0] = $newval;
+  	} else {
+			$item = array();
+			$item['type'] = 'node_field';
+			$item['msg'] = $eup_node->title;
+			$item['handler_nids'] = array($eup_node->nid);
+			$item['node_field'] = array();
+			$item['node_field']['nid'] = $worker_node->nid;
+			$item['node_field']['field_name'] = 'field_sirius_phone';
+			$item['node_field']['val'] = $newval;
+			$result = SiriusResult::create($cq->queue($item));
+			if (!$result->success()) { $result->drupalSetMessage(); }
+		}
 	}
+
+
+
 
 	if ($row['email']) {
-		$item = array();
-		$item['type'] = 'node_field';
-		$item['msg'] = $eup_node->title;
-		$item['handler_nids'] = array($eup_node->nid);
-		$item['node_field'] = array();
-		$item['node_field']['nid'] = $worker_node->nid;
-		$item['node_field']['field_name'] = 'field_sirius_email';
-		$item['node_field']['val'] = array('value' => $row['email']);
-		$result = SiriusResult::create($cq->queue($item));
-		if (!$result->success()) { $result->drupalSetMessage(); }
+  	$newval = array('value' => $row['email']);
+
+  	if (!$worker_node->field_sirius_email['und'][0]['value']) {
+  		$worker_node->field_sirius_email['und'][0] = $newval;
+  	} else {
+			$item = array();
+			$item['type'] = 'node_field';
+			$item['msg'] = $eup_node->title;
+			$item['handler_nids'] = array($eup_node->nid);
+			$item['node_field'] = array();
+			$item['node_field']['nid'] = $worker_node->nid;
+			$item['node_field']['field_name'] = 'field_sirius_email';
+			$item['node_field']['val'] = $newval;
+			$result = SiriusResult::create($cq->queue($item));
+			if (!$result->success()) { $result->drupalSetMessage(); }
+		}
 	}
+
+
+
 
   if ($row['addr_thoroughfare'] && $row['addr_locality'] && $row['addr_administrative_area'] && $row['addr_postal_code']) {
-		$item = array();
-		$item['type'] = 'node_field';
-		$item['msg'] = $eup_node->title;
-		$item['handler_nids'] = array($eup_node->nid);
-		$item['node_field'] = array();
-		$item['node_field']['nid'] = $worker_node->nid;
-		$item['node_field']['field_name'] = 'field_sirius_address';
-		$item['node_field']['val'] = array(
-  		'thoroughfare' => $row['addr_thoroughfare'],
-  		'locality' => $row['addr_locality'],
-  		'administrative_area' => $row['addr_administrative_area'],
-  		'postal_code' => $row['addr_postal_code'],
-  		'premise' => $row['addr_premise'],
-  		'country' => 'US',
-  	);
-		$result = SiriusResult::create($cq->queue($item));
-		if (!$result->success()) { $result->drupalSetMessage(); }
+		$newval = sirius_worker_address_canonicalize(
+			array(
+	  		'thoroughfare' => $row['addr_thoroughfare'],
+	  		'locality' => $row['addr_locality'],
+	  		'administrative_area' => $row['addr_administrative_area'],
+	  		'postal_code' => $row['addr_postal_code'],
+	  		'premise' => $row['addr_premise'],
+	  		'country' => 'US',
+	  	)
+	  );
+	  // dpm($newval);
+
+  	if (!$worker_node->field_sirius_address['und'][0]['addr_thoroughfare']) {
+  		// drupal_set_message("Setting address for " . $worker_node->title);
+  		$worker_node->field_sirius_address['und'][0] = $newval;
+  	} else {
+  		// drupal_set_message("Queueing address for " . $worker_node->title);
+			$item = array();
+			$item['type'] = 'node_field';
+			$item['msg'] = $eup_node->title;
+			$item['handler_nids'] = array($eup_node->nid);
+			$item['node_field'] = array();
+			$item['node_field']['nid'] = $worker_node->nid;
+			$item['node_field']['field_name'] = 'field_sirius_address';
+			$item['node_field']['val'] = $newval;
+			$result = SiriusResult::create($cq->queue($item));
+			if (!$result->success()) { $result->drupalSetMessage(); }
+		}
 	}
 
+
+
+
   if ($row['dob']) {
-		$item = array();
-		$item['type'] = 'node_field';
-		$item['msg'] = $eup_node->title;
-		$item['handler_nids'] = array($eup_node->nid);
-		$item['node_field'] = array();
-		$item['node_field']['nid'] = $worker_node->nid;
-		$item['node_field']['field_name'] = 'field_sirius_dob';
-		$item['node_field']['val'] = $worker_node->field_sirius_dob['und'][0];
-		$item['node_field']['val']['value'] = $row['dob'] . " 00:00:00";
-		$result = SiriusResult::create($cq->queue($item));
-		if (!$result->success()) { $result->drupalSetMessage(); }
+  	$newval = $worker_node->field_sirius_dob['und'][0];
+  	$newval['value'] = $row['dob'] . " 00:00:00";
+
+  	if (!$worker_node->field_sirius_dob['und'][0]) {
+  		$worker_node->field_sirius_dob['und'][0] = $newval;
+  	} else {
+			$item = array();
+			$item['type'] = 'node_field';
+			$item['msg'] = $eup_node->title;
+			$item['handler_nids'] = array($eup_node->nid);
+			$item['node_field'] = array();
+			$item['node_field']['nid'] = $worker_node->nid;
+			$item['node_field']['field_name'] = 'field_sirius_dob';
+			$item['node_field']['val'] = $newval;
+			$result = SiriusResult::create($cq->queue($item));
+			if (!$result->success()) { $result->drupalSetMessage(); }
+		}
+	}
+
+	// If we changed anything in the worker, save now.
+	if ($changes = sirius_revision_changed($worker_node, $worker_node_orig)) {
+		// drupal_set_message("Saving because $changes");
+		node_save($worker_node);
 	}
 
 	// 
@@ -277,7 +330,7 @@ function sirius_smf_feed_ehrs_post_form_hrs_batch($wizard_node, $info, $data, $c
 
 	$dept_tid = sirius_taxonomy_lookup_by_anything('grievance_department', 'default');
   if (!$dept_tid) {
-  	drupal_set_mesasge("No department found with ID='default'.", 'error');
+  	drupal_set_message("No department found with ID='default'.", 'error');
   	return;
   }
 
