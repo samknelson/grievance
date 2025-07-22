@@ -648,10 +648,12 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
 
     $search_params = array();
     $search_params['worker_nid'] = $context['worker_node']->nid;
-    $search_params['ts'] = $context['asof_ts'];
+    // $search_params['ts'] = $context['asof_ts'];
     $search_params['benefit_type'] = $benefit_type;
     $wb_nodes = sirius_trust_worker_benefits_search($search_params);
     if (!$wb_nodes) { return ''; }
+    $wb_nodes =  sirius_trust_worker_benefits_sort_by_date($wb_nodes);
+
     $wb_node = reset($wb_nodes);
     $benefit_node = node_load($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
     return $benefit_node->field_sirius_id['und'][0]['value'];
