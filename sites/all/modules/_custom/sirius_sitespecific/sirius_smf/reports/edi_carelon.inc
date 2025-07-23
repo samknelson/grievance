@@ -116,26 +116,7 @@ class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Gen
   }
 
   public function grpnum($context) {
-    if (!$context['worker_node']) { return ''; }
-
-    $benefit_type = &drupal_static(__FUNCTION__);
-    if (!isset($benefit_type)) {
-      $benefit_type = Sirius_Trust_Cobra::getInstance()->cobra_benefit_type();
-      if (!$benefit_type) {
-        drupal_set_message("No COBRA benefit type has been set. (I'm assuming that the COBRA benefit type is the medical benefit.)", 'error');
-      }
-    }
-    if (!$benefit_type) { return ''; }
-
-    $search_params = array();
-    $search_params['worker_nid'] = $context['worker_node']->nid;
-    $search_params['ts'] = $context['asof_ts'];
-    $search_params['benefit_type'] = $benefit_type;
-    $wb_nodes = sirius_trust_worker_benefits_search($search_params);
-    if (!$wb_nodes) { return ''; }
-    $wb_node = reset($wb_nodes);
-    $benefit_node = node_load($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
-    return $benefit_node->field_sirius_id['und'][0]['value'];
+    return $this->medical_coverage_id($context);
   }
 
   public function mstacd($context) {
