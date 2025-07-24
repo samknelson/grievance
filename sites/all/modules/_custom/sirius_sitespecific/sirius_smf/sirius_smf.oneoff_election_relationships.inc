@@ -66,7 +66,7 @@ function sirius_smf_worker_oneoff_election_relationships_all($mode) {
 		sirius_minilog("Processing $count / $total / $total_grand: $worker_nid: " . $worker_node->title . ": $estimate");
 		sirius_minilog_indent();
 		sirius_smf_worker_oneoff_election_relationships($mode, $worker_node);
-		sirius_domain_nid($worker_node->field_sirius_domain['und'][0]['target_id']);
+		sirius_domain($worker_node->field_sirius_domain['und'][0]['target_id']);
 		if ($mode == 'live') {
 			sirius_minilog("Saving the worker record.");
 			node_save($worker_node);
