@@ -44,6 +44,22 @@ class Sirius_Smf_Eligibility_Plugin_Kaiser extends Sirius_Trust_Elgibility_Plugi
 			return array('success' => FALSE, 'msg' => 'Don\'t know which benefit type is "medical". This is configured on the COBRA configuration page.');
 		}
 
+		// Have we *ever* had Kaiser or Kaiser Enhanced
+		$kaiser_benefit_ids = array('K', 'KE');
+		$kaiser_benefit_nids = array();
+		foreach ($kaiser_benefit_ids as $id) {
+			$nid = sirius_find_nid_by_id($id, 'sirius_trust_benefit');
+			if (!$nid) { return array('success' => FALSE, 'msg' => "Configuration error: there is no benefit with id [$id]."); }
+			$kaiser_benefit_nids[] = $nid;
+		}
+
+		$search_params = array();
+		$search_params['subscriber_nid'] = $subscriber_node->nid;
+		$search_params['benefit_nids'] = $kaiser_benefit_nids;
+		$search_params['nids_only'] = TRUE;
+		$probe = sirius_trust_worker_benefits_search($search_params);
+		if ($probe) { return array('success' => TRUE, 'msg' => 'The subscriber met the eligibility requirements for starting Kaiser (had a previous instance of Kaiser coverage).'); }
+
 		// Start date. 15th of the month.
 		$ts = $params['ts'];
 		if (!$ts) { $ts = time(); }
@@ -58,9 +74,9 @@ class Sirius_Smf_Eligibility_Plugin_Kaiser extends Sirius_Trust_Elgibility_Plugi
 			$search_params['benefit_type'] = $medical_benefit_type->tid;
 			$search_params['ts'] = $ts;
 			$search_params['nids_only'] = TRUE;
-			$benefit_nids = sirius_trust_worker_benefits_search($search_params);
-			if (!$benefit_nids) {
-				return array('success' => FALSE, 'msg' => 'The subscriber did not have a benefit of type ' . $medical_benefit_type->name . ' as of ' . date('m/Y', $ts));
+			$probe = sirius_trust_worker_benefits_search($search_params);
+			if (!$probe) {
+				return array('success' => FALSE, 'msg' => 'The subscriber never had Kaiser coverage, and did not have a benefit of type ' . $medical_benefit_type->name . ' as of ' . date('m/Y', $ts));
 			}
 		}
 

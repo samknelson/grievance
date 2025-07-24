@@ -47,6 +47,18 @@ class Sirius_Smf_Eligibility_Plugin_Healthnet extends Sirius_Trust_Elgibility_Pl
 		$subscriber_node = $params['subscriber_worker_node'];
 		if (!$subscriber_node) { return array('success' => FALSE, 'msg' => 'No subscriber specified.'); }
 
+		// Have we *ever* had HealthNet?
+		$healthnet_benefit_id = 'H';
+		$healthnet_benefit_nid = sirius_find_nid_by_id($healthnet_benefit_id, 'sirius_trust_benefit');
+		if (!$healthnet_benefit_nid) { return array('success' => FALSE, 'msg' => "Configuration error: there is no benefit with id [$healthnet_benefit_id]."); }
+		$search_params = array();
+		$search_params['subscriber_nid'] = $subscriber_node->nid;
+		$search_params['benefit_nid'] = $healthnet_benefit_nid;
+		$search_params['nids_only'] = TRUE;
+		$probe = sirius_trust_worker_benefits_search($search_params);
+		if ($probe) { return array('success' => TRUE, 'msg' => 'The subscriber met the eligibility requirements for starting Health Net (had a previous instance of Health Net coverage).'); }
+
+
 		// Start date. 15th of the month.
 		$ts = $params['ts'];
 		if (!$ts) { $ts = time(); }
@@ -61,10 +73,9 @@ class Sirius_Smf_Eligibility_Plugin_Healthnet extends Sirius_Trust_Elgibility_Pl
 			$search_params['linked_benefit_nid'] = $linked_benefit_nid;
 			$search_params['ts'] = $ts;
 			$search_params['nids_only'] = TRUE;
-			$benefit_nids = sirius_trust_worker_benefits_search($search_params);
-			if (!$benefit_nids) {
-				$break;
-				return array('success' => FALSE, 'msg' => 'The subscriber did not have a benefit of type ' . sirius_node_title($linked_benefit_nid) . ' as of ' . date('m/Y', $ts));
+			$probe = sirius_trust_worker_benefits_search($search_params);
+			if (!$probe) {
+				return array('success' => FALSE, 'msg' => 'The subscriber never had Health Net coverage, and did not have a benefit of type ' . sirius_node_title($linked_benefit_nid) . ' as of ' . date('m/Y', $ts));
 			}
 		}
 
