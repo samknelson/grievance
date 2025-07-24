@@ -164,6 +164,12 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
     return array('is_multiple' => TRUE, 'rows' => $rows);
   }
 
+  public function ssn($context, $which) {
+    $str = parent::ssn($context, $which);
+    while (strlen($str) < 9) { $str = "0$str"; }
+    return $str;
+  }
+
   public function enrollment_unit($context) {
     if ($this->is_cobra($context)) { return '7000'; } else { return '0000'; }
   }
