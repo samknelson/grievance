@@ -30,6 +30,53 @@ function sirius_smf_node_tab_worker_oneoff_election_relationships_form_submit($f
 	return sirius_smf_worker_oneoff_election_relationships($form_state['values']['mode'], $worker_node);
 }
 
+// drush --user=1 php-eval "sirius_require('sirius_smf', 'sirius_smf.oneoff_election_relationships.inc'); sirius_smf_worker_oneoff_election_relationships_all('test');"
+function sirius_smf_worker_oneoff_election_relationships_all($mode) {
+	sirius_minilog_echo_active(TRUE);
+	sirius_denorm_realtime(FALSE);
+
+	$batch_size = 1000;
+
+	$last_worker_nid = variable_get('sirius_smf_worker_oneoff_election_relationships_all_last_worker_nid');
+	if (!$last_worker_nid) { $last_worker_nid = 0; }
+
+	$sql = "select count(*) as c from node where type = 'sirius_worker' and nid > $last_worker_nid";
+	$stmt = sirius_sql_query($sql, array());
+	$hr = $stmt->fetchAssoc();
+	$total_grand = $hr['c'];
+	sirius_minilog("There are " . number_format($grand_total) . " records remaining.");
+
+	$sql = "select nid from node where type = 'sirius_worker' and nid > $last_worker_nid order by nid limit $batch_size";
+	$stmt = sirius_sql_query($sql, array());
+
+	$worker_nids = array();
+	while ($hr = $stmt->fetchAssoc()) { $worker_nids[] = $hr['nid']; }
+	$total = count($worker_nids);
+
+  $ts_start = time();
+	foreach ($worker_nids as $worker_nid) {
+		++$count;
+
+		$ts_elapsed = time() - $ts_start;
+		$ts_per_record = $ts_elapsed / $count;
+		$estimate = format_interval($ts_per_record * $total);
+
+		$worker_node = node_load($worker_nid);
+
+		sirius_minilog("Processing $count / $total / $total_grand: $worker_nid: " . $worker_node->title . ": $estimate");
+		sirius_minilog_indent();
+		sirius_smf_worker_oneoff_election_relationships($mode, $worker_node);
+		sirius_domain_nid($worker_node->field_sirius_domain['und'][0]['target_id']);
+		if ($mode == 'live') {
+			sirius_minilog("Saving the worker record.");
+			node_save($worker_node);
+		}
+		sirius_minilog_outdent();
+
+		variable_set('sirius_smf_worker_oneoff_election_relationships_all_last_worker_nid', $worker_nid);
+	}
+}
+
 function sirius_smf_worker_oneoff_election_relationships($mode, $subscriber_worker_node) {
 	sirius_minilog("Scanning: " . $subscriber_worker_node->title . " (mode = $mode)");
 
@@ -89,7 +136,7 @@ function sirius_smf_worker_oneoff_election_relationships($mode, $subscriber_work
 		} else {
 			$params['end_date'] = $subscriber_wb_node->field_sirius_date_end['und'][0]['value'];
 		}
-		sirius_minilog("... ... Searching for: " . print_r($params, 1));
+		sirius_minilog("... ... Searching for: " . preg_replace('/\s+/', ' ', print_r($params, 1)));
 		$params['nids_only'] = TRUE;
 		$probe = sirius_trust_worker_benefits_search($params);
 		if (!$probe) {
