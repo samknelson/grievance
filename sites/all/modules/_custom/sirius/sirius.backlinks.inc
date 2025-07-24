@@ -105,7 +105,14 @@ function sirius_backlinks_from_term($term) {
 function sirius_backlinks_from_node($node) {
 	$links = array();
 
-	if ($node->type == 'sirius_contact') { $contact_nid = $node->nid; }
+	if ($node->type == 'sirius_contact') {
+		$contact_nid = $node->nid;
+
+		$sc_nid = sirius_shop_contact_get_by_contact_nid($contact_nid, TRUE);
+		if ($sc_nid) {
+			$links["node/$sc_nid"] = array('name' => "Shop Contact");
+		}
+	}
 	if (!$contact_nid) { $contact_nid = $node->field_sirius_contact['und'][0]['target_id']; }
 	if ($contact_nid) { $worker_nid = sirius_worker_get_by_contact_nid($contact_nid, TRUE); }
 	if ($contact_nid && !$worker_nid) {
@@ -117,6 +124,8 @@ function sirius_backlinks_from_node($node) {
 
 		if ($path) { $links[$path] = array('name' => $name, 'title' => sirius_backlink_title($contact_nid)); }
 	}
+
+
 
 	if (!$worker_nid) { $worker_nid = $node->field_sirius_worker['und'][0]['target_id']; }
 	if ($worker_nid) {
@@ -303,6 +312,7 @@ function sirius_backlinks_from_node($node) {
 		else if ($definition_type == 'customfield') { $links['sirius/customfield/definition/list'] = array('name' => 'All Custom Field Sets'); }
 		else if ($definition_type == 'sirius:disclaimer') { $links['sirius/disclaimer/list'] = array('name' => 'All Disclaimers'); }
 		else if ($definition_type == 'sirius:cardcheck') { $links['sirius/cardcheck/definitions'] = array('name' => 'All Card Checks'); }
+		else if ($definition_type == 'workdays') { $links['sirius/workdays'] = array('name' => 'All Calendars'); }
 	}
 
 	if ($node->type == 'grievance_basic_page') {

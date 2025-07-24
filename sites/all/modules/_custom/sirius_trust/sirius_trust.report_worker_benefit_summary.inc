@@ -233,8 +233,10 @@ class Sirius_Trust_Report_WB_Summary extends Report_Cache_Report_Generator {
     return $pks;
   }
 
-  public function breakouts($values) {
-    return array_filter($values['parameters']['general']['breakout']);
+  public function breakouts($values = array()) {
+    $tmp = $values['parameters']['general']['breakout'];
+    if (!$tmp) { return array(); }
+    return array_filter($tmp);
   }
 
   public function breakout_keys($key, $values) {

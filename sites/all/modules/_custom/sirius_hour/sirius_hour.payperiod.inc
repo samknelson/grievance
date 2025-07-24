@@ -169,12 +169,17 @@ function sirius_hour_payperiod_load($domain_nid, $worker_nid, $employer_nid, $ye
   $payperiod_node->status = 1;
   $payperiod_node->promote = 0;
   $payperiod_node->comment = 0;
-	$start_date = "$year-$month-01 00:00:00";
+	$start_date = $start_date_db = "$year-$month-01 00:00:00";
+	$end_date = $end_date_db = date('Y-m-t', strtotime($start_date));
   $payperiod_node->field_sirius_date_start['und'][0]['value'] = $start_date_db;
-	$end_date = "$year-$month-15 23:59:00";
-	$end_date_db = gmdate('Y-m-t 00:00:00', strtotime($end_date));
   $payperiod_node->field_sirius_date_end['und'][0]['value'] = $end_date_db;
-  $payperiod_node->field_sirius_active['und'][0]['value'] = $create_active;
+
+  if ($create_active) {
+  	$payperiod_node->field_sirius_active['und'][0]['value'] = 'Yes';
+  } else {
+  	$payperiod_node->field_sirius_active['und'][0]['value'] = 'No';
+  }
+  
   $payperiod_node->field_sirius_worker['und'][0]['target_id'] = $worker_nid;
   $payperiod_node->field_grievance_shop['und'][0]['target_id'] = $employer_nid;
   if ($domain_nid) { $payperiod_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
@@ -190,8 +195,7 @@ function sirius_hour_payperiod_load($domain_nid, $worker_nid, $employer_nid, $ye
 
 function sirius_hour_payperiod_load_multiple($domain_nid, $worker_nid, $year, $month, $day) {
 	$date = "$year-$month-$day 00:00:00";
-
-	$date_db = gmdate('Y-m-d H:i:s', strtotime($date));
+	$date_db = date('Y-m-d', strtotime($date));
 
 	$domain_nid = sirius_domain_nid();
 	$sql_args = array();
@@ -199,8 +203,8 @@ function sirius_hour_payperiod_load_multiple($domain_nid, $worker_nid, $year, $m
 	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
 	$sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_datetime use index (field_sirius_datetime_value) on field_data_field_sirius_datetime.entity_type = 'node' and field_data_field_sirius_datetime.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_datetime_completed on field_data_field_sirius_datetime_completed.entity_type = 'node' and field_data_field_sirius_datetime_completed.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_date_start use index (sirius_date_start) on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_date_end on field_data_field_sirius_date_end.entity_type = 'node' and field_data_field_sirius_date_end.entity_id = node.nid ";
 	$sql .= "where node.type = 'sirius_payperiod' ";
 
 	if ($domain_nid) {
@@ -212,19 +216,97 @@ function sirius_hour_payperiod_load_multiple($domain_nid, $worker_nid, $year, $m
 	$sql_args[':worker_nid'] = $worker_nid;
 
   if ($day == 1) {
-		$sql .= "and field_sirius_datetime_value = :date_db ";
+		$sql .= "and field_sirius_date_start_value = :date_db ";
 		$sql_args[':date_db'] = $date_db;
 	} else {
-		$sql .= "and field_sirius_datetime_value <= :date_db ";
-		$sql .= "and field_sirius_datetime_completed_value > :date_db ";
+		$sql .= "and field_sirius_date_start_value <= :date_db ";
+		$sql .= "and field_sirius_date_end_value >= :date_db ";
 		$sql_args[':date_db'] = $date_db;
 	}
   $sql .= "order by nid ";
 
-  $stmt = sirius_sql_query($sql, $sql_args);
+  $stmt = db_query($sql, $sql_args);
   $nids = array();
   while ($hr = $stmt->fetchAssoc()) {
   	$nids[] = $hr['nid'];
   }
   return node_load_multiple($nids);
+}
+
+/*
+This query seems to work. It takes about a minute to run.
+
+
+select group_concat(nid, ','), count(*) as c from node 
+left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid 
+left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = node.nid 
+left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid 
+where node.type = 'sirius_payperiod' 
+and field_sirius_date_start_value is not null 
+group by field_sirius_worker_target_id, field_grievance_shop_target_id, field_sirius_date_start_value 
+having c > 1
+
+The queries below don't work. They can go awya.
+
+select a.nid from node a 
+left join field_data_field_sirius_worker worker_a on worker_a.entity_type = 'node' and worker_a.entity_id = a.nid
+left join field_data_field_grievance_shop employer_a on employer_a.entity_type = 'node' and employer_a.entity_id = a.nid
+left join field_data_field_sirius_date_start date_a on date_a.entity_type = 'node' and date_a.entity_id = a.nid 
+
+where a.type = 'sirius_payperiod' 
+and exists (
+	select 1 from node b 
+	left join field_data_field_sirius_worker worker_b on worker_b.entity_type = 'node' and worker_b.entity_id = b.nid
+	left join field_data_field_grievance_shop employer_b on employer_b.entity_type = 'node' and employer_b.entity_id = b.nid
+	left join field_data_field_sirius_date_start date_b on date_b.entity_type = 'node' and date_b.entity_id = b.nid 
+	and b.nid = 4154801 
+	and a.nid != b.nid 
+	and b.type = 'sirius_payperiod' 
+	and worker_a.field_sirius_worker_target_id = worker_b.field_sirius_worker_target_id 
+	and employer_a.field_grievance_shop_target_id = employer_b.field_grievance_shop_target_id
+	and date_a.field_sirius_date_start_value = date_b.field_sirius_date_start_value
+)
+*/
+
+function sirius_hour_payperiod_duplicate_search() {
+	$sql = "select nid from node where type = 'sirius_payperiod' order by nid ";
+	//$stmt = db_query($sql, array());
+	//while ($hr = $stmt->fetchAssoc()) { $nids[] = $hr['nid']; }
+	$nids = array(4154801);
+	$count = 0;
+	$total = count($nids);
+	foreach ($nids as $nid) {
+		++$count;
+		print "$count / $total: $nid\n";
+
+		$sql = "select a.nid from node a  ";
+		$sql .= "left join field_data_field_sirius_worker worker_a on worker_a.entity_type = 'node' and worker_a.entity_id = a.nid ";
+		$sql .= "left join field_data_field_grievance_shop employer_a on employer_a.entity_type = 'node' and employer_a.entity_id = a.nid ";
+		$sql .= "left join field_data_field_sirius_date_start date_a on date_a.entity_type = 'node' and date_a.entity_id = a.nid  ";
+
+		$sql .= "where a.type = 'sirius_payperiod'  ";
+		$sql .= "and exists ( ";
+		$sql .= "	select 1 from node b  ";
+		$sql .= "	left join field_data_field_sirius_worker worker_b on worker_b.entity_type = 'node' and worker_b.entity_id = b.nid ";
+		$sql .= "	left join field_data_field_grievance_shop employer_b on employer_b.entity_type = 'node' and employer_b.entity_id = b.nid ";
+		$sql .= "	left join field_data_field_sirius_date_start date_b on date_b.entity_type = 'node' and date_b.entity_id = b.nid  ";
+		$sql .= "	where b.nid = :nid ";
+		$sql .= "	and a.nid != b.nid  ";
+		$sql .= "	and b.type = 'sirius_payperiod'  ";
+		$sql .= "	and worker_a.field_sirius_worker_target_id = worker_b.field_sirius_worker_target_id  ";
+		$sql .= "	and employer_a.field_grievance_shop_target_id = employer_b.field_grievance_shop_target_id ";
+		$sql .= "	and date_a.field_sirius_date_start_value = date_b.field_sirius_date_start_value ";
+		$sql .= ") ";
+
+		$stmt = db_query($sql, array(':nid' => $nid));
+		$hr = $stmt->fetchAssoc();
+		if ($hr) {
+			print_r($hr);
+			exit();
+		}
+
+
+
+
+	}
 }

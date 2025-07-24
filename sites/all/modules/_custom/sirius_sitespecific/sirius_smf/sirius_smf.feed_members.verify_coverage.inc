@@ -39,6 +39,8 @@ function sirius_smf_feed_members_row_verify_coverage($feed_node, $info, $data, &
     if (strlen($month) < 2) { $month = "0$month"; }
     $date = "$year-$month-$day 00:00:00";
 
+    $linked_benefits = sirius_smf_feed_members_linked_benefits();
+
     // Look up the benefits
     $election_benefits_str = $coverage_record['10 SMCEE-CWELCODE'] . $coverage_record['10 SMCEE-CDENCODE'];
     $strs = str_split($election_benefits_str);
@@ -47,7 +49,14 @@ function sirius_smf_feed_members_row_verify_coverage($feed_node, $info, $data, &
       $benefit_nid = sirius_find_nid_by_id($str, 'sirius_trust_benefit');
       if (!$benefit_nid) { return array('success' => FALSE, 'msg' => "For coverage month $coverage_month, benefit not found: $str"); }
       $benefit_nids[] = $benefit_nid;
+
+      if ($linked_benefits[$benefit_nid]) {
+        foreach ($linked_benefits[$benefit_nid] as $linked_benefit_nid) {
+          $benefit_nids[] = $linked_benefit_nid;
+        }
+      }
     }
+    $benefit_nids = array_unique($benefit_nids);
 
     // Get the employer
     $employer_nid = NULL;
@@ -156,4 +165,45 @@ function sirius_smf_feed_members_row_verify_coverage($feed_node, $info, $data, &
   }
 
   return array('success' => TRUE);
+}
+
+function sirius_smf_feed_members_linked_benefits() {
+  // Get the "linked" benefits
+  // - MLK should create:
+  // - - VSP Enhanced
+  // - - Express Scripts
+  // - - Hinge PT
+  // - - Life Insurance
+  // - - Carelon EAP
+  // - - Carelon Behavioral Health
+  // - - AD&D
+  // 
+  // - Healthnet, Kaiser & Kaiser Enhanced should create:
+  // - - VSP
+  // - - Express Scripts
+  // - - Life Insurance
+  // - - Carelon EAP
+  // - - AD&D
+
+  $linked_benefits = &drupal_static(__FUNCTION__);
+  if (!$linked_benefits) {
+    $map_by_id = array();
+    $map_by_id['M'] = array('3E', 'EXPRESSSCRIPTS', 'HINGEPT', '2', 'CARELONEAP', 'CARELONBEHAVIORALHEALTH', 'ADD');
+    $map_by_id['H'] = array('3', 'EXPRESSSCRIPTS', '2', 'CARELONEAP', 'ADD');
+    $map_by_id['K'] = $map_by_id['KE'] = $map_by_id['H'];
+
+    foreach ($map_by_id as $from_id => $to_ids) {
+      $from_nid = sirius_find_nid_by_id($from_id, 'sirius_trust_benefit');
+      if (!$from_nid) { return array('success' => FALSE, 'msg' => "Unable to find the benefit NID for ID [$from_id]"); }
+
+      foreach ($to_ids as $to_id) {
+        $to_nid = sirius_find_nid_by_id($to_id, 'sirius_trust_benefit');
+        if (!$to_nid) { return array('success' => FALSE, 'msg' => "Unable to find the benefit NID for ID [$to_id]"); }
+
+        $linked_benefits[$from_nid][] = $to_nid;
+      }
+    }
+  }
+
+  return $linked_benefits;
 }

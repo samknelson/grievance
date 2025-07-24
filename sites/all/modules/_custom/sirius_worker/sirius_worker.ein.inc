@@ -33,13 +33,14 @@ function sirius_worker_employee_lookup_all_employers($worker_nid) {
 }
 
 
-function sirius_worker_employee_lookup($worker_nid, $employer_nid) {
+function sirius_worker_employee_lookup($worker_nid, $employer_nid, $params = array()) {
 	$domain_nid = sirius_domain_nid();
 
 	$sql_args = array();
-	$sql = "select nid from node ";
+	$sql = "select nid, field_sirius_id_value from node ";
 	$sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
 	if ($domain_nid) {
 		$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
 	}
@@ -56,7 +57,11 @@ function sirius_worker_employee_lookup($worker_nid, $employer_nid) {
 	$stmt = sirius_sql_query($sql, $sql_args);
 	$hr = $stmt->fetchAssoc();
 
-	return $hr['nid'];
+	if ($params['return'] == 'ein') {
+		return $hr['field_sirius_id_value'];
+	} else {
+		return $hr['nid'];
+	}
 }
 
 function sirius_worker_ein_lookup($employer_nid, $ein) {

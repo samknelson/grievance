@@ -38,7 +38,26 @@ class Sirius_Ledger_Currency_Plugin extends Sirius_Singleton {
 
 		return $html;
 	}
+
+	public function validate_amt($amt) {
+		$amt = trim($amt);
+		$amt = preg_replace('/[\$\,]/', '', $amt);
+		if (preg_match('/[^0-9\.]/', $amt)) { return array('success' => FALSE, 'msg' => 'Please enter only digits.'); }
+
+		if (!is_numeric($amt) || !($amt > 0)) { return array('success' => FALSE, 'msg' => 'Please enter a positive number.'); }
+
+		if ($amt != round($amt, 2)) { return array('success' => FALSE, 'msg' => 'Please enter a valid dollar amount.'); }
+
+		$max = sirius_domain_variable_get('sirius_ledger_payment_max', 100000);
+		if ($amt > $max) { return array('success' => FALSE, 'msg' => "Please enter a value less than " . $this->render_amt($max)); }
+
+		$min = sirius_domain_variable_get('sirius_ledger_payment_min', 2);
+		if ($amt < $min) {  return array('success' => FALSE, 'msg' => "Please enter a value greater than " . $this->render_amt($min)); }
+
+		return array('success' => TRUE, 'amt' => $amt);
+	}
 }
+
 
 class Sirius_Ledger_Currency_Plugin_USD extends Sirius_Ledger_Currency_Plugin {
 	public $type = 'USD';

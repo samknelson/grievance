@@ -5,6 +5,23 @@ class Sirius_Ledger_Charge_Plugin_Hourly extends Sirius_Ledger_Charge_Plugin {
 	public $name = 'Hourly';
 	public $description = 'Generate hourly charges from payperiods.';
 
+	public function entity_settings_form($form, &$form_state, $entity_node, $plugin_uuid) {
+		$form = parent::entity_settings_form($form, $form_state, $entity_node, $plugin_uuid);
+
+		$hour_types = sirius_taxonomy_load('sirius_hour_type', 'tid', 'name');
+		$form['settings']['hour_type_tids'] = array(
+			'#type' => 'checkboxes',
+			'#title' => 'Hour Types',
+			'#options' => $hour_types,
+			'#checkall' => TRUE,
+		);
+
+		$json = sirius_json_get($entity_node);
+		sirius_jsonfield_util_set_defaults($form['settings'], $this->entity_settings($entity_node, $plugin_uuid));
+
+		return $form;
+	}
+
 	public function trigger_enabled($trigger_key) { return ($trigger_key == 'hourly'); }
 
 	public function charge(&$context, $mode = 'test') {
@@ -19,9 +36,16 @@ class Sirius_Ledger_Charge_Plugin_Hourly extends Sirius_Ledger_Charge_Plugin {
 			return array('success' => TRUE);
 		}
 
+		$hour_type_tids = $context['policy_settings']['hour_type_tids'];
+		if (!$hour_type_tids) {
+			sirius_minilog("The hour types have not been specified for this charge plugin.", 'warning');
+			return array('success' => TRUE); 
+		}
+		$hour_type_tids = array_filter(array_values($hour_type_tids));
+
 		$payperiod_json = sirius_json_get($context['payperiod_node']);
-		$qty = $payperiod_json['totals']['hours']['total'];
-		if (!$qty) { $qty	= 0; }
+		$qty = 0;
+		foreach ($hour_type_tids as $hour_type_tid) { $qty += $payperiod_json['totals']['hours']['by_type'][$hour_type_tid]; }
 
 		$history_item = $this->util_history_lookup($context['employer_settings']['rates']['history'], $context['ts']);
 		if (!$history_item) {
@@ -30,11 +54,15 @@ class Sirius_Ledger_Charge_Plugin_Hourly extends Sirius_Ledger_Charge_Plugin {
 		}
 
 		$rate = $history_item['rate'];
-		sirius_minilog("Found rate \$" . number_format($rate, 2) . " effective $history_item[date]");
+		$rate_format = "\$" . number_format($rate, 2);
+
+		sirius_minilog("Found rate $rate_format effective $history_item[date]");
 
 		$amt = $qty * $rate;
 
-	  $memo = "Hourly: $qty hours at $rate";
+	  $memo = "Hourly: $qty eligible hours at $rate_format";
+	  sirius_minilog("Memo: $memo");
+
 	  $entry = array();
 	  $entry['ledger_amount'] = $amt;
 	  $entry['ledger_memo'] = $memo;

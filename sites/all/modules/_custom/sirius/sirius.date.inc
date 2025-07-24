@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * Implements hook_element_info_alter
+ */
+
+function sirius_element_info_alter(&$type) {
+	// The date_popup by default only lets you pick years 3 years past or future. 
+	// This is a weird default, and is frustrating because e.g. we have birthday fields all over. 
+	// So let's override the built-in default.
+	if (isset($type['date_popup']['#date_year_range'])) {
+		$type['date_popup']['#date_year_range'] = '-100:+100';
+	}
+}
+
 function sirius_date_ts($node, $field, $delta = 0, $col = 'value') {
 	if (!$node->{$field}['und'][$delta][$col]) { return 0; }
 	return strtotime($node->{$field}['und'][$delta][$col] . ' ' . $node->{$field}['und'][$delta]['timezone_db']);

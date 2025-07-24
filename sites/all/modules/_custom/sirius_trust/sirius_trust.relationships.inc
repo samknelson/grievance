@@ -1,5 +1,23 @@
 <?php
 
+function sirius_trust_relationship_title($relationship_node) {
+	$name = '';
+
+	$dependent_contact_nid = $relationship_node->field_sirius_contact_alt['und'][0]['target_id'];
+	if ($dependent_contact_nid) {
+		$name = sirius_node_title($dependent_contact_nid);
+	} else {
+		$name = '[no name]';
+	}
+
+	$relationship_type_tid = $relationship_node->field_sirius_contact_reltype['und'][0]['tid'];
+	$relationship_type_term = taxonomy_term_load($relationship_type_tid);
+	if ($relationship_type_term) {
+		$name .= ' (' . $relationship_type_term->field_sirius_name_alt['und'][0]['value'] . ')';
+	}
+	return $name;
+}
+
 function sirius_trust_relationship_criteria_check($relationship_criteria, $relationship_nids) {
 	foreach ($relationship_criteria as $criterion) {
 		$result = sirius_trust_relationship_criterion_check($criterion, $relationship_nids);
@@ -50,7 +68,7 @@ function sirius_trust_relationship_criteria_render($relationship_criteria, $opti
 	if ($text) {
 		$title = $options['title'];
 		if (!$title) { $title = 'Relationship Criteria'; }
-		$text = '<h2>' . $title . '</h2>' . '<ul>' . $text . '</ul>';
+		$text = '<strong>' . $title . '</strong>' . '<ul>' . $text . '</ul>';
 	} else {
 		$text = '';
 	}

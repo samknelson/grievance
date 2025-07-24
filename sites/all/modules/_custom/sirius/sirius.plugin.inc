@@ -76,6 +76,6 @@ class Sirius_Plugin extends Sirius_Singleton {
 		$entity_node = node_load($form_state['entity_nid']);
 		$plugin_uuid = $form_state['plugin_uuid'];
 		$this->entity_settings_set($entity_node, $plugin_uuid, $form_state['values']['settings']);
-		return;
+		return array('success' => TRUE, 'msg' => 'Settings saved.');
 	}
 }

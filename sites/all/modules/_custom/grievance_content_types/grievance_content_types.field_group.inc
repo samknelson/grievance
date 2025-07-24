@@ -2168,7 +2168,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Dispatch Details',
-    'weight' => '4',
+    'weight' => '5',
     'children' => array(
       0 => 'field_sirius_timelimit',
       1 => 'field_sirius_member_status',
@@ -2393,7 +2393,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Employer Notes',
-    'weight' => '3',
+    'weight' => '4',
     'children' => array(
       0 => 'field_sirius_address_parking',
       1 => 'field_sirius_notes',
@@ -2559,7 +2559,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Job Details',
-    'weight' => '2',
+    'weight' => '1',
     'children' => array(
       0 => 'field_sirius_datetime',
       1 => 'field_sirius_datetime_completed',
@@ -2571,6 +2571,7 @@ function grievance_content_types_field_group_info() {
       7 => 'field_grievance_departments',
       8 => 'field_sirius_dispatch_job_tags',
       9 => 'field_sirius_events',
+      10 => 'field_grievance_classifications',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2610,6 +2611,7 @@ function grievance_content_types_field_group_info() {
       9 => 'field_sirius_dispatch_job_tags',
       10 => 'field_sirius_payrate',
       11 => 'field_sirius_events',
+      12 => 'field_grievance_classifications',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2636,7 +2638,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Job Info',
-    'weight' => '1',
+    'weight' => '2',
     'children' => array(
       0 => 'field_sirius_datetime_created',
       1 => 'field_sirius_dispatch_job_type',
@@ -2699,7 +2701,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Notification Settings',
-    'weight' => '5',
+    'weight' => '3',
     'children' => array(
       0 => 'field_sirius_dispatch_job_nfcns',
       1 => 'field_sirius_notify',
@@ -2887,7 +2889,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Worker Counts',
-    'weight' => '9',
+    'weight' => '6',
     'children' => array(
       0 => 'field_sirius_count',
       1 => 'field_sirius_count_yes',

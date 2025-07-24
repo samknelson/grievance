@@ -1,15 +1,20 @@
 <?php
 
 /** 
- * Implements hook_sirius_service_client_info
+ * Implements hook_sirius_plugin_info
  */
 
-function sirius_modernassprog_sirius_service_client_info() {
-  sirius_require('sirius_pcct', 'sirius_pcct.member.inc');
-  sirius_require('sirius_modernassprog', 'sirius_modernassprog.member.inc');
-
+function sirius_modernassprog_sirius_plugin_info($class) {
   $infos = array();
-  Sirius_Modernassprog_Member_Lookup_Jarvis::getInstance()->setInfo($infos);
+
+  if ($class == 'service_client') {
+    sirius_require('sirius_pcct', 'sirius_pcct.member.inc');
+    sirius_require('sirius_modernassprog', 'sirius_modernassprog.member.inc');
+
+    $infos = array();
+    Sirius_Modernassprog_Member_Lookup_Jarvis::getInstance()->setInfo($infos);
+  }
+
   return $infos;
 }
 

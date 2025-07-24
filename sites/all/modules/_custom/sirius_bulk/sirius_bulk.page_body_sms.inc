@@ -69,7 +69,7 @@ function sirius_bulk_node_tab_body_sms_form($form, &$form_state, $bulk_node) {
 	$form['sms']['attach']['url'][0] = array(
 		'#type' => 'textfield',
 		'#title' => t('MMS URL'),
-		'#states' => array('visible' => array(":input[id=\"sms_attach_medthod\"]" => array('value' => 'url'))),
+		'#states' => array('visible' => array(":input[id=\"sms_attach_method\"]" => array('value' => 'url'))),
 		'#default_value' => $bulk_json['sms']['attach']['url'][0],
 		'#description' => t('If a URL is entered, the message will be sent as an MMS. Additional carrier fees may apply.'),
 	);

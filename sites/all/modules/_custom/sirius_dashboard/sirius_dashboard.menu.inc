@@ -3,16 +3,15 @@
 function sirius_dashboard_node_tabs() {
 	$node_tabs = array();
 
-  /*
-  $node_tabs['sirius_log']['sirius_event_intake_application_manage'] = array(
-    'title' => 'Manage',
+  $node_tabs['sirius_worker']['sirius_worker_dashboard'] = array(
+    'title' => 'Dashboard',
     'description' => '',
-    'callback' => 'sirius_node_tab_event_intake_application_manage',
-    'permissions' => array('sirius'),
-    'file' => 'sirius_event.page_intake_application_manage.inc',
-    'weight' => 4,
+    'callback' => 'sirius_dashboard_node_tab_worker',
+    'permissions' => array('sirius dashboard user'),
+    'file' => 'sirius_dashboard.page_worker.inc',
+    'weight' => -1,
+    'component' => 'dashboard:worker',
   );
-  */
 
   sirius_node_tab_set_module('sirius_dashboard', $node_tabs);
 	return $node_tabs;

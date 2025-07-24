@@ -1,23 +1,7 @@
 <?php
 
 function sirius_node_tab_worker_password_access($worker_node) {
-	// "user sync" must be enabled
-	if (!sirius_domain_component_enabled('worker:usersync')) { return FALSE; }
-
-	// Must have a user
-	$worker_user = sirius_worker_get_user($worker_node->nid);
-	if (!$worker_user) { return FALSE; }
-
-  // Admins can edit
-  if (user_access('sirius worker admin')) { return TRUE; }
-
-
-
-  // Workers can edit
-  $my_worker_node = sirius_worker_get();
-  if ($my_worker_node && $worker_node && $my_worker_node->nid == $worker_node->nid) { return TRUE; }
-
-  return FALSE;
+	return Sirius_Worker_Access::getInstance()->access('update password', array('worker_node' => $worker_node));
 }
 
 function sirius_node_tab_worker_password_form($form, &$form_state, $worker_node) {

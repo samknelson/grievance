@@ -255,12 +255,38 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
 
     $sql_args[':date'] = $date;
   }
+
+  if ($filters['include_ein']) {
+    $sql .= "( ";
+    $sql .= "  select field_sirius_id_value from node emp_node ";
+    $sql .= "  left join field_data_field_sirius_worker emp_worker on emp_worker.entity_type = 'node' and emp_worker.entity_id = emp_node.nid ";
+    $sql .= "  left join field_data_field_grievance_shop emp_shop on emp_shop.entity_type = 'node' and emp_shop.entity_id = emp_node.nid ";
+    $sql .= "  left join field_data_field_sirius_id emp_id on emp_id.entity_type = 'node' and emp_id.entity_id = emp_node.nid ";
+    $sql .= "  where emp_worker.field_sirius_worker_target_id = node.nid ";
+    $sql .= "  and emp_shop.field_grievance_shop_target_id = :employer_nid ";
+    $sql .= "  order by emp_node.nid desc limit 1 ";
+    $sql .= ") as worker_ein, ";
+  }
+
+  if ($filters['include_phone']) {
+    $sql .= "field_sirius_phone_value as worker_phone, ";
+    $sql .= "field_sirius_phone_alt_value as worker_phone_alt, ";
+    $sql .= "field_sirius_dispatch_medium_value as worker_dispatch_medium, ";
+  }
+
   $sql .= "concat('I', field_sirius_id_value) as worker_id, ";
   $sql .= "concat(field_sirius_name_family, ', ', field_sirius_name_given) as worker_name, ";
   $sql .= "ms_term.tid as worker_ms ";
   $sql .= "from node ";
   $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_name on field_data_field_sirius_name.entity_type = 'node' and field_data_field_sirius_name.entity_id = node.nid ";
+
+  if ($filters['include_phone']) {
+    $sql .= "left join field_data_field_sirius_phone on field_data_field_sirius_phone.entity_type = 'node' and field_data_field_sirius_phone.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_phone_alt on field_data_field_sirius_phone_alt.entity_type = 'node' and field_data_field_sirius_phone_alt.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_dispatch_medium on field_data_field_sirius_dispatch_medium.entity_type = 'node' and field_data_field_sirius_dispatch_medium.entity_id = node.nid ";
+  }
+  
   $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = node.nid ";
 
@@ -314,9 +340,27 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
 
   $sql .= "order by field_sirius_name_family, field_sirius_name_given ";
 
+  $ms_name_lookup = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
+
   $workers = array();
   $stmt = sirius_sql_query($sql, $sql_args);
   while ($hr = $stmt->fetchAssoc()) {
+    $hr['worker_ms_name'] = $ms_name_lookup[$hr['worker_ms']];
+
+    // We want to send the phone number for opt-ins only
+    if ($hr['worker_dispatch_medium'] == 'sms') {
+      // worker_phone is correct
+    } else if ($hr['worker_dispatch_medium'] == 'sms_alt') {
+      // Use the alternative worker_phone
+      $hr['worker_phone'] = $hr['worker_phone_alt'];
+    } else {
+      // Send no worker_phone
+      unset($hr['worker_phone']);
+    }
+
+    unset($hr['worker_phone_alt']);
+    unset($hr['worker_dispatch_medium']);
+
     $workers[] = $hr;
   }
   return $workers;

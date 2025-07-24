@@ -10,6 +10,10 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/s
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.relationships.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.denorm.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.services.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.cobra.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.qmsco.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.changequeue.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.provider_edi.inc';
 
 /**
  * Implements hook_sirius_domain_component_info
@@ -25,9 +29,17 @@ function sirius_trust_sirius_domain_component_info() {
       'title' => 'Trust - Provider',
       'description' => 'Manage Trust service providers, such as doctor offices or hospitals.',
     ),
+    'trust:provider:edi' => array(
+      'title' => 'Trust - Provider - EDI',
+      'description' => 'Manage provider (vendor) feeds',
+    ),
     'trust:beneficiary' => array(
       'title' => 'Trust - Beneficiary',
       'description' => 'Manage beneficiary designations.',
+    ),
+    'trust:cobra' => array(
+      'title' => 'Trust - COBRA',
+      'description' => 'Enable COBRA determinations and functionality.',
     ),
   );
 }
@@ -81,6 +93,19 @@ function sirius_trust_node_insert($node) { return sirius_trust_denormalize_queue
 
 function sirius_trust_node_delete($node) { return sirius_trust_denormalize_queue($node); }
 
+/**
+ * Implements hook_node_veiw
+ */
+
+function sirius_trust_node_view($node, $view_mode, $langcode) {
+  if ($node->type == 'sirius_trust_benefit' && $view_mode == 'full') {
+    // Hide certain fields from non-staff
+    if (Sirius_Trust_Access::getInstance()->access('staff', array('worker_node' => $worker_node))) { return; }
+    unset($node->content['field_sirius_id']);
+    unset($node->content['field_sirius_active']);
+  }
+}
+
 /***
  * Implements hook_report_cache_info() 
  */
@@ -97,15 +122,28 @@ function sirius_trust_report_cache_info() {
   sirius_require('sirius_trust', 'sirius_trust.report_relationship_sequence.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_newhire.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_hour.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_relationship_self.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_qmsco_no_rp.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_qmsco_multiple_rp.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_relationship_reciprocal.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_election_dependent_uncovered.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_worker_benefit_ending.inc');
+  // sirius_require('sirius_trust', 'sirius_trust.report_election_no_hours.inc');
 
   $items['sirius-trust-eligibility-compare'] = sirius_trust_report_eligibility_compare_info();
   $items['sirius-trust-worker-benefit'] = sirius_trust_report_worker_benefit_info();
   $items['sirius-trust-worker-change'] = sirius_trust_report_worker_benefit_change_info();
   $items['sirius-trust-relationship-sequence'] = sirius_trust_report_relationship_sequence_info();
+  Sirius_Trust_Report_Worker_Benefit_Ending::getInstance()->setInfo($items);
 
   Sirius_Trust_Report_Newhire::getInstance()->setInfo($items);
   Sirius_Trust_Report_Hour::getInstance()->setInfo($items);
   Sirius_Trust_Report_WB_Summary::getInstance()->setInfo($items);
+  Sirius_Trust_Report_Relationship_Self::getInstance()->setInfo($items);
+  Sirius_Trust_Report_Qmsco_No_Rp::getInstance()->setInfo($items);
+  Sirius_Trust_Report_Qmsco_Multiple_Rp::getInstance()->setInfo($items);
+  Sirius_Trust_Report_Relationship_Reciprocal::getInstance()->setInfo($items);
+  // Sirius_Trust_Report_Election_No_Hours::getInstance()->setInfo($items);
 
   // $items['sirius-trust-worker-detail'] = sirius_trust_report_worker_benefit_detail_info();
 
@@ -151,9 +189,11 @@ function sirius_trust_report_cache_info() {
 function sirius_trust_sirius_config_links_alter(&$links) {
   $links['trust']['title'] = 'Trust';
   $links['trust']['links']['sirius/trust/config'] = array('title' => 'General Configuration', 'description' => 'Configure general settings for the Sirius Trust module.');
+  $links['trust']['links']['sirius/trust/cobra'] = array('title' => 'COBRA');
   $links['trust']['links']['sirius/trust/benefits'] = array('title' => 'Benefits', 'description' => 'Configure system benefits.');
   $links['trust']['links']['sirius/trust/services'] = array('title' => 'Services', 'description' => 'Configure services (usually associated with CPT codes).');
   $links['trust']['links']['sirius/trust/providers'] = array('title' => 'Providers', 'description' => 'Configure service providers, such as outpatient facilities, clinics, or hospitals.');
+  $links['trust']['links']['sirius/trust/election/wizard'] = array('title' => 'Election Wizards', 'description' => 'Configure or list election wizards.');
 }
 
 /**
@@ -164,7 +204,7 @@ function sirius_trust_sirius_cron_scan_info() {
   $items['trust_benefit'] = array(
     'title' => 'Trust Worker Benefit Scan',
     'description' => 'Check eligibility for all worker benefits',
-    'schedule' => 'daily',
+    'schedule' => 'always',
     'callback' => 'sirius_trust_worker_benefit_scan',
     'multidomain' => TRUE,
     'component' => 'trust',
@@ -179,12 +219,23 @@ function sirius_trust_sirius_cron_scan_info() {
     'component' => 'trust',
   );
 
+  /*
   $items['trust_beneficiary'] = array(
     'title' => 'Trust Worker Beneficiary Scan',
     'description' => 'Check beneficiaries for all workers, and make sure that only one is active at a time.',
     'schedule' => 'daily',
     'callback' => 'sirius_trust_worker_beneficiary_scan',
     'multidomain' => TRUE,
+    'component' => 'trust',
+  );
+  */
+
+  $items['trust_wb_scan_changelog_purge'] = array(
+    'title' => 'Trust WB Scan Changelog',
+    'description' => 'Purge old scan changelog entries',
+    'schedule' => 'daily',
+    'callback' => 'sirius_trust_wb_scan_changelog_purge_cron',
+    'multidomain' => FALSE,
     'component' => 'trust',
   );
 
@@ -247,5 +298,87 @@ function sirius_trust_sirius_wizard_info() {
 function sirius_trust_sirius_backlinks_from_node_alter(&$links, $node) {
   if ($node->type == 'sirius_trust_service') {
     $links['sirius/trust/services'] = array('name' => 'All Services');
+  }
+
+ if ($node->type == 'sirius_log' && $node->field_sirius_category['und'][0]['value'] == 'trust:election_wizard') {
+    $worker_node = sirius_log_handler($node, 'sirius_worker');
+    unset($links['node/' . $worker_node->nid . '/sirius_worker_log']);
+    $links['node/' . $worker_node->nid . '/sirius_trust_worker_election'] = array('name' => 'Worker');
+  }
+}
+
+/**
+ * Implements hook_sirius_dashboard_info
+ */
+
+function sirius_trust_sirius_dashboard_plugin_info() {
+  $plugins = array();
+
+  $plugins['trust_elections'] = array(
+    'title' => 'Trust: Elections',
+    'description' => '',
+    'file' => 'sirius_trust.dashboard_plugin_elections.inc',
+    'module' => 'sirius_trust',
+    'callbacks' => array(
+      'data' => 'sirius_trust_dashboard_plugin_elections_data',
+      'config' => 'sirius_trust_dashboard_plugin_elections_config',
+      // 'prefs' => 'sirius_trust_dashboard_plugin_elections_prefs',
+    ),
+  );
+
+  $plugins['trust_changequeue'] = array(
+    'title' => 'Trust: Changequeue',
+    'description' => '',
+    'file' => 'sirius_trust.dashboard_plugin_changequeue.inc',
+    'module' => 'sirius_trust',
+    'callbacks' => array(
+      'data' => 'sirius_trust_dashboard_plugin_changequeue_data',
+    ),
+  );
+
+  $plugins['trust_wbs'] = array(
+    'title' => 'Trust: Worker: Benefits',
+    'description' => '',
+    'file' => 'sirius_trust.dashboard_wbs.inc',
+    'module' => 'sirius_trust',
+    'callbacks' => array(
+      'data' => 'sirius_trust_dashboard_wbs_data',
+    ),
+  );
+
+  $plugins['trust_wb_scan'] = array(
+    'title' => 'Trust: Worker Benefit Scan Status',
+    'description' => '',
+    'file' => 'sirius_trust.benefit.inc',
+    'module' => 'sirius_trust',
+    'callbacks' => array(
+      'data' => 'sirius_trust_wb_scan_dashboard_data',
+    ),
+  );
+
+  $plugins['trust_worker_election'] = array(
+    'title' => 'Trust: Worker: Election',
+    'description' => '',
+    'file' => 'sirius_trust.dashboard_worker_election.inc',
+    'module' => 'sirius_trust',
+    'callbacks' => array(
+      'data' => 'sirius_trust_dashboard_worker_election_data',
+    ),
+  );
+
+  return $plugins;
+}
+
+/**
+ * Implements hook_sirius_plugin_info
+ */
+
+function sirius_trust_sirius_plugin_info($class) {
+  if ($class == 'trust_provider_edi') {
+    sirius_require('sirius_trust', 'sirius_trust.provider_edi.root.inc');
+
+    $items = array();
+    Sirius_Trust_Provider_Edi::getInstance()->setInfo($items);
+    return $items;
   }
 }

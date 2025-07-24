@@ -4,6 +4,14 @@ function sirius_employer_node_tab_labproj_status_access($labproj_node) {
 	if ($labproj_node->field_sirius_category['und'][0]['value'] != 'labproj') { return FALSE; }
 	if (!in_array($labproj_node->field_sirius_type['und'][0]['value'], array('draft', 'active'))) { return FALSE; }
 
+	// Employers can access their own page only
+	if (!user_access('sirius employer admin')) { 
+		$employer_node = sirius_log_handler($labproj_node, 'grievance_shop');
+		global $user;
+		$user_full = user_load($user->uid);
+		if ($user_full->field_grievance_shops['und'][0]['target_id'] != $employer_node->nid) { return FALSE; }
+	}
+
 	return TRUE; 
 }
 

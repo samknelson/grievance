@@ -10,12 +10,23 @@
 function sirius_hour_node_tabs() {
   $node_tabs = array();
 
+  $node_tabs['sirius_payperiod']['sirius_payperiod_simple'] = array(
+    'title' => 'Hours',
+    'description' => '',
+    'callback' => 'sirius_hour_node_tab_payperiod_simple',
+    'permissions' => array('sirius'),
+    'weight' => 0,
+    'component' => 'hour:simple',
+    'file' => 'sirius_hour.page_payperiod_simple.inc',
+  );
+
   $node_tabs['sirius_payperiod']['sirius_payperiod_entries_summary'] = array(
     'title' => 'Totals',
     'description' => '',
     'callback' => 'sirius_hour_node_tab_payperiod_entries_summary',
     'permissions' => array('sirius hour user'),
     'weight' => 0,
+    'component' => 'hour:complex',
   );
 
   $node_tabs['sirius_payperiod']['sirius_payperiod_entries_view'] = array(
@@ -24,6 +35,7 @@ function sirius_hour_node_tabs() {
     'callback' => 'sirius_hour_node_tab_payperiod_entries_view',
     'permissions' => array('sirius hour user'),
     'weight' => 1,
+    'component' => 'hour:complex', 
   );
 
   $node_tabs['sirius_payperiod']['sirius_payperiod_entries_edit'] = array(
@@ -32,6 +44,7 @@ function sirius_hour_node_tabs() {
     'callback' => 'sirius_hour_node_tab_payperiod_entries_edit',
     'permissions' => array('sirius hour admin'),
     'weight' => 2,
+    'component' => 'hour:complex',
   );
 
   $node_tabs['sirius_payperiod']['sirius_payperiod_entries_reconcile'] = array(
@@ -47,7 +60,8 @@ function sirius_hour_node_tabs() {
     'title' => 'Hours',
     'description' => '',
     'callback' => 'sirius_hour_node_tab_worker_hours',
-    'permissions' => array('sirius hour admin'),
+    'permissions' => array('sirius'),
+    'component' => 'hour',
   );
 
   $node_tabs['grievance_shop']['sirius_employer_hours'] = array(
@@ -58,15 +72,7 @@ function sirius_hour_node_tabs() {
     'component' => 'hour:transmittal',
   );
 
-  /*
-  $node_tabs['sirius_payperiod']['sirius_payperiod_entries/accrual'] = array(
-    'title' => 'Accrual',
-    'description' => '',
-    'callback' => 'sirius_hour_node_tab_payperiod_entries_accrual',
-    'permissions' => array('sirius hour user'),
-    'weight' => 6,
-  );
-  */
+  sirius_node_tab_set_module('sirius_hour', $node_tabs);
 
   return $node_tabs;
 }
@@ -110,18 +116,30 @@ function sirius_hour_menu() {
     'description' => '',
     'page callback' => 'sirius_hour_page_search_month',
     'page arguments' => array(),
-    'access arguments' => array('sirius hour admin'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'sirius_hour.page_search_bymonth.inc',
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius hour admin',
+        'component' => 'hour',
+      ),
+    ),
   );
 
   $items['sirius/hour/config'] = array(
     'title' => 'Hour Configuration',
     'description' => '',
-    'access arguments' => array('sirius hour admin'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_hour_config'),
     'type' => MENU_NORMAL_ITEM,
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius hour admin',
+        'component' => 'hour',
+      ),
+    ),
   );
 
   return $items;

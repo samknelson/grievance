@@ -9,7 +9,7 @@ function sirius_bulk_page_create_form($form, &$form_state) {
 	$media = sirius_bulk_media();
 
 	$form['title'] = array(
-		'#title' => t('Subject'),
+		'#title' => t('Title'),
 		'#type' => 'textfield',
 		'#required' => TRUE,
 	);

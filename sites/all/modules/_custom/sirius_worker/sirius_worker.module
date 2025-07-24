@@ -4,6 +4,7 @@
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.permission.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.access.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.menu.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.user.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.member_status.inc";
@@ -272,10 +273,9 @@ function sirius_worker_form_alter(&$form, &$form_state, $form_id) {
     // Some fields must be edited within tabs, can't be modified here.
     $form['field_sirius_skill']['#access'] = FALSE;
     $form['field_sirius_skill_expire']['#access'] = FALSE;
-    $form['field_sirius_member_status']['#access'] = FALSE;
+    // $form['field_sirius_member_status']['#access'] = FALSE;
     $form['field_sirius_industry']['#access'] = FALSE;
     $form['field_sirius_work_status']['#access'] = FALSE;
-    $form['field_sirius_member_status']['#access'] = FALSE;
     $form['field_sirius_worker_dispstatus']['#access'] = FALSE;
     $form['field_sirius_dispatch_availdate']['#access'] = FALSE;
     $form['field_sirius_skill']['#access'] = FALSE;
@@ -313,6 +313,12 @@ function sirius_worker_node_presave($worker_node) {
   // Only for workers
   if ($worker_node->type != 'sirius_worker') { return; }
 
+  $worker_node->field_sirius_name['und'][0] = sirius_worker_name_canonicalize($worker_node->field_sirius_name['und'][0]);
+
+  if ($worker_node->field_sirius_address['und'][0]) {
+    $worker_node->field_sirius_address['und'][0] = sirius_worker_address_canonicalize($worker_node->field_sirius_address['und'][0]);
+  }
+
   // Only on insert
   if ($worker->nid) { return; }
 
@@ -323,24 +329,10 @@ function sirius_worker_node_presave($worker_node) {
 }
 
 function sirius_worker_nextid() {
-  $sql = "select max(field_sirius_id_value) as m from field_data_field_sirius_id ";
-  $sql .= "where entity_type = 'node' "; 
-  $sql .= "and bundle = 'sirius_worker' ";
-  $sql .= "and field_sirius_id_value != '999099' ";
-  $sql .= "and field_sirius_id_value != '666666' ";
-  $sql .= "and field_sirius_id_value != '999001' ";
-  $sql .= "and field_sirius_id_value < '999000' ";
-  $sql .= "and length(field_sirius_id_value) = 6 ";
-  // $sql .= 'and field_sirius_id_value REGEXP \'^[0-9]{6}$\' ';
-  $stmt = db_query($sql, array());
-  $hr = $stmt->fetchAssoc();
-  $id = $hr['m'];
-  if ($id > 0) {
-    $id++;
-    if ($id == 999099) { $id++; }
-    if ($id == 666666) { $id++; }
-    if ($id == 999001) { $id++; }
-  }
+  $id = sirius_domain_variable_get('sirius_worker_nextid');
+  if (!$id) { $id = 1000000; }
+  ++$id; 
+  sirius_domain_variable_set('sirius_worker_nextid', $id);
   drupal_alter('sirius_worker_nextid', $id);
   return $id;
 }
@@ -368,6 +360,29 @@ function sirius_worker_sirius_access_info() {
   return $infos;
 }
 
+/**
+ * Implements hook_sirius_dashboard_info
+ */
+
+function sirius_worker_sirius_dashboard_plugin_info() {
+  $plugins = array();
+
+  $plugins['worker_contact'] = array(
+    'title' => 'Worker: Contact Info',
+    'description' => '',
+    'file' => 'sirius_worker.dashboard_contact.inc',
+    'module' => 'sirius_worker',
+    'callbacks' => array(
+      'data' => 'sirius_worker_dashboard_contact_data',
+      // 'config' => 'sirius_denorm_dashboard_config',
+      // 'prefs' => 'sirius_denorm_dashboard_prefs',
+    ),
+    'proxy' => TRUE,
+  );
+
+  return $plugins;
+}
+
 /***
  * Implements hook_report_cache_info() 
  */
@@ -380,6 +395,7 @@ function sirius_worker_report_cache_info() {
   sirius_require('sirius_worker', 'sirius_worker.report_ssn_invalid.inc');
   sirius_require('sirius_worker', 'sirius_worker.report_ssn_missing.inc');
   sirius_require('sirius_worker', 'sirius_worker.report_geo.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_notification_media.inc');
 
   $items = array();
 
@@ -387,6 +403,7 @@ function sirius_worker_report_cache_info() {
   Sirius_Worker_Report_Ssn_Missing::getInstance()->setInfo($items);
   Sirius_Worker_Report_Ssn_Duplicate::getInstance()->setInfo($items);
   Sirius_Worker_Report_Geo::getInstance()->setInfo($items);
+  Sirius_Worker_Report_Notification_Media::getInstance()->setInfo($items);
 
   $items['sirius-worker-duplicate-id'] = array(
     'name' => t('Workers with Duplicate IDs'),
@@ -449,6 +466,22 @@ function sirius_worker_node_view($node, $view_mode, $langcode) {
 
   // Render contact tags
   sirius_worker_contact_tags_node_view($node, $view_mode, $langcode);
+
+  // Address
+  sirius_worker_addr_node_view($node, $view_mode, $langcode);
+}
+
+function sirius_worker_addr_node_view(&$worker_node, $view_mode, $langcode) {
+  if ($worker_node->type != 'sirius_worker') { return; }
+  if (!$worker_node->content['field_sirius_address']) { return; }
+  $contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+  if (!$contact_node) { return; }
+  $accuracy = $contact_node->field_sirius_address_accuracy['und'][0]['value'];
+  if (!$accuracy) { return; }
+  $renderable = field_view_field('node', $contact_node, 'field_sirius_address_accuracy', 'full');
+  if ($renderable) {
+    $worker_node->content['field_sirius_address']['#suffix'] = render($renderable);
+  }
 }
 
 /**
@@ -594,4 +627,47 @@ function sirius_worker_sirius_denorm($item) {
 
 function sirius_worker_contact_get($worker_node) {
   return node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+}
+
+function sirius_worker_name_canonicalize($value) {
+  foreach (array('given', 'family', 'middle') as $key) {
+    $value[$key] = sirius_worker_name_canonicalize_part($value[$key]);
+  }
+  return $value;
+}
+
+function sirius_worker_address_canonicalize($value) {
+  $cols = array_keys(sirius_addr_cols());
+  foreach ($cols as $key) {
+    $value[$key] = strtoupper($value[$key]);
+  }
+  return $value;
+}
+
+function sirius_worker_name_canonicalize_part($string) {
+  $word_splitters = array(' ', '-', "O'", "L'", "D'", 'St.', 'Mc', 'Mac');
+  $lowercase_exceptions = array('the', 'van', 'den', 'von', 'und', 'der', 'de', 'di', 'da', 'of', 'and', "l'", "d'");
+  $uppercase_exceptions = array('III', 'IV', 'VI', 'VII', 'VIII', 'IX');
+
+  $string = strtolower($string);
+  foreach ($word_splitters as $delimiter) {
+    $words = explode($delimiter, $string);
+    $newwords = array();
+    foreach ($words as $word) {
+      if (in_array(strtoupper($word), $uppercase_exceptions)) {
+        $word = strtoupper($word);
+      } else if (!in_array($word, $lowercase_exceptions)) {
+        $word = ucfirst($word);
+      }
+
+      $newwords[] = $word;
+    }
+
+    if (in_array(strtolower($delimiter), $lowercase_exceptions)) {
+      $delimiter = strtolower($delimiter);
+    }
+
+    $string = join($delimiter, $newwords);
+  }
+  return $string;
 }

@@ -16,6 +16,14 @@ function sirius_bulk_node_tab_medium_form($form, &$form_state, $bulk_node) {
 	$json = sirius_jsonfield_util_node_json_get($bulk_node);
 
 	$form['#tree'] = TRUE; 
+
+  $form["title"] = array(
+    '#title' => t('Title'),
+		'#type' => 'textfield',
+	  '#default_value' => $bulk_node->title,
+		'#required' => TRUE,
+  );
+
   $form["medium"] = array(
     '#title' => t('Medium'),
 		'#type' => 'select',
@@ -43,7 +51,7 @@ function sirius_bulk_node_tab_medium_form($form, &$form_state, $bulk_node) {
 	);
 
 	if ($json['do_not_disturb']['id']) {
-		$form['do_not_disturb']['render'] = array('#markup' => sirius_do_not_disurb_render($json['do_not_disturb']['id']));
+		$form['do_not_disturb']['render'] = array('#markup' => sirius_do_not_disturb_render($json['do_not_disturb']['id']));
 	}
 
 	$form['submit'] = array(
@@ -57,6 +65,7 @@ function sirius_bulk_node_tab_medium_form($form, &$form_state, $bulk_node) {
 function sirius_bulk_node_tab_medium_form_submit($form, &$form_state) {
 	$media = sirius_bulk_media();
 	$bulk_node = node_load($form_state['bulk_nid']);
+	$bulk_node->title = $form_state['values']['title'];
 	$bulk_node->field_sirius_bulk_medium['und'][0]['value'] = $form_state['values']['medium'];
 	$json = sirius_jsonfield_util_node_json_get($bulk_node);
 	$json['do_not_disturb'] = $form_state['values']['do_not_disturb'];

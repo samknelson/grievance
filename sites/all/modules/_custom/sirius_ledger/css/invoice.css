@@ -1,0 +1,10 @@
+@media print {
+	.sirius_wizard {
+		display: none;
+	}
+}
+
+.sirius_invoice_printby {
+	margin-top: 20px;
+	font-family: monospace;
+}

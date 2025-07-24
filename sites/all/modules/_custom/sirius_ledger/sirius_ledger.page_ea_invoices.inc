@@ -1,8 +1,21 @@
 <?php
 
 function sirius_ledger_node_tab_ea_invoices_access($ea_node) {
+	// Must be an EA node
 	if ($ea_node->field_sirius_category['und'][0]['value'] != 'ledger:ea') { return FALSE; }
-	return Sirius_Ledger_Access::getInstance()->access('ea_invoices', array('ea_node' => $ea_node));
+
+	// Must have access to view invoices
+	if (!Sirius_Ledger_Access::getInstance()->access('ea_invoices', array('ea_node' => $ea_node))) { return FALSE; }
+
+	// Must be at least one invoice
+	$ea = Sirius_Ledger_EA::getInstance();
+	$invoice_obj = sirius_ledger_invoice_obj();
+	$participant_node = $ea->participant_node($ea_node);
+	$account_node = $ea->account_node($ea_node);
+	$first_interval = $invoice_obj->first_interval($participant_node->nid, $account_node->nid);
+	if (!$first_interval) { return FALSE; }
+
+	return TRUE;
 }
 
 function sirius_ledger_node_tab_ea_invoices($ea_node) {

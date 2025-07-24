@@ -29,7 +29,6 @@ function sirius_sched_db_search($params) {
 		$sql_args[':end_ts_max'] = $params['end_ts_max'];
 	}
 
-
 	if (isset($params['interval'])) {
 
 		// We want any schedule entries which overlap a given interval. There are five possibilities.
@@ -54,6 +53,7 @@ function sirius_sched_db_search($params) {
 		$sql .= "and ( ";
 		$sql .= "     (:interval_start <= start_ts and start_ts <= :interval_end) ";  // The start date of the event falls within the interval
 		$sql .= "  or (start_ts <= :interval_start and :interval_start <= end_ts) ";  // The start date of the interval falls within the event
+		$sql .= "  or (start_ts <= :interval_start and end_ts is null) ";              // The end ts is null
 		$sql .= ") ";
 		$sql_args[':interval_start'] = $params['interval']['start_ts'];
 		$sql_args[':interval_end'] = $params['interval']['end_ts'];
@@ -66,7 +66,7 @@ function sirius_sched_db_search($params) {
 	$offset = $params['offset'];
 	if (!$offset) { $offset = 0; }
 
-	$sql .= "order by $order limit $limit offset $offset ";
+	$sql .= "order by $order limit $limit offset $offset";
 	$stmt = sirius_sql_query($sql, $sql_args);
 	$scheds = array();
 	while ($hr = $stmt->fetchAssoc()) {

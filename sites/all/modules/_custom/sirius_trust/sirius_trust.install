@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * Create the sirius_trust_wb_scan_changelog table
+ */
+
+function sirius_trust_update_7001() {
+  $sqls = array(
+'create table sirius_trust_wb_scan_changelog (
+  log_nid integer primary key auto_increment,
+  ts integer,
+  mode varchar(255),
+  scan varchar(255),
+  wb_nid integer,
+  subscriber_worker_nid integer,
+  dependent_worker_nid integer,
+  relationship_nid integer,
+  benefit_nid integer,
+  msg varchar(255),
+  action varchar(255)
+);',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      drupal_set_message("Executing: $sql");
+      $stmt = db_query($sql, array());
+    } catch (exception $ignore) {
+      drupal_set_message("Error: " . $ignore->getMessage(), 'warning');
+    }
+  }
+}
