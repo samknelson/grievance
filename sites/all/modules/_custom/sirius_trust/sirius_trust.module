@@ -125,6 +125,7 @@ function sirius_trust_report_cache_info() {
   sirius_require('sirius_trust', 'sirius_trust.report_relationship_self.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_qmsco_no_rp.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_qmsco_multiple_rp.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_worker_benefit_pair.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_relationship_reciprocal.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_election_dependent_uncovered.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_worker_benefit_ending.inc');
@@ -142,6 +143,7 @@ function sirius_trust_report_cache_info() {
   Sirius_Trust_Report_Relationship_Self::getInstance()->setInfo($items);
   Sirius_Trust_Report_Qmsco_No_Rp::getInstance()->setInfo($items);
   Sirius_Trust_Report_Qmsco_Multiple_Rp::getInstance()->setInfo($items);
+  Sirius_Trust_Report_Worker_Benefit_Pair::getInstance()->setInfo($items);
   Sirius_Trust_Report_Relationship_Reciprocal::getInstance()->setInfo($items);
   // Sirius_Trust_Report_Election_No_Hours::getInstance()->setInfo($items);
 
