@@ -113,13 +113,9 @@ class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Gen
   public function relcod($context) {
     $reltype_id = $this->relationship_type($context['relationship_node']); 
 
-    if (in_array($reltype_id, array('C', 'AC', 'SC')))  { return '30'; }
-    if (in_array($reltype_id, array('SP')))             { return '20'; }
-    if (in_array($reltype_id, array('DP')))             { return '21'; }
-    if (in_array($reltype_id, array('H')))              { return '32'; }
-    if (in_array($reltype_id, array('G')))              { return '40'; }
-    if (in_array($reltype_id, array('QMSCO')))          { return '13'; }
-    return '10';
+    if (in_array($reltype_id, array('SP', 'DP'))) { return '02'; }
+    if (in_array($reltype_id, array('C', 'AC', 'H', 'QMSCO', 'SC', 'G'))) { return '03'; }
+    return '01';
   }
 
   public function gender($context) {
