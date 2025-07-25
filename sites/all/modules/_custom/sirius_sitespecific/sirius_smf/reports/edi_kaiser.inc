@@ -129,7 +129,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       $row['Subscriber SSN'] = $this->ssn($context, 'subscriber_node');
       $row['Member SSN'] = $this->ssn($context, 'worker_node');
       $row['Employee ID'] = '';
-      $row['Supplemental ID'] = '';
+      $row['Supplemental ID'] = $this->supplemental_id($context);
       $row['Employer ID'] = '';
       $row['Employment Status'] = '';
       $row['Hire Date'] = '';
@@ -168,6 +168,11 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
     $str = parent::ssn($context, $which);
     while (strlen($str) < 9) { $str = "0$str"; }
     return $str;
+  }
+
+  public function supplemental_id($context) {
+    if ($this->is_qmsco($context)) { return '08'; }
+    return '';
   }
 
   public function enrollment_unit($context) {
