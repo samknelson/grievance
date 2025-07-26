@@ -30,6 +30,68 @@ function sirius_smf_node_tab_worker_oneoff_dentwell_election_form_submit($form, 
 	return sirius_smf_oneoff_dentwell_election($form_state['values']['mode'], $worker_node);
 }
 
+
+
+
+
+
+
+
+
+
+// drush --user=1 php-eval "sirius_require('sirius_smf', 'sirius_smf.oneoff_dentwell_election.inc'); sirius_smf_worker_oneoff_dentwell_election_all('test');"
+function sirius_smf_worker_oneoff_dentwell_election_all($mode) {
+	sirius_minilog_echo_active(TRUE);
+	sirius_denorm_realtime(FALSE);
+
+	$batch_size = 1000;
+
+	$last_worker_nid = variable_get('sirius_smf_worker_oneoff_dentwell_election_all_last_worker_nid');
+	if (!$last_worker_nid) { $last_worker_nid = 0; }
+
+	$sql = "select count(*) as c from node where type = 'sirius_worker' and nid > $last_worker_nid";
+	$stmt = sirius_sql_query($sql, array());
+	$hr = $stmt->fetchAssoc();
+	$total_grand = $hr['c'];
+	sirius_minilog("There are " . number_format($grand_total) . " records remaining.");
+
+	$sql = "select nid from node where type = 'sirius_worker' and nid > $last_worker_nid order by nid limit $batch_size";
+	$stmt = sirius_sql_query($sql, array());
+
+	$worker_nids = array();
+	while ($hr = $stmt->fetchAssoc()) { $worker_nids[] = $hr['nid']; }
+	$total = count($worker_nids);
+
+  $ts_start = time();
+	foreach ($worker_nids as $worker_nid) {
+		++$count;
+
+		$ts_elapsed = time() - $ts_start;
+		$ts_per_record = $ts_elapsed / $count;
+		$estimate = format_interval($ts_per_record * $total);
+
+		$worker_node = node_load($worker_nid);
+
+		sirius_minilog("Processing $count / $total / $total_grand: $worker_nid: " . $worker_node->title . ": $estimate");
+		sirius_minilog_indent();
+		sirius_smf_oneoff_dentwell_election($mode, $worker_node);
+		sirius_domain($worker_node->field_sirius_domain['und'][0]['target_id']);
+		sirius_minilog_outdent();
+
+		variable_set('sirius_smf_worker_oneoff_dentwell_election_all_last_worker_nid', $worker_nid);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
 function sirius_smf_oneoff_dentwell_election($mode, $worker_node) {
 	sirius_minilog("Scanning: " . $worker_node->title . " (mode = $mode)");
 
@@ -83,5 +145,5 @@ function sirius_smf_oneoff_dentwell_election($mode, $worker_node) {
 
 	node_save($prior_election_node);
 	node_save($new_election_node);
-	sirius_minilog("... Election saved: " . $new_election_node->title . ' (' . $new_election_node->nid . ')');
+	sirius_minilog("... *** Election saved: " . $new_election_node->title . ' (' . $new_election_node->nid . ')');
 }
