@@ -483,7 +483,11 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
       }
 
       $fields = $info['preview']['default_display_fields'];
-      fputcsv($fp, $fields);
+
+      if (!$info['edi_csv_hide_header']) {
+        fputcsv($fp, $fields);
+      }
+
   		while ($hr = $stmt->fetchAssoc()) {
   			$hr = $info['generator']->row_decode($hr['report_data']);
   			$row = array();

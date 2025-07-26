@@ -124,6 +124,11 @@ function sirius_trust_worker_benefits_search($params) {
   	$sql_args[':end_date_range_start'] = date('Y-m-d 00:00:00', strtotime($params['end_date_range']['start']));
   	$sql_args[':end_date_range_end'] = date('Y-m-d 00:00:00', strtotime($params['end_date_range']['end']));
   }
+  if ($params['start_date_range']) {
+  	$sql .= "and (field_sirius_date_start_value >= :start_date_range_start and field_sirius_date_start_value <= :start_date_range_end) ";
+  	$sql_args[':start_date_range_start'] = date('Y-m-d 00:00:00', strtotime($params['start_date_range']['start']));
+  	$sql_args[':start_date_range_end'] = date('Y-m-d 00:00:00', strtotime($params['start_date_range']['end']));
+  }
   if ($params['end_date']) {
   	$sql .= "and field_sirius_date_end_value = :end_date ";
   	$sql_args[':end_date'] = date('Y-m-d 00:00:00', strtotime($params['end_date']));

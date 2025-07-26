@@ -18,8 +18,11 @@ function sirius_trust_node_tab_worker_benefits_form($form, &$form_state, $worker
   }
 
 	$active_benefits_received = sirius_trust_fetch_worker_benefits($worker_node, 'direct', array('active' => 'Yes', 'benefit_types' => $benefit_types));
+	$future_benefits_received = sirius_trust_fetch_worker_benefits($worker_node, 'direct', array('benefit_types' => $benefit_types, 'start_date_range' => array('start' => date('Y-m-d', strtotime('+1 day')), 'end' => date('Y-m-d', strtotime('+100 years')))));
 	$all_benefits_received = sirius_trust_fetch_worker_benefits($worker_node, 'direct', array('benefit_types' => $benefit_types));
+	
 	$active_benefits_provided = sirius_trust_fetch_worker_benefits($worker_node, 'dependent', array('active' => 'Yes', 'benefit_types' => $benefit_types));
+	$future_benefits_provided = sirius_trust_fetch_worker_benefits($worker_node, 'dependent', array('benefit_types' => $benefit_types, 'start_date_range' => array('start' => date('Y-m-d', strtotime('+1 day')), 'end' => date('Y-m-d', strtotime('+100 years')))));
 	$all_benefits_provided = sirius_trust_fetch_worker_benefits($worker_node, 'dependent', array('benefit_types' => $benefit_types));
 
 	$form['#tree'] = TRUE;
@@ -62,7 +65,7 @@ function sirius_trust_node_tab_worker_benefits_form($form, &$form_state, $worker
 	if ($show_inactive) {
 		$html .= sirius_trust_render_worker_benefits($worker_node, 'direct', $all_benefits_received, $render_options);
 	} else {
-		$html .= sirius_trust_render_worker_benefits($worker_node, 'direct', $active_benefits_received, $render_options);
+		$html .= sirius_trust_render_worker_benefits($worker_node, 'direct', array_merge($active_benefits_received, $future_benefits_provided), $render_options);
 		$count_inactive = count($all_benefits_received) - count($active_benefits_received);
 
 		if ($is_staff) {
@@ -79,7 +82,7 @@ function sirius_trust_node_tab_worker_benefits_form($form, &$form_state, $worker
 		if ($show_inactive) {
 			$html .= sirius_trust_render_worker_benefits($worker_node, 'direct', $all_benefits_provided, $render_options);
 		} else {
-			$html .= sirius_trust_render_worker_benefits($worker_node, 'direct', $active_benefits_provided, $render_options);
+			$html .= sirius_trust_render_worker_benefits($worker_node, 'direct', array_merge($active_benefits_provided, $future_benefits_provided), $render_options);
 			$count_inactive = count($all_benefits_provided) - count($active_benefits_provided);
 			if ($count_inactive > 0) {
 				$html .= '<p>' . t('(Not showing <strong>@count_inactive</strong> inactive records.)', array('@count_inactive' => $count_inactive)) . '</p>';
