@@ -96,6 +96,7 @@ function sirius_smf_oneoff_dentwell_election($mode, $worker_node) {
 	sirius_minilog("Scanning: " . $worker_node->title . " (mode = $mode)");
 
 	$lookups = &drupal_static(__FUNCTION__);
+	sirius_minilog("... COUNT SO FAR: " . $lookups['count']);
 	if (!isset($lookups['delta'])) {
 		$lookups['delta'] = sirius_find_nid_by_id('D', 'sirius_trust_benefit');
 		$lookups['dentwell'] = sirius_find_nid_by_id('LADC', 'sirius_trust_benefit');
@@ -146,4 +147,5 @@ function sirius_smf_oneoff_dentwell_election($mode, $worker_node) {
 	node_save($prior_election_node);
 	node_save($new_election_node);
 	sirius_minilog("... *** Election saved: " . $new_election_node->title . ' (' . $new_election_node->nid . ')');
+	++$lookups['count'];
 }
