@@ -74,8 +74,8 @@ function sirius_smf_worker_oneoff_dentwell_election_all($mode) {
 
 		sirius_minilog("Processing $count / $total / $total_grand: $worker_nid: " . $worker_node->title . ": $estimate");
 		sirius_minilog_indent();
-		sirius_smf_oneoff_dentwell_election($mode, $worker_node);
 		sirius_domain($worker_node->field_sirius_domain['und'][0]['target_id']);
+		sirius_smf_oneoff_dentwell_election($mode, $worker_node);
 		sirius_minilog_outdent();
 
 		variable_set('sirius_smf_worker_oneoff_dentwell_election_all_last_worker_nid', $worker_nid);
