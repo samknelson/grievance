@@ -113,6 +113,7 @@ function sirius_trust_worker_benefit_scan($mode = 'test', $force = FALSE) {
 }
 
 function sirius_trust_wb_scan_worker($mode, $worker_node, $options = array()) {
+	sirius_domain($worker_node->field_sirius_domain['und'][0]['target_id']);
 	if ($options['month'] == 'next_month') {
 		$ts = strtotime(date('Y-m-15', strtotime('+1 month')));
 	} else {

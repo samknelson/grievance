@@ -109,10 +109,10 @@ function sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, 
 	// Did the benefit end any time between the first of last month and the end of this month? If so, just extend it.
 	unset($search_params['active']);
 	$search_params['end_date_range'] = array(
-		'start' => date('Y-m-d 00:00:00', strtotime('-1 month', strtotime(date('Y-m-1', $options['ts'])))),
-		'end' => date('Y-m-d'),
+		'start' => date('Y-m-1 00:00:00', strtotime('-1 month', $options['ts'])),
+		'end' => date('Y-m-d', $options['ts']),
 	);
-	// $search_params['ts'] = strtotime('-1 month', strtotime(date('Y-m-15')));
+	$search_params['ts'] = strtotime('-1 month', strtotime(date('Y-m-15', $options['ts'])));
 	$probe = sirius_trust_worker_benefits_search($search_params);
 	if ($probe) {
 		$change_data['msg'] = 'The worker had the benefit last month.';
