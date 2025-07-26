@@ -15,6 +15,7 @@ class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Gen
       'row_encoding' => 'json',
       'edi_tiers' => array('mlk', 'other'),
       'edi_output_format' => 'csv',
+      'edi_csv_hide_header' => TRUE,
     );
 
     return parent::info($result);
