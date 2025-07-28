@@ -89,12 +89,13 @@ function sirius_trust_wb_scan_record_stop($mode, $wb_node, $options = array()) {
 		}
 	} else if ($result['warning']) {
 		sirius_minilog("Worker is eligible for the benefit, but with a warning: " . $result['msg']);
-		$wb_node['scan']['warnings'] = $result['msg'];
+		$wb_json['scan']['warnings'] = $result['msg'];
 
 		$change_data['msg'] = "Warning: " . $result['msg'];
 		$change_data['action'] = 'warning';
 	} else {
 		sirius_minilog("Worker is still eligible for the benefit.");
+		$wb_json['scan']['msg'] = "Ok";
 
 		$change_data['action'] = 'ok';
 	}

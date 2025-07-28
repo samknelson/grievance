@@ -214,10 +214,32 @@ function sirius_trust_worker_benefits($worker_node, $ts = NULL) {
 	return $wb_nodes;
 }
 
+
+
+
+
 function sirius_trust_worker_benefits_sort_by_date($wb_nodes) {
+	// Gather susbscriber, contact names
+	foreach ($wb_nodes as $wb_nid => $wb_node) {
+		$relationship_node = node_load($wb_node->field_sirius_contact_relation['und'][0]['target_id']);
+		$wb_nodes[$wb_nid]->sort_dependent_name = sirius_node_title($relationship_node->field_sirius_contact_alt['und'][0]['target_id']);
+		$wb_nodes[$wb_nid]->sort_subscriber_name = sirius_node_title($wb_node->field_sirius_trust_subscriber['und'][0]['target_id']);
+		$wb_nodes[$wb_nid]->sort_benefit_name = sirius_node_title($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
+	}
+
   uksort($wb_nodes, function($a, $b) use ($wb_nodes) {
-    $active_a = $wb_nodes[$a]->field_sirius_active['und'][0]['value'];
-    $active_b = $wb_nodes[$b]->field_sirius_active['und'][0]['value'];
+
+    // $active_a = $wb_nodes[$a]->field_sirius_active['und'][0]['value'];
+    // $active_b = $wb_nodes[$b]->field_sirius_active['und'][0]['value'];
+
+  	$subscriber_name_a = $wb_nodes[$a]->sort_subscriber_name;
+  	$subscriber_name_b = $wb_nodes[$b]->sort_subscriber_name;
+
+  	$dependent_name_a = $wb_nodes[$a]->sort_dependent_name;
+  	$dependent_name_b = $wb_nodes[$b]->sort_dependent_name;
+
+  	$benefit_name_a = $wb_nodes[$a]->sort_benefit_name;
+  	$benefit_name_b = $wb_nodes[$b]->sort_benefit_name;
 
     $start_a = $wb_nodes[$a]->field_sirius_date_start['und'][0]['value'];
     $start_b = $wb_nodes[$b]->field_sirius_date_start['und'][0]['value'];
@@ -225,15 +247,35 @@ function sirius_trust_worker_benefits_sort_by_date($wb_nodes) {
     $end_a = $wb_nodes[$a]->field_sirius_date_end['und'][0]['value'];
     $end_b = $wb_nodes[$b]->field_sirius_date_end['und'][0]['value'];
 
-    // drupal_set_message("Comparing: $start_a / $end_a / $active_a to $start_b / $end_b / $active_b");
+    // drupal_set_message("Comparing: $dependent_name_a / $benefit_name_a / $start_a / $end_a / $active_a to $dependent_name_b / $benefit_name_b / $start_b / $end_b / $active_b");
 
-    if ( ($active_a == 'Yes') && ($active_b != 'Yes') ) { return -1; }
-    if ( ($active_a != 'Yes') && ($active_b == 'Yes') ) { return 1; }
+    // Sort first by subscriber
+  	$result = strcmp($subscriber_name_a, $subscriber_name_b);
+  	if ($result) { return $result; }
+
+  	// Next by dependent
+  	$result = strcmp($dependent_name_a, $dependent_name_b);
+  	if ($result) { return $result; }
+
+  	// Next by benefit
+  	$result = strcmp($benefit_name_a, $benefit_name_b);
+  	if ($result) { return $result; }
+
+    // if ( ($active_a == 'Yes') && ($active_b != 'Yes') ) { return -1; }
+    // if ( ($active_a != 'Yes') && ($active_b == 'Yes') ) { return 1; }
+
+  	// Next by end date
+    if ($end_a && !$end_b) { return 1; }
+    if ($end_b && !$end_a) { return -1; }
 
     $result = -1 * strcmp($end_a, $end_b);
     if ($result) { return $result; }
 
-    return strcmp($start_a, $start_b);
+    // Next by start date
+    $result = -1 * strcmp($start_a, $start_b);
+    if ($result) { return $result; }
+    return 0;
+    // return strcmp($start_a, $start_b);
   });
 
   return $wb_nodes;
@@ -427,6 +469,8 @@ function sirius_trust_render_worker_benefits($worker_node, $direction, $wb_nodes
 		return '<p>' . t('No records found.') . '</p>';
 	}
 
+	$wb_nodes = sirius_trust_worker_benefits_sort_by_date($wb_nodes);
+
 	static $relationship_type_terms;
 	if (!isset($relationship_type_terms)) { $relationship_type_terms = sirius_taxonomy_load('sirius_contact_relationship_types', 'tid', 'full'); }
 
@@ -533,6 +577,8 @@ function sirius_trust_render_worker_benefits($worker_node, $direction, $wb_nodes
 	  	} else {
 	  		$class = 'active';
 	  	}
+  	} else if ($start_ts > time()) {
+  		$class = 'blue';
   	} else {
 	  	$class = 'inactive';
   	}
