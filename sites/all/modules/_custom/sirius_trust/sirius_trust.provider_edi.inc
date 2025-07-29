@@ -138,6 +138,11 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     $sql .= "and (field_sirius_date_end_value >= :start_date or field_sirius_date_end_value is null) ";
     $sql_args[':start_date'] = $start_date;
 
+    if ($_REQUEST['worker_nid']) {
+      $sql .= "and field_sirius_worker_target_id = :input_worker_nid ";
+      $sql_args[':input_worker_nid'] = $_REQUEST['worker_nid'];
+    }
+
     $sql .= "order by field_sirius_trust_subscriber_target_id, field_sirius_worker_target_id ";
 
     $stmt = sirius_sql_query($sql, $sql_args);
@@ -656,7 +661,7 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     $search_params['benefit_type'] = $benefit_type;
     $wb_nodes = sirius_trust_worker_benefits_search($search_params);
     if (!$wb_nodes) { return ''; }
-    $wb_nodes =  sirius_trust_worker_benefits_sort_by_date($wb_nodes);
+    $wb_nodes =  sirius_trust_worker_benefits_sort_by_date_only($wb_nodes);
 
     $wb_node = reset($wb_nodes);
     $benefit_node = node_load($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
