@@ -82,7 +82,7 @@ function sirius_trust_node_tab_worker_benefits_form($form, &$form_state, $worker
 		if ($show_inactive) {
 			$html .= sirius_trust_render_worker_benefits($worker_node, 'direct', $all_benefits_provided, $render_options);
 		} else {
-			$html .= sirius_trust_render_worker_benefits($worker_node, 'direct', $active_benefits_provided, $render_options);
+			$html .= sirius_trust_render_worker_benefits($worker_node, 'direct', $active_benefits_provided+$future_benefits_provided, $render_options);
 			$count_inactive = count($all_benefits_provided) - count($active_benefits_provided);
 			if ($count_inactive > 0) {
 				$html .= '<p>' . t('(Not showing <strong>@count_inactive</strong> inactive records.)', array('@count_inactive' => $count_inactive)) . '</p>';
