@@ -271,7 +271,7 @@ class Sirius_Smf_Report_Edi_ExpressScripts extends Sirius_Trust_Provider_Edi_Rep
       $row['Participant Effective Date'] = $this->coverage_start_date($context);
       $row['Participant First Name'] = $context['worker_node']->field_sirius_name['und'][0]['given'];
       $row['Participant Last Name'] =  $context['worker_node']->field_sirius_name['und'][0]['family'];
-      $row['Participant Middle Initial'] = $context['worker_node']->field_sirius_name['und'][0]['given'];
+      $row['Participant Middle Initial'] = substr($context['worker_node']->field_sirius_name['und'][0]['middle'], 0, 1);
       $row['Address #1'] = $context['worker_node']->field_sirius_address['und'][0]['thoroughfare'];
       $row['Address #2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
       $row['Address #3'] = '';
