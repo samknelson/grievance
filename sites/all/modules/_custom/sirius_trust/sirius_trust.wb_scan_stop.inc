@@ -34,7 +34,10 @@ function sirius_trust_wb_scan_record_stop($mode, $wb_node, $options = array()) {
 
 	$employer_node = node_load($wb_node->field_grievance_shop['und'][0]['target_id']);
 
-	$policy_node = sirius_ledger_policy_lookup($subscriber_worker_node, $employer_node);
+	$election_node = sirius_trust_worker_election($subscriber_worker_node, $options['ts']);
+
+	if ($election_node) { $policy_node = node_load($election_node->field_sirius_trust_policy['und'][0]['target_id']); }
+	if (!$policy_node) { $policy_node = sirius_ledger_policy_lookup($subscriber_worker_node, $employer_node); }
 	if (!$policy_node) { return array('success' => FALSE, 'msg' => 'No policy record.'); }
 
 	$relationship_node = node_load($wb_node->field_sirius_contact_relation['und'][0]['target_id']);
