@@ -102,6 +102,12 @@ function sirius_hour_page_search_month_form($form, &$form_state) {
 		'#options' => array(NULL => t('-- Select --')) + $ms_lookup,
 	);
 
+	$form['hours_type_tid'] = array(
+		'#type' => 'select',
+		'#title' => 'Hours Type',
+		'#options' => array(NULL => t('-- Select --')) + sirius_taxonomy_load('sirius_hour_type', 'tid', 'name'),
+	);
+
 	$form['output'] = array(
 		'#title' => t('Output'),
 		'#type' => 'select',
@@ -170,6 +176,10 @@ function sirius_hour_page_search_month_form_submit($form, &$form_state) {
 	if ($form_state['values']['ws_tid']) {
 		$sql .= "and field_sirius_work_status_tid = :ws_tid ";
 		$sql_args[':ws_tid'] = $form_state['values']['ws_tid'];
+	}
+	if ($form_state['values']['hours_type_tid']) {
+		$sql .= "and hours_type_tid = :hours_type_tid ";
+		$sql_args[':hours_type_tid'] = $form_state['values']['hours_type_tid'];
 	}
 	if ($industry_tid) {
 		$sql .= "and field_sirius_industry_tid = :industry_tid ";
