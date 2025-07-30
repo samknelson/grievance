@@ -84,6 +84,9 @@ class Sirius_Worker_Access extends Sirius_Access {
     // Admins can do anything
     if ($is_admin) { return TRUE; }
 
+    // Staff can do anything
+    if ($is_staff) { return TRUE; }
+
     if ($action == 'staff') {
       if ($is_staff) { return TRUE; }
     }
