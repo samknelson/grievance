@@ -96,7 +96,7 @@ function sirius_smf_oneoff_dentwell_election($mode, $worker_node) {
 	sirius_minilog("Scanning: " . $worker_node->title . " (mode = $mode)");
 
 	$lookups = &drupal_static(__FUNCTION__);
-	sirius_minilog("... COUNT SO FAR: " . $lookups['count']);
+	sirius_minilog("COUNT SO FAR: " . $lookups['count']);
 	if (!isset($lookups['delta'])) {
 		$lookups['delta'] = sirius_find_nid_by_id('D', 'sirius_trust_benefit');
 		$lookups['dentwell'] = sirius_find_nid_by_id('LADC', 'sirius_trust_benefit');
@@ -108,12 +108,12 @@ function sirius_smf_oneoff_dentwell_election($mode, $worker_node) {
 
 	$prior_election_node = sirius_trust_worker_election($worker_node);
 	if (!$prior_election_node) {
-		sirius_minilog("... No currently active election found. Skipping.");
+		sirius_minilog("No currently active election found. Skipping.");
 		return array('success' => TRUE);
 	}
 
 	if (!in_array($lookups['delta'], sirius_fieldvals($prior_election_node, 'field_sirius_trust_benefits', 'target_id'))) {
-		sirius_minilog("... Worker did not have delta previously.");
+		sirius_minilog("Worker did not have delta previously.");
 		return array('success' => TRUE);
 	}
 
@@ -140,12 +140,12 @@ function sirius_smf_oneoff_dentwell_election($mode, $worker_node) {
 	}
 
 	if ($mode != 'live') {
-		sirius_minilog("... (Skipping save because mode = $mode)");
+		sirius_minilog("(Skipping save because mode = $mode)");
 		return array('success' => TRUE);
 	}
 
 	node_save($prior_election_node);
 	node_save($new_election_node);
-	sirius_minilog("... *** Election saved: " . $new_election_node->title . ' (' . $new_election_node->nid . ')');
+	sirius_minilog("*** Election saved: " . $new_election_node->title . ' (' . $new_election_node->nid . ')');
 	++$lookups['count'];
 }

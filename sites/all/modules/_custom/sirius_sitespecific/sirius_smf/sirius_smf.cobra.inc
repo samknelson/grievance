@@ -68,7 +68,7 @@ class Sirius_Smf_Cobra extends Sirius_Singleton {
 					$msg = "Benefit has no value in the 'ID' field. Can't compute the rate.";
 					sirius_minilog($msg, 'error'); return array('success' => FALSE, 'msg' => $msg);
 				}
-				if (!in_array($dental, array('L', 'D'))) {
+				if (!in_array($dental, array('L', 'D', 'LADC'))) {
 					$msg = "Don't know how to compute the COBRA rate for benefit with ID $dental.";
 					sirius_minilog($msg, 'error'); return array('success' => FALSE, 'msg' => $msg);
 				}
@@ -83,30 +83,39 @@ class Sirius_Smf_Cobra extends Sirius_Singleton {
 		$rates['K']['']['Single'] = 769.15;
 		$rates['K']['L']['Single'] = 793.92;
 		$rates['K']['D']['Single'] = 847.28;
+		$rates['K']['LADC']['Single'] = 847.28;
 		$rates['H']['']['Single'] = 537.83;
 		$rates['H']['L']['Single'] = 562.60;
 		$rates['H']['D']['Single'] = 615.95;
+		$rates['H']['LADC']['Single'] = 615.95;
 		$rates['M']['']['Single'] = 202.76;
 		$rates['M']['L']['Single'] = 227.53;
 		$rates['M']['D']['Single'] = 280.88;
+		$rates['M']['LADC']['Single'] = 280.88;
 		$rates['K']['']['Single+1'] = 1526.15;
 		$rates['K']['L']['Single+1'] = 1551.96;
 		$rates['K']['D']['Single+1'] = 1605.32;
+		$rates['K']['LADC']['Single+1'] = 1605.32;
 		$rates['H']['']['Single+1'] = 1130.25;
 		$rates['H']['L']['Single+1'] = 1156.07;
 		$rates['H']['D']['Single+1'] = 1209.43;
+		$rates['H']['LADC']['Single+1'] = 1209.43;
 		$rates['M']['']['Single+1'] = 350.15;
 		$rates['M']['L']['Single+1'] = 375.97;
 		$rates['M']['D']['Single+1'] = 429.32;
+		$rates['M']['LADC']['Single+1'] = 429.32;
 		$rates['K']['']['Family'] = 2151.54;
 		$rates['K']['L']['Family'] = 2178.65;
 		$rates['K']['D']['Family'] = 2232.00;
+		$rates['K']['LADC']['Family'] = 2232.00;
 		$rates['H']['']['Family'] = 1550.31;
 		$rates['H']['L']['Family'] = 1577.42;
 		$rates['H']['D']['Family'] = 1630.77;
+		$rates['H']['LADC']['Family'] = 1630.77;
 		$rates['M']['']['Family'] = 470.14;
 		$rates['M']['L']['Family'] = 497.25;
 		$rates['M']['D']['Family'] = 550.60;
+		$rates['M']['LADC']['Family'] = 550.60;
 
 		$rate = $rates[$medical][$dental][$tier];
 		if (!$rate) { 
