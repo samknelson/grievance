@@ -164,6 +164,13 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
     return array('is_multiple' => TRUE, 'rows' => $rows);
   }
 
+  public function coverage_start_date($context) {
+    $date = parent::coverage_start_date($context);
+    if (!$date) { return $date; }
+    if ($date < '20250801') { $date = '20250801'; }
+    return $date;
+  }
+
   public function ssn($context, $which) {
     $str = parent::ssn($context, $which);
     while (strlen($str) < 9) { $str = "0$str"; }
