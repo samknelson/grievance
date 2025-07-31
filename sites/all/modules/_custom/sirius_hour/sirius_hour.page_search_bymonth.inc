@@ -150,6 +150,7 @@ function sirius_hour_page_search_month_form_submit($form, &$form_state) {
 	$sql = "select worker_nid, ";
 	$sql .= "worker_node.title as worker_title, ";
 	$sql .= "field_sirius_work_status_tid, ";
+	$sql .= "field_sirius_ssn_value, ";
 	$sql .= "group_concat(distinct field_sirius_member_status_tid order by field_sirius_member_status_tid separator ',') as ms_tids, ";
 	$sql .= "year, month, ";
 	$sql .= "sum(hours) / count(*) as s from sirius_hours_cache ";
@@ -160,6 +161,7 @@ function sirius_hour_page_search_month_form_submit($form, &$form_state) {
 	if ($industry_tid) {
 		$sql .= "left join field_data_field_sirius_industry on field_data_field_sirius_industry.entity_type = 'node' and field_data_field_sirius_industry.entity_id = employer_nid ";
 	}
+	$sql .= "left join field_data_field_sirius_ssn on field_data_field_sirius_ssn.entity_type = 'node' and field_data_field_sirius_ssn.entity_id = worker_node.nid ";
 	$sql .= "where field_sirius_domain_target_id = :domain_nid ";
 	$sql .= "and year >= :start_year ";
 	$sql .= "and year <= :end_year ";
@@ -207,6 +209,10 @@ function sirius_hour_page_search_month_form_submit($form, &$form_state) {
 		$ms_rendered = join(',', $ms_names);
 
 		$row = array();
+		if ($output == 'csv') {
+			$row[] = $hr['worker_nid'];
+			$row[] = $hr['field_sirius_ssn_value'];
+		}
 		$row[] = $hr['worker_title'];
 		$row[] = $ws_lookup[$hr['field_sirius_work_status_tid']];
 		$row[] = $ms_rendered;
@@ -218,6 +224,10 @@ function sirius_hour_page_search_month_form_submit($form, &$form_state) {
 	}
 
 	$header = array();
+	if ($output == 'csv') {
+		$header[] = 'Worker NID';
+		$header[] = 'SSN';
+	}
 	$header[] = t('Worker Name');
 	$header[] = t('Work Status');
 	$header[] = t('Member Status');
