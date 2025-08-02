@@ -61,47 +61,6 @@ function sirius_smf_node_tabs() {
     'weight' => 12,
   );
 
-  /*
-  $node_tabs['sirius_worker']['sirius_worker_hours/smf_hour_threshold'] = array(
-    'title' => 'Hours Threshold',
-    'callback' => 'sirius_smf_node_tab_worker_hour_threshold',
-    'permissions' => array('sirius trust staff'),
-    'file' => 'sirius_smf.page_worker_hour_threshold.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-  );
-  */
-
-  $node_tabs['sirius_worker']['sirius_trust_worker_benefits/oneoff_benefit_cleanup'] = array(
-    'title' => 'Oneoff Benefit Cleanup',
-    'callback' => 'sirius_smf_node_tab_worker_oneoff_benefit_cleanup',
-    'permissions' => array('sirius trust staff'),
-    'file' => 'sirius_smf.oneoff_benefit_cleanup.inc',
-    'component' => 'trust',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 12,
-  );
-
-  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_dentwell_election'] = array(
-    'title' => 'Oneoff Dentwell Election',
-    'callback' => 'sirius_smf_node_tab_worker_oneoff_dentwell_election',
-    'permissions' => array('sirius trust staff'),
-    'file' => 'sirius_smf.oneoff_dentwell_election.inc',
-    'component' => 'trust',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 12,
-  );
-
-  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_election_relationships'] = array(
-    'title' => 'Oneoff Election Relationships',
-    'callback' => 'sirius_smf_node_tab_worker_oneoff_election_relationships',
-    'permissions' => array('sirius trust staff'),
-    'file' => 'sirius_smf.oneoff_election_relationships.inc',
-    'component' => 'trust',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 12,
-  );
-
   $node_tabs['sirius_worker']['sirius_worker_contact/smf_autotag'] = array(
     'title' => 'Autotag',
     'callback' => 'sirius_smf_node_tab_worker_autotag',
@@ -181,6 +140,56 @@ function sirius_smf_node_tabs() {
     'file' => 'sirius_smf.page_ehrs_wizard_corrections.inc',
     'skip_node_view_check' => TRUE,
   );
+
+  //
+  // Oneoffs
+  //
+
+  /*
+  $node_tabs['sirius_worker']['sirius_trust_worker_benefits/oneoff_benefit_cleanup'] = array(
+    'title' => 'Oneoff Benefit Cleanup',
+    'callback' => 'sirius_smf_node_tab_worker_oneoff_benefit_cleanup',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_benefit_cleanup.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+
+  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_dentwell_election'] = array(
+    'title' => 'Oneoff Dentwell Election',
+    'callback' => 'sirius_smf_node_tab_worker_oneoff_dentwell_election',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_dentwell_election.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+
+  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_election_relationships'] = array(
+    'title' => 'Oneoff Election Relationships',
+    'callback' => 'sirius_smf_node_tab_worker_oneoff_election_relationships',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_election_relationships.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+  */
+
+  $node_tabs['sirius_trust_worker_election']['oneoff_linked_benefit'] = array(
+    'title' => 'Oneoff Linked Benefits',
+    'callback' => 'sirius_smf_node_tab_election_oneoff_linked_benefit',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_linked_election.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+
+
+
+
 
   sirius_node_tab_set_module('sirius_smf', $node_tabs);
 	return $node_tabs;
