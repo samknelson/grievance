@@ -132,6 +132,7 @@ class Sirius_Batchrunner extends Sirius_Singleton {
 		$count = 0;
 		$batch_size = count($pks);
 		$batch_estimate_ts = 0;
+		$change_count = 0;
 		foreach ($pks as $pk) {
 			sirius_minilog("Processing $count / $batch_size / $context[grand_total_pending] / " . format_interval($batch_estimate_ts));
 
@@ -139,6 +140,7 @@ class Sirius_Batchrunner extends Sirius_Singleton {
 			if ($this->mode($context) == 'live') {
 				$this->last_pk_set($pk);
 			}
+			if ($result['changed']) { ++$change_count; }
 
 			++$count;
 			$ts = time();
@@ -153,6 +155,7 @@ class Sirius_Batchrunner extends Sirius_Singleton {
 
 		sirius_minilog("Ended:      " . date('c', $end_ts));
 		sirius_minilog("Elapsed:    " . format_interval($elapsed_ts, 2));
+		sirius_minilog("Changed:    " . $change_count);
 		sirius_minilog("Records Left: " . number_format($context['grand_total_pending'] - $batch_size));
 		sirius_minilog("Estimate Remaining: " . format_interval($grand_estimate_ts));
 	}
@@ -233,6 +236,7 @@ class Sirius_Smf_Batchrunner_Oneoff_Linked_Benefit extends Sirius_Batchrunner {
 		} else {
 			sirius_minilog("(Skipping save because mode = " . $this->mode($context) . ')');
 		}
+		return array("success" => TRUE, "changed" => TRUE);
 	}
 
 	public function benefit_name($benefit_nid) {
