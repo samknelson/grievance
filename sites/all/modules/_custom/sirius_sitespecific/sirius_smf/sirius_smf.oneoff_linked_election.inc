@@ -76,6 +76,10 @@ class Sirius_Batchrunner extends Sirius_Singleton {
 		return variable_set($this->last_pk_variable_name($context), $pk);
 	}
 
+	public function reset(&$context = array()) {
+		return $this->last_pk_set(0);
+	}
+
 	public function get_next_batch(&$context = array()) {
 		$batch_size = $this->batch_size($context);
 		$last_pk = $this->last_pk($context);
