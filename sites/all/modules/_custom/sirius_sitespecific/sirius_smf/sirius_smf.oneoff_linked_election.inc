@@ -89,7 +89,6 @@ class Sirius_Batchrunner extends Sirius_Singleton {
 		while ($hr = $stmt->fetchAssoc()) {
 			$pks[] = $hr['nid'];
 		}
-		print_r($pks);
 		return $pks;
 	}
 
@@ -160,6 +159,7 @@ class Sirius_Batchrunner extends Sirius_Singleton {
 
 	public function process_record($pk, &$context = array()) {
 		$record = node_load($pk);
+		sirius_domain($record->field_sirius_domain['und'][0]['target_id']);
 		$mode = $this->mode($context);
 
 		sirius_minilog('Processing: ' . $this->record_title($record) . " (mode = $mode)");
