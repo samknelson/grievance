@@ -43,6 +43,50 @@ class Sirius_Smf_Batchrunner_Oneoff_Dentwell_Election_2 extends Sirius_Batchrunn
 	public $type = 'smf_oneoff_dentwell_election_2';
 	public $name = 'Sirius_Smf_Oneoff_Dentwell_Election_2';
 
+
+
+
+	public function get_next_batch(&$context = array()) {
+		$batch_size = $this->batch_size($context);
+		$last_pk = $this->last_pk($context);
+		$content_type = $this->content_type_impl($context);
+		if (!$content_type) { return array(); }
+
+		$sql = "select nid from node ";
+		$sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
+		$sql .= "where type = :content_type ";
+		$sql .= "and field_sirius_date_start_value > '2025-07-01' ";
+		$sql .= "and nid > :last_pk ";
+		$sql .= "order by nid limit $batch_size";
+		$stmt = sirius_sql_query($sql, array(':content_type' => $content_type, ':last_pk' => $last_pk));
+
+		$pks = array();
+		while ($hr = $stmt->fetchAssoc()) {
+			$pks[] = $hr['nid'];
+		}
+		return $pks;
+	}
+
+	public function grand_total_pending(&$context = array()) {
+		$content_type = $this->content_type_impl($context);
+		if (!$content_type) { return 0; }
+
+		$last_pk = $this->last_pk($context);
+		$sql = "select count(*) as c from node ";
+		$sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
+		$sql .= "where type = :content_type ";
+		$sql .= "and field_sirius_date_start_value > '2025-07-01' ";
+		$sql .= "and nid > :last_pk ";
+		$stmt = sirius_sql_query($sql, array(':content_type' => $content_type, ':last_pk' => $last_pk));
+		$hr = $stmt->fetchAssoc();
+		return $hr['c'];
+	}
+
+
+
+
+
+
 	public function content_type_impl(&$context = array()) {
 		return 'sirius_trust_worker_election';
 	}
