@@ -54,7 +54,7 @@ class Sirius_Smf_Batchrunner_Oneoff_Dentwell_Election_2 extends Sirius_Batchrunn
 			$lookups['delta'] = sirius_find_nid_by_id('D', 'sirius_trust_benefit');
 			$lookups['dentwell'] = sirius_find_nid_by_id('LADC', 'sirius_trust_benefit');
 			$lookups['ts'] = strtotime('2025-07-22');
-			$lookups['ts'] = strtotime('1500-01-01');
+			// $lookups['ts'] = strtotime('1500-01-01');
 			$lookups['ts_render'] = date('Y-m-d', $lookups['ts']);
 		}
 		if (!$lookups['delta'] || !$lookups['dentwell']) {
