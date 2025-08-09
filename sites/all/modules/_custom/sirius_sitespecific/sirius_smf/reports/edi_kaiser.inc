@@ -20,6 +20,21 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
     return parent::info($result);
   }
 
+  public function form() {
+    $form = parent::form();
+    $form['activity_date'] = array(
+      '#type' => 'select',
+      '#title' => t('Activity Date'),
+      '#options' => array(
+        'today' => 'File Creation Date',
+        'first_of_month' => 'First Day of the Month',
+      ),
+      '#description' => t('This will appear in the header row as "production / test indicator"'),
+    );
+
+    return $form;
+  }
+
   public function edi_premium_tier($context) {
     if (!($this->is_subscriber($context))) { return NULL; }
 
@@ -116,7 +131,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       $row['Record Type'] = '1';
       $row['Customer ID'] = '000226111';
       $row['Enrollment Unit'] = $this->enrollment_unit($context);
-      $row['Activity Date'] = date('Ymd');
+      $row['Activity Date'] = $this->activity_date($context);
       $row['Transaction Type'] = '';
       $row['Record Code'] = $this->record_code($context);
       $row['Last Name'] = $context['worker_node']->field_sirius_name['und'][0]['family'];
@@ -162,6 +177,14 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
     }
 
     return array('is_multiple' => TRUE, 'rows' => $rows);
+  }
+
+  public function activity_date($context) {
+    if ($context['parameters']['activity_date'] == 'first_of_month') {
+      return date('Ym') . '01';
+    } else {
+      return date('Ymd');
+    }
   }
 
   public function coverage_start_date($context) {
