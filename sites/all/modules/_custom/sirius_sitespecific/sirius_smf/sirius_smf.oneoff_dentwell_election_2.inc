@@ -112,6 +112,11 @@ class Sirius_Smf_Batchrunner_Oneoff_Dentwell_Election_2 extends Sirius_Batchrunn
 			return array('success' => TRUE);
 		}
 
+		if ($election_node->field_sirius_active['und'][0]['value'] != 'Yes') {
+			sirius_minilog("Only scanning elections active elections. This election is currently inactive.");
+			return array('success' => TRUE);
+		}
+
 		if (!in_array($lookups['dentwell'], sirius_fieldvals($election_node, 'field_sirius_trust_benefits', 'target_id'))) {
 			sirius_minilog("Election does not have dentwell.");
 			return array('success' => TRUE);
