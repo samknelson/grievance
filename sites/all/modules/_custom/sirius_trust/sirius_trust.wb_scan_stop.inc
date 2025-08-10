@@ -2,6 +2,7 @@
 
 
 function sirius_trust_wb_scan_worker_stop($mode, $worker_node, $options = array()) {
+	$change_count = 0;
 	$search_params['subscriber_nid'] = $worker_node->nid;
 	$search_params['active'] = 'Yes';
 	$wb_nodes = sirius_trust_worker_benefits_search($search_params);
@@ -9,11 +10,12 @@ function sirius_trust_wb_scan_worker_stop($mode, $worker_node, $options = array(
 	foreach ($wb_nodes as $wb_nid => $wb_node) {
 		sirius_minilog("Scanning worker benefit " . $wb_node->title . ' (' . $wb_node->nid . ')');
 		sirius_minilog_indent();
-		sirius_trust_wb_scan_record_stop($mode, $wb_node, $options);
+		$result = sirius_trust_wb_scan_record_stop($mode, $wb_node, $options);
+		$change_count += $result['change_count'];
 		sirius_minilog_outdent();
 	}
 
-	return array('success' => TRUE);
+	return array('success' => TRUE, 'change_count' => $change_count);
 }
 
 function sirius_trust_wb_scan_record_stop($mode, $wb_node, $options = array()) {
@@ -107,11 +109,13 @@ function sirius_trust_wb_scan_record_stop($mode, $wb_node, $options = array()) {
 		$need_save = TRUE;
 	}
 
+	$result = array();
 	if ($need_save) {
 		sirius_json_set($wb_node, $wb_json);
 		if ($mode == 'live') {
 			node_save($wb_node);
 			sirius_minilog("Worker benefit updated.");
+			$result['change_count'] = 1;
 		} else {
 			sirius_minilog("(Test mode, worker benefit not saved.)");
 		}
@@ -119,7 +123,10 @@ function sirius_trust_wb_scan_record_stop($mode, $wb_node, $options = array()) {
 
 	Sirius_Trust_Wb_Scan_Changelog::getInstance()->log($change_data);
 
-	return array('success' => TRUE);
+	$result['success'] = TRUE;
+	$result['msg'] = 'Benefit stopped.';
+
+	return $result;
 }
 
 function sirius_trust_benefits_list_in_order($benefit_nids) {

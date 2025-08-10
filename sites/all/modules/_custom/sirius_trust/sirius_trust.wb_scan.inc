@@ -123,17 +123,47 @@ function sirius_trust_wb_scan_worker($mode, $worker_node, $options = array()) {
 
 	sirius_minilog("Worker Benefit Scan: " . $worker_node->title . " as of " . date('Y-m-d', $ts));
 
-	sirius_minilog("Worker Benefit Scan: START Benefits:  " . $worker_node->title);
-	sirius_minilog_indent();
-	$result = sirius_trust_wb_scan_worker_start($mode, $worker_node, $options);
-	sirius_minilog_outdent();
-	if ($result['msg']) { sirius_minilog($result['msg']); }
+	$change_count = 1;
+	$loop_count = 0;
+	while ($change_count) {
+		++$loop_count;
+		if ($loop_count > 5) {
+			sirius_minilog("(Too many passes. Stopping.)");
+			break;
+		}
 
-	sirius_minilog("Worker Benefit Scan: STOP Benefits: " . $worker_node->title);
-	sirius_minilog_indent();
-	$result = sirius_trust_wb_scan_worker_stop($mode, $worker_node, $options);
-	if ($result['msg']) { sirius_minilog($result['msg']); }
-	sirius_minilog_outdent();
+		sirius_minilog("Worker Benefit Scan: START Benefits Pass #$loop_count:  " . $worker_node->title);
+
+		sirius_minilog_indent();
+		$result = sirius_trust_wb_scan_worker_start($mode, $worker_node, $options);
+		sirius_minilog_outdent();
+		if ($result['msg']) { sirius_minilog($result['msg']); }
+
+		$change_count = $result['change_count'];
+		if ($change_count) {
+			sirius_minilog("Found $change_count changed records, so the scan will be re-run.");
+		}
+	}
+
+	$change_count = 1;
+	$loop_count = 0;
+	while ($change_count) {
+		++$loop_count;
+		if ($loop_count > 5) {
+			sirius_minilog("(Too many passes. Stopping.)");
+			break;
+		}
+
+		sirius_minilog("Worker Benefit Scan: STOP Benefits Pass #$loop_count: " . $worker_node->title);
+		sirius_minilog_indent();
+		$result = sirius_trust_wb_scan_worker_stop($mode, $worker_node, $options);
+		if ($result['msg']) { sirius_minilog($result['msg']); }
+		sirius_minilog_outdent();
+		$change_count = $result['change_count'];
+		if ($change_count) {
+			sirius_minilog("Found $change_count changed records, so the scan will be re-run.");
+		}
+	}
 
 	sirius_minilog("Worker Benefit Scan: Complete: " . $worker_node->title);
 }

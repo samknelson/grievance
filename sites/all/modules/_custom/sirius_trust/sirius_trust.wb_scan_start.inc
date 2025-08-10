@@ -1,6 +1,7 @@
 <?php
 
 function sirius_trust_wb_scan_worker_start($mode, $worker_node, $options = array()) {
+	$change_count = 0;
 	$election_node = sirius_trust_worker_election($worker_node, $options['ts']);
 	if (!$election_node) {
 		sirius_minilog("No election found.");
@@ -25,6 +26,7 @@ function sirius_trust_wb_scan_worker_start($mode, $worker_node, $options = array
 			sirius_minilog("Checking relationship [self]");
 			unset($options['subscriber_eligibility']);
 			$result = sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, $worker_node, NULL, $benefit_node, $options);
+			$change_count += $result['change_count'];
 			sirius_minilog($result['msg']);
 			$options['subscriber_eligibility'] = $result['eligibility'];
 
@@ -32,11 +34,14 @@ function sirius_trust_wb_scan_worker_start($mode, $worker_node, $options = array
 			foreach ($relationship_nodes as $relationship_nid => $relationship_node) {
 				sirius_minilog("Checking relationship " . $relationship_node->title);
 				$result = sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, $worker_node, $relationship_node, $benefit_node, $options);
+				$change_count += $result['change_count'];
 				sirius_minilog($result['msg']);
 			}
 			sirius_minilog_outdent();
 		}
 	}
+
+	return array('success' => TRUE, 'change_count' => $change_count);
 }
 
 function sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, $worker_node, $relationship_node, $benefit_node, $options = array()) {
@@ -153,14 +158,21 @@ function sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, 
 	}
 
 	// sirius_trust_worker_benefit_node_presave($wb_node);
+	$result = array();
 	if ($mode == 'live') {
+		$result['change_count'] = 1;
 		node_save($wb_node);
 	} else {
 		sirius_minilog("(mode = $mode, record not saved.)");
 	}
 
 	Sirius_Trust_Wb_Scan_Changelog::getInstance()->log($change_data);
-	return array('success' => TRUE, 'msg' => 'Benefit started.', 'eligibility' => $eligibility);
+
+	$result['success'] = TRUE;
+	$result['msg'] = 'Benefit started.';
+	$result['eligibility'] = $eligibility;
+
+	return $result;
 }
 
 
