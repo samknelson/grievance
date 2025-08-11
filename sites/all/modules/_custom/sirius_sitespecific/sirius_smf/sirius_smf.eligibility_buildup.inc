@@ -100,6 +100,7 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 
 		$result = array();
 
+		$msg_details = array();
 		foreach ($data as $ym => $record) {
 			list ($y, $m) = explode('-', $ym);
 
@@ -115,6 +116,7 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 			$hr = $stmt->fetchAssoc();
 			$hrs = $hr['c'];
 			if (!$hrs) { $hrs = 0; }
+			$msg_details[] = '[' . round($hrs) . " hrs $m/$y]";
 
 			// Eligibility month
 			if ($m == $threemonthsprev_month && $y == $threemonthsprev_year) {
@@ -206,6 +208,8 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 		if ($warning_break_count && ($current_break_count >= $warning_break_count)) {
 			$result['warning'] = TRUE;
 		}
+
+		$result['msg'] .= ' ' . join(' ', $msg_details);
 
 		return $result;
 	}
