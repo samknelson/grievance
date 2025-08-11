@@ -230,6 +230,7 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 			$ms_term = taxonomy_term_load($ms_tid);
 			$ms_json = sirius_json_get($ms_term);
 			$val = $ms_json['smf']['threshold'];
+			if (is_array($val)) { $val = $val['hrs']; }
 			if (!($val > 0)) { $val = 100; }
 			$cache[$ms_tid] = $val;
 		}
