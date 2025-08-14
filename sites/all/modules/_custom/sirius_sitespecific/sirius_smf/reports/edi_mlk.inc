@@ -86,12 +86,12 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
       $row['SEX'] = $this->gender($context);
       $row['SSN'] = ''; // $this->ssn($context, 'subscriber_node');
       $row['DEP SSN'] = ''; // $this->ssn($context, 'worker_node');
-      $row['PHONE'] = $this->phone($context, 'worker_node');
-      $row['ADDR1'] = $context['worker_node']->field_sirius_address['und'][0]['thoroughfare'];
-      $row['ADDR2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
-      $row['CITY'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
-      $row['ST'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['ZIP'] = $this->zip($context, 'worker_node');
+      $row['PHONE'] = $this->mlk_column($context, 'phone');
+      $row['ADDR1'] = $this->mlk_column($context, 'thoroughfare');
+      $row['ADDR2'] = $this->mlk_column($context, 'premise'); 
+      $row['CITY'] = $this->mlk_column($context, 'locality');
+      $row['ST'] = $this->mlk_column($context, 'administrative_area');
+      $row['ZIP'] = $this->mlk_column($context, 'zip');
       $row['EFF DT'] = $this->coverage_start_date($context);
       $row['TERM DT'] =  $this->coverage_end_date($context);
       $row['PCP'] = '';
@@ -106,6 +106,23 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
     }
 
     return array('is_multiple' => TRUE, 'rows' => $rows);
+  }
+
+  public function mlk_column($context, $column) {
+    // First try to fetch the data directly from the worker.
+    if ($column == 'zip')       { $result = $this->zip($context, 'worker_node'); }
+    elseif ($column == 'phone') { $result = $this->phone($context, 'worker_node'); }
+    else                        { $result = $context['worker_node']->field_sirius_address['und'][0][$column]; }
+    if ($result) { return $result; }
+
+    // If the worker is QMSCO, we're done now.
+    if ($this->is_qmsco($context)) { return ''; }
+
+    // Otherwise, copy the data from the subscriber.
+    if ($column == 'zip')       { $result = $this->zip($context, 'subscriber_node'); }
+    elseif ($column == 'phone') { $result = $this->phone($context, 'subscriber_node'); }
+    else                        { $result = $context['subscriber_node']->field_sirius_address['und'][0][$column]; }
+    return $result;
   }
 
   public function mlk_acct($worker_node) {
