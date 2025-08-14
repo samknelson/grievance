@@ -75,8 +75,8 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
       $row['PLAN'] = '1';
       $row['GROUP'] = 'SMC';
       $row['FILE DT'] = date('Ymd');
-      $row['MEM ACCT'] = $this->mlk_acct($context['subscriber_node']);
-      $row['DEP ACCT'] = $this->mlk_acct($context['worker_node']);
+      $row['MEM ACCT'] = $this->mlk_acct($context, 'subscriber_node');
+      $row['DEP ACCT'] = $this->mlk_acct($context, 'worker_node');
       $row['MEM/DEP'] = $this->memdep($context);
       $row['LN'] = $context['worker_node']->field_sirius_name['und'][0]['family'];
       $row['FN'] = $context['worker_node']->field_sirius_name['und'][0]['given'];
@@ -125,10 +125,23 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
     return $result;
   }
 
-  public function mlk_acct($worker_node) {
-    $id = $worker_node->field_sirius_id3['und'][0]['value'];
+  public function mlk_acct($context, $which) {
+    // For subscribers, we use this algorithm
+    if ($this->is_subscriber($context) || ($which == 'subscriber_node')) {
+      $id = $context['subscriber_node']->field_sirius_id3['und'][0]['value'];
+      if (preg_match('/^U/', $id)) { return $id; }
+
+      return $context['subscriber_node']->field_sirius_id['und'][0]['value'];
+    }
+
+    // For dependents, it's slightly different
+    $id = $context['worker_node']->field_sirius_id3['und'][0]['value'];
+    if ($id) { return $id; }
+
+    $id = $context['worker_node']->field_sirius_id2['und'][0]['value'];
     if (preg_match('/^U/', $id)) { return $id; }
-    return $worker_node->field_sirius_id['und'][0]['value'];
+
+    return $context['worker_node']->field_sirius_id['und'][0]['value'];
   }
 
   public function cobrastatus($context) {
