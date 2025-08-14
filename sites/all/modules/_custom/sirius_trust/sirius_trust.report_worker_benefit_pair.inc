@@ -106,7 +106,6 @@ class Sirius_Trust_Report_Worker_Benefit_Pair extends Report_Cache_Report_Genera
     $sql .= "where node.type = 'sirius_worker' ";
     $sql .= "and field_sirius_domain_target_id = :domain_nid ";
 
-    $_REQUEST['worker_nid'] = 13285951;
     if ($_REQUEST['worker_nid']) {
       $sql .= "and nid = :input_worker_nid ";
       $sql_args[':input_worker_nid'] = $_REQUEST['worker_nid'];
