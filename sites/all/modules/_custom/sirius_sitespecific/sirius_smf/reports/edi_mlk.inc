@@ -135,10 +135,10 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
     }
 
     // For dependents, it's slightly different
-    $id = $context['worker_node']->field_sirius_id3['und'][0]['value'];
-    if ($id) { return $id; }
-
     $id = $context['worker_node']->field_sirius_id2['und'][0]['value'];
+    if (preg_match('/^U/', $id)) { return $id; }
+
+    $id = $context['worker_node']->field_sirius_id3['und'][0]['value'];
     if (preg_match('/^U/', $id)) { return $id; }
 
     return $context['worker_node']->field_sirius_id['und'][0]['value'];
