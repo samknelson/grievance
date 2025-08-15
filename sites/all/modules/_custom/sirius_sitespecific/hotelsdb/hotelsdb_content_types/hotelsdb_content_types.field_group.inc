@@ -23,7 +23,12 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->data = array(
     'label' => 'Airports',
     'weight' => '10',
-    'children' => array(),
+    'children' => array(
+      0 => 'field_airport',
+      1 => 'field_airport_alt',
+      2 => 'field_calc_airport_dist',
+      3 => 'field_calc_airport_dist_alt',
+    ),
     'format_type' => 'fieldset',
     'format_settings' => array(
       'label' => 'Airports',
@@ -104,6 +109,10 @@ function hotelsdb_content_types_field_group_info() {
       12 => 'field_fh_parking_capacity',
       13 => 'field_fh_meeting_room_largest',
       14 => 'field_niche',
+      15 => 'field_airport',
+      16 => 'field_airport_alt',
+      17 => 'field_calc_airport_dist',
+      18 => 'field_calc_airport_dist_alt',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -373,9 +382,9 @@ function hotelsdb_content_types_field_group_info() {
     'label' => 'Food Service',
     'weight' => '10',
     'children' => array(
-      0 => 'field_rest_cuisine',
-      1 => 'field_rest_type',
-      2 => 'field_fs_segment',
+      0 => 'field_fs_segment',
+      1 => 'field_fs_dbe',
+      2 => 'field_fs_concession_type',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -635,9 +644,9 @@ function hotelsdb_content_types_field_group_info() {
     'label' => 'Food Service',
     'weight' => '14',
     'children' => array(
-      0 => 'field_rest_cuisine',
-      1 => 'field_rest_type',
-      2 => 'field_fs_segment',
+      0 => 'field_fs_segment',
+      1 => 'field_fs_dbe',
+      2 => 'field_fs_concession_type',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
