@@ -265,8 +265,7 @@ function sirius_smf_feed_members_employer_mapping($from) {
 	$map['H0975'] = array('employer_id' => 'H0975', 'note' => 'Coverage coming from FOX STUDIO LOT, LLC: Cafeteria Worker');
 	$map['C0085'] = array('employer_id' => 'C0085', 'note' => 'Coverage coming from WORKER POWER PAC: PA Worker');
 	$map['C0086'] = array('employer_id' => 'C0085', 'note' => 'Coverage coming from WORKER POWER PAC: PA Worker');
-	$map['D9999'] = array('employer_id' => 'D9999', 'note' => 'Coverage coming from DISABILITY: ');
-	$map['I9999'] = array('employer_id' => 'I9999', 'note' => 'Coverage coming from DISABILITY-INDUSTRIAL: ');
+	$map['D9999'] = array('note' => 'Coverage coming from DISABILITY: ');
 	$map['E8888'] = array('note' => 'Coverage coming from SELF PAY TYPE E SUBSIDY: ');
 	$map['E9999'] = array('note' => 'Coverage coming from SELF PAY TYPE E: ');
 	$map['F6666'] = array('note' => 'Coverage coming from SELF PAY TYPE F HARDSHIP: ');
@@ -278,6 +277,7 @@ function sirius_smf_feed_members_employer_mapping($from) {
 	$map['G9999'] = array('note' => 'Coverage coming from SELF PAY TYPE G: ');
 	$map['H7777'] = array('note' => 'Coverage coming from SELF PAY COVID SUBSIDY TYPE W: ');
 	$map['H777R'] = array('note' => 'Coverage coming from SELF PAY COVID REFUND  M KP: ');
+	$map['I9999'] = array('note' => 'Coverage coming from DISABILITY-INDUSTRIAL: ');
 	$map['K8888'] = array('note' => 'Coverage coming from SELF PAY TYPE K SUBSIDY: ');
 	$map['K9999'] = array('note' => 'Coverage coming from SELF PAY TYPE K: ');
 	$map['L6666'] = array('note' => 'Coverage coming from SELF PAY TYPE L HARDSHIP: ');
@@ -359,6 +359,22 @@ function sirius_smf_feed_members_employer_mapping($from) {
 	$map['X5555'] = array('note' => 'Coverage coming from SELF PAY TYPE X - UNION PYMT: HN/UC CORE PLUS');
 	$map['Y5555'] = array('note' => 'Coverage coming from SELF PAY TYPE Y - UNION PYMT');
 	$map['Z5555'] = array('note' => 'Coverage coming from SELF PAY TYPE Z - UNION PYMT: NON CORE 18 MO/HN-DELTA EE ONLY');
+	$map['C0815'] = array('employer_id' => 'C0815', 'note' => 'Coverage coming from SOFITEL');
+	$map['H0680'] = array('employer_id' => 'H0680', 'note' => 'Coverage coming from THE MOXY + AC HOTEL');
+	$map['H0430'] = array('employer_id' => 'H0430', 'note' => 'Coverage coming from HIGHGATE HOTEL-HOTEL FIGUEROA');
+	$map['H0380'] = array('employer_id' => 'H0380', 'note' => 'Coverage coming from HILTON LOS ANGELES NORTH/GLENDALE');
+	$map['B0380'] = array('employer_id' => 'H0380', 'note' => 'Coverage coming from HILTON LOS ANGELES NORTH/GLENDALE');
+	$map['C0690'] = array('employer_id' => 'C0591', 'note' => 'Coverage coming from AA LOUNGES LAX-EUREST/COMPASS');
+	$map['C2397'] = array('employer_id' => 'C2397', 'note' => 'Coverage coming from LAGUNA BEACH PACIFIC EDGE HOTEL');
+	$map['H2932'] = array('employer_id' => 'H2932', 'note' => 'Coverage coming from LINBROOK BOWL');
+	$map['C5575'] = array('employer_id' => 'C5575', 'note' => 'Coverage coming from ASM GLOBAL - THE GREEK THEATRE');
+	$map['C0094'] = array('employer_id' => 'C0090', 'note' => 'Coverage coming from UNITE HERE LOCAL 11 BENEFIT: PA Worker');
+	$map['C0095'] = array('employer_id' => 'C0090', 'note' => 'Coverage coming from UNITE HERE LOCAL 11 BENEFIT: PA Worker');
+	$map['C0096'] = array('employer_id' => 'C0090', 'note' => 'Coverage coming from UNITE HERE LOCAL 11 BENEFIT: PA Worker');
+	$map['C0097'] = array('employer_id' => 'C0090', 'note' => 'Coverage coming from UNITE HERE LOCAL 11 BENEFIT: PA Worker');
+	$map['C0252'] = array('employer_id' => 'C0250', 'note' => 'Coverage coming from W HOLLYWOOD RESTAURANT (FORMERLY MOSAIC/DELPHINE)');
+
+
 	
 	return $map[$from];
 }

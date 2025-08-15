@@ -14,6 +14,10 @@ function sirius_worker_permission() {
       'title' => t('Sirius Worker View'), 
       'description' => t('Permission to view any worker.'),
     ),
+    'sirius worker view own status' => array(
+      'title' => t('Sirius Worker View Own Status'), 
+      'description' => t('Permission to view your own "status" page.'),
+    ),
     'sirius worker view headshot' => array(
       'title' => t('Sirius Worker View Headshot'), 
       'description' => t('Permission to view the headshot of any worker. This may be granted to users without "Sirius Worker View", for example, if a steward has permission to see headshots on worker lists but not to view the underlying worker record.'),

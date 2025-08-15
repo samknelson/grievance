@@ -114,7 +114,7 @@ function sirius_bulk_deliver_batch($bulk_node, $force = FALSE) {
   	$result = sirius_bulk_deliver_entry($log_nid);
   	++$count; 
   	if ($result['success']) { ++$count_success; } else { ++$count_error; }
-  	sirius_minilog("Delivery to recipient #$log_nid via " . $result['medium'] . ": " . $result['to'] . ': ' . $result['msg']);
+  	sirius_minilog("Delivery to recipient #$log_nid via " . $result['medium'] . ": " . print_r($result['to'], 1) . ': ' . $result['msg']);
   }
 
 	return array('success' => TRUE, 'msg' => "Attempted delivery of $count messages, with $count_success success and $count_error error.");;
@@ -246,7 +246,11 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $deliver_args = arra
 	$params['amd']['MachineDetection'] = 'DetectMessageEnd';
 
 	if (!$is_test) {
-		$params['X-Sirius-Id'] = "UNIQUE/bulk/" . $bulk_node->nid . '/' . $to;
+		if (is_array($to)) {
+			$params['X-Sirius-Id'] = "UNIQUE/bulk/" . $bulk_node->nid . '/' . md5(json_encode($to));
+		} else {
+			$params['X-Sirius-Id'] = "UNIQUE/bulk/" . $bulk_node->nid . '/' . $to;
+		}
 	}
 
 	if ($medium == 'email') {

@@ -1,5 +1,10 @@
 <?php
 
+sirius_require('sirius_trust', 'sirius_trust.wb_scan.inc');
+sirius_require('sirius_trust', 'sirius_trust.wb_scan_start.inc');
+sirius_require('sirius_trust', 'sirius_trust.wb_scan_stop.inc');
+sirius_require('sirius_trust', 'sirius_trust.wb_scan_changelog.inc');
+
 function sirius_trust_benefits($active = TRUE) {
 	$query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
@@ -119,6 +124,15 @@ function sirius_trust_worker_benefits_search($params) {
   	$sql_args[':end_date_range_start'] = date('Y-m-d 00:00:00', strtotime($params['end_date_range']['start']));
   	$sql_args[':end_date_range_end'] = date('Y-m-d 00:00:00', strtotime($params['end_date_range']['end']));
   }
+  if ($params['start_date_range']) {
+  	$sql .= "and (field_sirius_date_start_value >= :start_date_range_start and field_sirius_date_start_value <= :start_date_range_end) ";
+  	$sql_args[':start_date_range_start'] = date('Y-m-d 00:00:00', strtotime($params['start_date_range']['start']));
+  	$sql_args[':start_date_range_end'] = date('Y-m-d 00:00:00', strtotime($params['start_date_range']['end']));
+  }
+  if ($params['end_date']) {
+  	$sql .= "and field_sirius_date_end_value = :end_date ";
+  	$sql_args[':end_date'] = date('Y-m-d 00:00:00', strtotime($params['end_date']));
+  }
   if ($params['exclude_nid']) {
   	$sql .= "and nid != :exclude_nid ";
   	$sql_args[':exclude_nid'] = $params['exclude_nid'];
@@ -198,6 +212,114 @@ function sirius_trust_worker_benefits($worker_node, $ts = NULL) {
  	});
 
 	return $wb_nodes;
+}
+
+
+
+
+
+function sirius_trust_worker_benefits_sort_by_date_only($wb_nodes) {
+  uksort($wb_nodes, function($a, $b) use ($wb_nodes) {
+
+    // $active_a = $wb_nodes[$a]->field_sirius_active['und'][0]['value'];
+    // $active_b = $wb_nodes[$b]->field_sirius_active['und'][0]['value'];
+
+    $start_a = $wb_nodes[$a]->field_sirius_date_start['und'][0]['value'];
+    $start_b = $wb_nodes[$b]->field_sirius_date_start['und'][0]['value'];
+
+    $end_a = $wb_nodes[$a]->field_sirius_date_end['und'][0]['value'];
+    $end_b = $wb_nodes[$b]->field_sirius_date_end['und'][0]['value'];
+
+    // drupal_set_message("Comparing: $dependent_name_a / $benefit_name_a / $start_a / $end_a / $active_a to $dependent_name_b / $benefit_name_b / $start_b / $end_b / $active_b");
+
+    // if ( ($active_a == 'Yes') && ($active_b != 'Yes') ) { return -1; }
+    // if ( ($active_a != 'Yes') && ($active_b == 'Yes') ) { return 1; }
+
+  	// Next by end date
+    if ($end_a && !$end_b) { return 1; }
+    if ($end_b && !$end_a) { return -1; }
+
+    $result = -1 * strcmp($end_a, $end_b);
+    if ($result) { return $result; }
+
+    // Next by start date
+    $result = -1 * strcmp($start_a, $start_b);
+    if ($result) { return $result; }
+    return 0;
+    // return strcmp($start_a, $start_b);
+  });
+
+  return $wb_nodes;
+}
+
+
+
+
+
+
+
+
+function sirius_trust_worker_benefits_sort_by_date($wb_nodes) {
+	// Gather susbscriber, contact names
+	foreach ($wb_nodes as $wb_nid => $wb_node) {
+		$relationship_node = node_load($wb_node->field_sirius_contact_relation['und'][0]['target_id']);
+		$wb_nodes[$wb_nid]->sort_dependent_name = sirius_node_title($relationship_node->field_sirius_contact_alt['und'][0]['target_id']);
+		$wb_nodes[$wb_nid]->sort_subscriber_name = sirius_node_title($wb_node->field_sirius_trust_subscriber['und'][0]['target_id']);
+		$wb_nodes[$wb_nid]->sort_benefit_name = sirius_node_title($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
+	}
+
+  uksort($wb_nodes, function($a, $b) use ($wb_nodes) {
+
+    // $active_a = $wb_nodes[$a]->field_sirius_active['und'][0]['value'];
+    // $active_b = $wb_nodes[$b]->field_sirius_active['und'][0]['value'];
+
+  	$subscriber_name_a = $wb_nodes[$a]->sort_subscriber_name;
+  	$subscriber_name_b = $wb_nodes[$b]->sort_subscriber_name;
+
+  	$dependent_name_a = $wb_nodes[$a]->sort_dependent_name;
+  	$dependent_name_b = $wb_nodes[$b]->sort_dependent_name;
+
+  	$benefit_name_a = $wb_nodes[$a]->sort_benefit_name;
+  	$benefit_name_b = $wb_nodes[$b]->sort_benefit_name;
+
+    $start_a = $wb_nodes[$a]->field_sirius_date_start['und'][0]['value'];
+    $start_b = $wb_nodes[$b]->field_sirius_date_start['und'][0]['value'];
+
+    $end_a = $wb_nodes[$a]->field_sirius_date_end['und'][0]['value'];
+    $end_b = $wb_nodes[$b]->field_sirius_date_end['und'][0]['value'];
+
+    // drupal_set_message("Comparing: $dependent_name_a / $benefit_name_a / $start_a / $end_a / $active_a to $dependent_name_b / $benefit_name_b / $start_b / $end_b / $active_b");
+
+    // Sort first by subscriber
+  	$result = strcmp($subscriber_name_a, $subscriber_name_b);
+  	if ($result) { return $result; }
+
+  	// Next by dependent
+  	$result = strcmp($dependent_name_a, $dependent_name_b);
+  	if ($result) { return $result; }
+
+  	// Next by benefit
+  	$result = strcmp($benefit_name_a, $benefit_name_b);
+  	if ($result) { return $result; }
+
+    // if ( ($active_a == 'Yes') && ($active_b != 'Yes') ) { return -1; }
+    // if ( ($active_a != 'Yes') && ($active_b == 'Yes') ) { return 1; }
+
+  	// Next by end date
+    if ($end_a && !$end_b) { return 1; }
+    if ($end_b && !$end_a) { return -1; }
+
+    $result = -1 * strcmp($end_a, $end_b);
+    if ($result) { return $result; }
+
+    // Next by start date
+    $result = -1 * strcmp($start_a, $start_b);
+    if ($result) { return $result; }
+    return 0;
+    // return strcmp($start_a, $start_b);
+  });
+
+  return $wb_nodes;
 }
 
 function sirius_trust_worker_benefit_node_presave($wb_node) {
@@ -355,280 +477,14 @@ function sirius_trust_worker_benefit_start_ts($worker_node, $benefit_nids, $ts =
 
 
 
-function sirius_trust_wb_scan_worker($mode, $worker_node, $options = array()) {
-	sirius_minilog("Worker Benefit Scan: " . $worker_node->title);
 
-	sirius_minilog("Worker Benefit Scan: START Benefits:  " . $worker_node->title);
-	sirius_minilog_indent();
-	$result = sirius_trust_wb_scan_worker_start($mode, $worker_node, $options = array());
-	sirius_minilog_outdent();
-	if ($result['msg']) { sirius_minilog($result['msg']); }
 
-	sirius_minilog("Worker Benefit Scan: STOP Benefits: " . $worker_node->title);
-	sirius_minilog_indent();
-	$result = sirius_trust_wb_scan_worker_stop($mode, $worker_node, $options = array());
-	if ($result['msg']) { sirius_minilog($result['msg']); }
-	sirius_minilog_outdent();
 
-	sirius_minilog("Worker Benefit Scan: Complete: " . $worker_node->title);
-}
 
-function sirius_trust_wb_scan_worker_start($mode, $worker_node, $options = array()) {
-	$election_node = sirius_trust_worker_election($worker_node);
-	if (!$election_node) {
-		sirius_minilog("No election found.");
-	} else {
-		sirius_minilog("Using election " . $election_node->title . " (" . $election_node->nid . ")");
 
-		$policy_node = node_load($election_node->field_sirius_trust_policy['und'][0]['target_id']);
-		if (!$policy_node) { return array('success' => FALSE, 'msg' => 'No policy found in the election.'); }
 
-		$employer_node = node_load($election_node->field_grievance_shop['und'][0]['target_id']);
-		if (!$employer_node) { return array('success' => FALSE, 'msg' => "No employer found in the election."); }
 
-		$benefit_nodes = node_load_multiple(sirius_fieldvals($election_node, 'field_sirius_trust_benefits', 'target_id'));
-		$relationship_nodes = node_load_multiple(sirius_fieldvals($election_node, 'field_sirius_contact_relations', 'target_id'));
 
-		foreach ($benefit_nodes as $benefit_nid => $benefit_node) {
-			sirius_minilog("Checking benefit " . $benefit_node->title);
-
-			sirius_minilog_indent();
-
-			// Check the subscriber. We store their eligibility results to make the dependent checks cheaper
-			sirius_minilog("Checking relationship [self]");
-			unset($options['subscriber_eligibility']);
-			$result = sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, $worker_node, NULL, $benefit_node, $options);
-			sirius_minilog($result['msg']);
-			$options['subscriber_eligibility'] = $result['eligibility'];
-
-			// Check each dependent
-			foreach ($relationship_nodes as $relationship_nid => $relationship_node) {
-				sirius_minilog("Checking relationship " . $relationship_node->title);
-				$result = sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, $worker_node, $relationship_node, $benefit_node, $options);
-				sirius_minilog($result['msg']);
-			}
-			sirius_minilog_outdent();
-		}
-	}
-}
-
-function sirius_trust_wb_scan_record_start($mode, $employer_node, $policy_node, $worker_node, $relationship_node, $benefit_node, $options = array()) {
-	// Find the dependent.
-	if ($relationship_node) {
-		$dependent_contact_nid = $relationship_node->field_sirius_contact_alt['und'][0]['target_id'];
-		if (!$dependent_contact_nid) { return array('success' => FALSE, 'msg' => 'The relationship does not reference a contact.'); }
-		$dependent_worker_nid = sirius_worker_get_by_contact_nid($dependent_contact_nid, TRUE);
-		if (!$dependent_worker_nid) { return array('success' => FALSE, 'msg' => 'The contact is not associated with a worker.'); }
-	}
-
-	// Find out if the benefit is already active
-	$search_params = array();
-	$search_params['active'] = 'Yes';
-	$search_params['benefit_nid'] = $benefit_node->nid;
-	$search_params['nids_only'] = TRUE;
-	if ($relationship_node) {
-		$search_params['worker_nid'] = $dependent_worker_nid;
-	} else {
-		$search_params['worker_nid'] = $worker_node->nid;
-	}
-	$probe = sirius_trust_worker_benefits_search($search_params);
-	if ($probe) {
-		return array('success' => TRUE, 'msg' => 'Benefit is already active.');
-	}
-
-	// Check eligibility.
-	$params = array();
-	$params['policy_node'] = $policy_node;
-	$params['benefit_node'] = $benefit_node;
-	$params['subscriber_worker_node'] = $worker_node;
-	$params['shortcut'] = TRUE;
-
-	// We really should scan just "benefit_start". But ... what if the settings are such that "benefit_start"
-	// and "benefit_continue" are in conflict? Then we'd start a benefit and immediately terminate it.
-	// So ... we scan both. 
-	// $params['scan_type'] = 'benefit_start'; 
-
-	if ($relationship_node) { $params['relationship_node'] = $relationship_node; }
-	if ($options['subscriber_eligibility']) { $params['subscriber_eligibility'] = $options['subscriber_eligibility']; }
-
-	$eligibility = sirius_trust_eligibility_plugin_check_all($params);
-	if (!$eligibility['success']) {
-		return array("success" => TRUE, 'msg' => "Not eligible: " . $eligibility['msg'], 'eligibility' => $eligibility);
-	}
-
-	sirius_minilog("There is no benefit active but the worker is eligible. Starting the benefit.");
-
-	// Did the benefit end any time between the first of last month and the end of this month? If so, just extend it.
-	unset($search_params['active']);
-	$search_params['end_date_range'] = array(
-		'start' => date('Y-m-d 00:00:00', strtotime('-1 month', strtotime(date('Y-m-1')))),
-		'end' => date('Y-m-d'),
-	);
-	// $search_params['ts'] = strtotime('-1 month', strtotime(date('Y-m-15')));
-	$probe = sirius_trust_worker_benefits_search($search_params);
-	if ($probe) {
-		sirius_minilog("The worker had the benefit last month. Extending.");
-		$wb_nid = reset($probe);
-		$wb_node = node_load($wb_nid);
-		unset($wb_node->field_sirius_date_end['und']);
-	} else {
-		sirius_minilog("The worker did not have the benefit last month. Starting.");
-
-		global $user;
-		$domain_nid = sirius_domain_nid();
-    $wb_node = new stdClass();
-    $wb_node->type = 'sirius_trust_worker_benefit';
-    $wb_node->language = LANGUAGE_NONE;
-    $wb_node->uid = $user->uid;
-    $wb_node->status = 1;
-    $wb_node->promote = 0;
-    $wb_node->comment = 0;
-    if ($domain_nid) { $wb_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
-    $wb_node->field_sirius_date_start['und'][0]['value'] = date('Y-m-1 00:00:00');
-    $wb_node->field_sirius_trust_benefit['und'][0]['target_id'] = $benefit_node->nid;
-    $wb_node->field_grievance_shop['und'][0]['target_id'] = $employer_node->nid;
-    if ($relationship_node) {
-    	$wb_node->field_sirius_contact_relation['und'][0]['target_id'] = $relationship_node->nid;
-    	$wb_node->field_sirius_trust_subscriber['und'][0]['target_id'] = $worker_node->nid;
-    	$wb_node->field_sirius_worker['und'][0]['target_id'] = $dependent_worker_nid;
-    } else {
-			$wb_node->field_sirius_worker['und'][0]['target_id'] = $worker_node->nid;
-    }
-    $wb_node->field_sirius_trust_election['und'][0]['target_id'] = $election_node->nid;
-    $wb_node->field_sirius_notes['und'][0]['value'] = 'Started by benefit scan.';
-	}
-
-	// sirius_trust_worker_benefit_node_presave($wb_node);
-	if ($mode == 'live') {
-		node_save($wb_node);
-	} else {
-		sirius_minilog("(mode = $mode, record not saved.)");
-	}
-
-	return array('success' => TRUE, 'msg' => 'Benefit started.', 'eligibility' => $eligibility);
-}
-
-function sirius_trust_wb_scan_worker_stop($mode, $worker_node, $options = array()) {
-	$search_params['subscriber_nid'] = $worker_node->nid;
-	$search_params['active'] = 'Yes';
-	$wb_nodes = sirius_trust_worker_benefits_search($search_params);
-
-	foreach ($wb_nodes as $wb_nid => $wb_node) {
-		sirius_minilog("Scanning worker benefit " . $wb_node->title . ' (' . $wb_node->nid . ')');
-		sirius_minilog_indent();
-		sirius_trust_wb_scan_record_stop($mode, $wb_node, $options);
-		sirius_minilog_outdent();
-	}
-
-	return array('success' => TRUE);
-}
-
-function sirius_trust_wb_scan_record_stop($mode, $wb_node, $options = array()) {
-
-	$wb_json = sirius_json_get($wb_node);
-	$wb_json_orig = $wb_json;
-	$need_save = FALSE;
-	unset($wb_json['scan']['warnings']);
-
-	$subscriber_worker_node  = node_load($wb_node->field_sirius_trust_subscriber['und'][0]['target_id']);
-	if (!$subscriber_worker_node) { return array('success' => FALSE, 'msg' => 'No subscriber worker record.'); }
-
-	$employer_node = node_load($wb_node->field_grievance_shop['und'][0]['target_id']);
-
-	$policy_node = sirius_ledger_policy_lookup($subscriber_worker_node, $employer_node);
-	if (!$policy_node) { return array('success' => FALSE, 'msg' => 'No policy record.'); }
-
-	$relationship_node = node_load($form_state['values']['relationship_nid']);
-	if ($relationship_node) {
-		$dependent_contact_nid = $relationship_node->field_sirius_contact_alt['und'][0]['target_id'];
-		$dependent_worker_node = sirius_worker_get_by_contact_nid($dependent_contact_nid);
-	} else {
-		$dependent_worker_node = $subscriber_worker_node;
-	}
-	if (!$dependent_worker_node) { return array('success' => FALSE, 'msg' => 'No dependent worker record.'); }
-
-	$benefit_node = node_load($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
-	if (!$benefit_node) { return array('success' => FALSE, 'msg' => 'No benefit record.'); }
-
-	$params = array();
-	$params['policy_node'] = $policy_node;
-	$params['employer_node'] = $employer_node;
-	$params['benefit_node'] = $benefit_node;
-	$params['subscriber_worker_node'] = $subscriber_worker_node;
-	$params['relationship_node'] = $relationship_node;
-	$params['shortcut'] = TRUE;
-	$params['scan_type'] = $form_state['values']['scan_type'];
-	$result = sirius_trust_eligibility_plugin_check_all($params);
-	if (!$result['success']) {
-		sirius_minilog("No longer eligible: " . $result['msg']);
-		sirius_minilog("The benefit will be expired.");
-
-		$date = gmdate('Y-m-1');
-		$wb_node->field_sirius_date_end['und'][0]['value'] = $date;
-		$wb_json['scan']['msg'] = $result['msg'];
-		$wb_json['scan']['ts'] = time();
-		$need_save = TRUE;
-		if ($mode == 'live') {
-			$log_node = sirius_log(
-				'trust:wb:scan', 
-				'terminated',
-				'Automated scan terminated benefit: ' . $result['msg'], 
-				'Automated scan terminated benefit: ' . $result['msg'], 
-				NULL,
-				array($wb_node->nid)
-			);
-		}
-	} else if ($result['warning']) {
-		sirius_minilog("Worker is eligible for the benefit, but with a warning: " . $result['msg']);
-		$wb_node['scan']['warnings'] = $result['msg'];
-	} else {
-		sirius_minilog("Worker is still eligible for the benefit.");
-	}
-
-	if (sirius_revision_changed_impl($wb_json, $wb_json_orig, 10) || sirius_revision_changed_impl($wb_json_orig, $wb_json, 10)) {
-		$need_save = TRUE;
-	}
-
-	if ($need_save) {
-		sirius_json_set($wb_node, $wb_json);
-		if ($mode == 'live') {
-			node_save($wb_node);
-			sirius_minilog("Worker benefit updated.");
-		} else {
-			sirius_minilog("(Test mode, worker benefit not saved.)");
-		}
-	}
-
-	return array('success' => TRUE);
-}
-
-function sirius_trust_benefits_list_in_order($benefit_nids) {
-	if (!$benefit_nids) { return array(); }
-
-	$benefit_types = &drupal_static(__FUNCTION__);
-	if (!isset($benefit_types)) {
-		$benefit_types = sirius_taxonomy_load('sirius_trust_benefit_type', 'tid', 'full');
-	}
-
-	$benefit_nodes = node_load_multiple($benefit_nids);
-
- 	uksort($benefit_nodes, function($benefit_nid_a, $benefit_nid_b) use ($benefit_nodes, $benefit_types) {
- 		$type_tid_a = $benefit_nodes[$benefit_nid_a]->field_sirius_trust_benefit_type['und'][0]['tid'];
- 		$type_tid_b = $benefit_nodes[$benefit_nid_b]->field_sirius_trust_benefit_type['und'][0]['tid'];
-
- 		$weight_a = $benefit_types[$type_tid_a]->weight;
- 		$weight_b = $benefit_types[$type_tid_b]->weight;
-
- 		return $weight_a <=> $weight_b;
- 	});
-
-	$benefit_names = array();
-	foreach ($benefit_nodes as $benefit_nid => $benefit_node) {
-		$benefit_names[$benefit_nid] = $benefit_node->title;
-	}
-
-	return $benefit_names;
-}
 
 function sirius_trust_fetch_worker_benefits($worker_node, $direction, $params = array()) {
   if ($direction == 'direct') {
@@ -653,6 +509,8 @@ function sirius_trust_render_worker_benefits($worker_node, $direction, $wb_nodes
 	if (!$wb_nodes) {
 		return '<p>' . t('No records found.') . '</p>';
 	}
+
+	$wb_nodes = sirius_trust_worker_benefits_sort_by_date($wb_nodes);
 
 	static $relationship_type_terms;
 	if (!isset($relationship_type_terms)) { $relationship_type_terms = sirius_taxonomy_load('sirius_contact_relationship_types', 'tid', 'full'); }
@@ -760,6 +618,8 @@ function sirius_trust_render_worker_benefits($worker_node, $direction, $wb_nodes
 	  	} else {
 	  		$class = 'active';
 	  	}
+  	} else if ($start_ts > time()) {
+  		$class = 'blue';
   	} else {
 	  	$class = 'inactive';
   	}
@@ -789,3 +649,37 @@ function sirius_trust_render_worker_benefits($worker_node, $direction, $wb_nodes
 
 	return sirius_table_render($header, $rows, array('class' => array('sirius_table_align')));
 }
+
+function sirius_trust_wb_scan_dashboard_data($prefs, $options = array()) {
+	$status = sirius_domain_variable_get('sirius_trust_wb_scan_status', array());
+	if (!$status) { return array(); }
+
+	if ($status['total']) {
+		$pct = 100 * round($status['complete'] / $status['total'], 2);
+ 	}
+
+
+	$msg .= "Month: <strong>$status[ym] ($pct%)</strong><br />";
+	$msg .= "Records: " . number_format($status['total'], 0) . "<br />";
+	$msg .= "Complete: " . number_format($status['complete']) . "<br />";
+	$msg .= "Pending: " . number_format($status['pending']) . "<br />";
+	$msg .= "[mode = $status[mode]]";
+
+	$tools = l(
+		'Details', 
+		'sirius/trust/benefits/scan', 
+		array(
+			'attributes' => array('class' => array('tool-button')),
+		)
+	);
+
+	$row = array(
+		'count' => $total,
+		'tools' => $tools,
+		'details' => $msg,
+	);
+	$rows[] = $row;
+
+	return $rows;
+}
+

@@ -105,9 +105,9 @@ class Sirius_Trust_Changequeue extends Sirius_Singleton {
 
 		// Don't create a queue entry if the field is changed.
 		$node = node_load($nid);
-		$node_orig = clone $node;
-		$node->{$field_name}['und'][0] = $val;
-		if (!sirius_revision_changed($node, $node_orig)) { return array('success' => TRUE, 'msg' => 'Node is unchanged.'); }
+		$node_new = clone $node;
+		$node_new->{$field_name}['und'][0] = $val;
+		if (!sirius_revision_changed($node, $node_new)) { return array('success' => TRUE, 'msg' => 'Node is unchanged.'); }
 
 		// Queue the entry
 		$msg = $cq_item['msg'];

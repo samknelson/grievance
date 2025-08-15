@@ -100,6 +100,7 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 
 		$result = array();
 
+		$msg_details = array();
 		foreach ($data as $ym => $record) {
 			list ($y, $m) = explode('-', $ym);
 
@@ -114,6 +115,8 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 			$stmt = sirius_sql_query($sql, array(':worker_nid' => $worker_nid, ':y' => $y, ':m' => $m));
 			$hr = $stmt->fetchAssoc();
 			$hrs = $hr['c'];
+			if (!$hrs) { $hrs = 0; }
+			$msg_details[] = '[' . round($hrs) . " hrs $m/$y]";
 
 			// Eligibility month
 			if ($m == $threemonthsprev_month && $y == $threemonthsprev_year) {
@@ -150,6 +153,8 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 			} else {
 				$break_count = 0;
 			}
+
+			// drupal_set_message("here with $ym, threshold $threshold, hours $hrs, buildup $buildup_count, break $break_count, ");
 
 			// Buildup complete
 			if ($buildup_count > 2) {
@@ -204,6 +209,8 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 			$result['warning'] = TRUE;
 		}
 
+		$result['msg'] .= ' ' . join(' ', $msg_details);
+
 		return $result;
 	}
 
@@ -227,6 +234,7 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 			$ms_term = taxonomy_term_load($ms_tid);
 			$ms_json = sirius_json_get($ms_term);
 			$val = $ms_json['smf']['threshold'];
+			if (is_array($val)) { $val = $val['hrs']; }
 			if (!($val > 0)) { $val = 100; }
 			$cache[$ms_tid] = $val;
 		}

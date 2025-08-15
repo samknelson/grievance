@@ -28,7 +28,7 @@ function sirius_trust_page_election_wizard_list_form($form, &$form_state) {
 	$records = sirius_trust_election_wizard_search($params);
 
 	if ($records) {
-		$header = array('Worker', 'Employer', 'Status', 'Tools');
+		$header = array('Worker', 'Employer', 'Status', 'Date Created', 'Tools');
 		$rows = array();
 		foreach ($records as $nid => $record) {
 			$wizard_node = node_load($nid);
@@ -52,6 +52,7 @@ function sirius_trust_page_election_wizard_list_form($form, &$form_state) {
 			$row[] = $worker_node->title;
 			$row[] = sirius_node_title($employer_nid);
 			$row[] = $wizard_node->field_sirius_type['und'][0]['value'];
+			$row[] = date('m/d/Y', $wizard_node->created);
 			$row[] = join(' ', $tools);
 			$rows[] = $row;
 		}

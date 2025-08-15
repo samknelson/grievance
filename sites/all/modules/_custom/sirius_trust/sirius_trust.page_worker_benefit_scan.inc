@@ -4,6 +4,15 @@ function sirius_trust_node_tab_worker_benefit_scan_form($form, &$form_state, $wo
 	$form_state['worker_nid'] = $worker_node->nid;
 	$form_state['#tree'] = TRUE;
 
+	$form['month'] = array(
+		'#type' => 'select',
+		'#title' => t('Month'),
+		'#options' => array(
+			'this_month' => date('F Y'),
+			'next_month' => date('F Y', strtotime('+1 month')),
+		),
+	);
+
 	$form['mode'] = array(
 		'#type' => 'select',
 		'#title' => t('Mode'),
@@ -20,7 +29,8 @@ function sirius_trust_node_tab_worker_benefit_scan_form($form, &$form_state, $wo
 
 	if ($form_state['submitted']) {
 		$mode = $form_state['values']['mode'];
-		sirius_trust_wb_scan_worker($mode, $worker_node);
+		$month = $form_state['values']['month'];
+		sirius_trust_wb_scan_worker($mode, $worker_node, array('month' => $month));
 
 		$html = '<hr>';
 		$html .= '<h2>' . t('Results') . '</h2>';

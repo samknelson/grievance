@@ -29,7 +29,7 @@ function sirius_smf_feed_notes_row_verify($feed_node, $info, $data, &$row, $prec
 
   // Date
   $year = $row['K'];
-  if ($year > 24) { $year += 1900; } else { $year += 2000; }
+  if ($year > 30) { $year += 1900; } else { $year += 2000; }
   $month = $row['L'];
   $day = $row['M'];
   $hour = $row['G'];

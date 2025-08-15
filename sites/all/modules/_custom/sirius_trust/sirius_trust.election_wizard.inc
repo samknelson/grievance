@@ -17,14 +17,14 @@ function sirius_trust_election_wizard_steps($data, $wizard_node) {
 
   $steps = array();
 
-	if (user_access('sirius trust staff')) {
+	// if (user_access('sirius trust staff')) {
   	$steps['policy'] = array(
   		'label' => 'Policy', 
   		'callback' => 'sirius_trust_election_wizard_policy_form',
 		  'file' => 'election_wizard/policy.inc',
   		'module' => 'sirius_trust',
   	);
-  }
+  // }
 
 	$policy_node = sirius_trust_election_wizard_get_policy($data);
 

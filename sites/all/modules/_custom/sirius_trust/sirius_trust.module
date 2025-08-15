@@ -11,6 +11,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/s
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.denorm.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.services.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.cobra.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.qmsco.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.changequeue.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.provider_edi.inc';
 
@@ -121,6 +122,10 @@ function sirius_trust_report_cache_info() {
   sirius_require('sirius_trust', 'sirius_trust.report_relationship_sequence.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_newhire.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_hour.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_relationship_self.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_qmsco_no_rp.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_qmsco_multiple_rp.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_worker_benefit_pair.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_relationship_reciprocal.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_election_dependent_uncovered.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_worker_benefit_ending.inc');
@@ -135,6 +140,10 @@ function sirius_trust_report_cache_info() {
   Sirius_Trust_Report_Newhire::getInstance()->setInfo($items);
   Sirius_Trust_Report_Hour::getInstance()->setInfo($items);
   Sirius_Trust_Report_WB_Summary::getInstance()->setInfo($items);
+  Sirius_Trust_Report_Relationship_Self::getInstance()->setInfo($items);
+  Sirius_Trust_Report_Qmsco_No_Rp::getInstance()->setInfo($items);
+  Sirius_Trust_Report_Qmsco_Multiple_Rp::getInstance()->setInfo($items);
+  Sirius_Trust_Report_Worker_Benefit_Pair::getInstance()->setInfo($items);
   Sirius_Trust_Report_Relationship_Reciprocal::getInstance()->setInfo($items);
   // Sirius_Trust_Report_Election_No_Hours::getInstance()->setInfo($items);
 
@@ -194,16 +203,14 @@ function sirius_trust_sirius_config_links_alter(&$links) {
  */
 
 function sirius_trust_sirius_cron_scan_info() {
-  /*
   $items['trust_benefit'] = array(
     'title' => 'Trust Worker Benefit Scan',
     'description' => 'Check eligibility for all worker benefits',
-    'schedule' => 'daily',
+    'schedule' => 'always',
     'callback' => 'sirius_trust_worker_benefit_scan',
     'multidomain' => TRUE,
     'component' => 'trust',
   );
-  */
 
   $items['trust_election'] = array(
     'title' => 'Trust Worker Election Scan',
@@ -224,6 +231,15 @@ function sirius_trust_sirius_cron_scan_info() {
     'component' => 'trust',
   );
   */
+
+  $items['trust_wb_scan_changelog_purge'] = array(
+    'title' => 'Trust WB Scan Changelog',
+    'description' => 'Purge old scan changelog entries',
+    'schedule' => 'daily',
+    'callback' => 'sirius_trust_wb_scan_changelog_purge_cron',
+    'multidomain' => FALSE,
+    'component' => 'trust',
+  );
 
   return $items;
 }
@@ -329,6 +345,16 @@ function sirius_trust_sirius_dashboard_plugin_info() {
     'module' => 'sirius_trust',
     'callbacks' => array(
       'data' => 'sirius_trust_dashboard_wbs_data',
+    ),
+  );
+
+  $plugins['trust_wb_scan'] = array(
+    'title' => 'Trust: Worker Benefit Scan Status',
+    'description' => '',
+    'file' => 'sirius_trust.benefit.inc',
+    'module' => 'sirius_trust',
+    'callbacks' => array(
+      'data' => 'sirius_trust_wb_scan_dashboard_data',
     ),
   );
 

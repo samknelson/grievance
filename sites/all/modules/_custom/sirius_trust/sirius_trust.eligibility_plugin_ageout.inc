@@ -93,7 +93,7 @@ class Sirius_Trust_Elgibility_Plugin_Ageout extends Sirius_Trust_Elgibility_Plug
 		$diff = $from->diff($to);
 		// drupal_set_message("Difference is " . $diff->y . " years " . $diff->m . " months " . $diff->d . " days ");
 
-		$age_in_months = (12*$diff->y) + $diff->m + 1;
+		$age_in_months = (12*$diff->y) + $diff->m;
 		$age = round(($age_in_months / 12), 2);
 
 		if ($age < $min_age) {

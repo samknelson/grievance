@@ -1,7 +1,7 @@
 <?php
 
 function sirius_node_tab_worker_status_access($worker_node) {
-	return node_access('view', $worker_node);
+	return Sirius_Worker_Access::getInstance()->access('view status', array('worker_node' => $worker_node));
 }
 
 function sirius_node_tab_worker_status($worker_node) {

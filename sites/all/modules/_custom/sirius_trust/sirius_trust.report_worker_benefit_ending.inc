@@ -180,7 +180,7 @@ class Sirius_Trust_Report_Worker_Benefit_Ending extends Report_Cache_Report_Gene
       $row['worker_phone'] = $worker_node->field_sirius_phone['und'][0]['value'];
       $row['worker_email'] = $worker_node->field_sirius_email['und'][0]['value'];
       foreach (sirius_addr_cols() as $col => $name) {
-        $fields["worker_address_$col"] = $worker_node->field_sirius_address['und'][0][$col];
+        $row["worker_address_$col"] = $worker_node->field_sirius_address['und'][0][$col];
       }
       $row['benefit_type_tid'] = $benefit_node->field_sirius_trust_benefit_type['und'][0]['tid'];
       $row['benefit_type_name'] = sirius_term_title($row['benefit_type_tid']);

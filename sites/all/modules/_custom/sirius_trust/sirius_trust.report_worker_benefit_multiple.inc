@@ -3,6 +3,7 @@
 function sirius_trust_report_worker_benefit_multiple_fields() {
   return array(
     'worker_nid' => 'Worker NID',
+    'worker_ssn' => 'Worker SSN',
     'worker_name' => 'Worker Name',
     'benefit_nid' => 'Benefit NID',
     'benefit_name' => 'Benefit Name',
@@ -98,9 +99,16 @@ function sirius_trust_report_worker_benefit_multiple_batch($wbs, $values, $repor
   foreach ($wbs as $wb) {
     list($worker_nid, $benefit_nid, $benefit_type_tid, $count) = explode('|', $wb);
 
+    $sql = "select field_sirius_ssn_value from field_data_field_sirius_ssn ";
+    $sql .= "where entity_type = 'node' and entity_id = :worker_nid ";
+    $stmt = sirius_sql_query($sql, array(':worker_nid' => $worker_nid));
+    $hr = $stmt->fetchAssoc();
+    $ssn = $hr['field_sirius_ssn_value'];
+
     $row = array();
     $row['worker_nid'] = $worker_nid;
     $row['worker_name'] = sirius_node_title($worker_nid);
+    $row['worker_ssn'] = $ssn;
     $row['benefit_nid'] = $benefit_nid;
     $row['benefit_name'] = $benefit_names[$benefit_nid];
     $row['benefit_type_tid'] = $benefit_type_tid;

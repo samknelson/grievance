@@ -90,6 +90,13 @@ function sirius_login_config() {
     '#description' => t('Enter the Drupal path to login. This is probably only relevant if you want to encourage users to login as saml/login.'),
   );
 
+  $form['sirius_login_account_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Account URL'),
+    '#default_value' => variable_get('sirius_login_account_url', ''),
+    '#description' => t('Enter the account URL. This is only appropriate if you want to send people to an offsite link, such as https://mysite.okta.com/enduser/settings'),
+  );
+
 	$form = system_settings_form($form);
   return $form;
 }
@@ -153,10 +160,14 @@ function sirius_banner_render() {
 			    }
 			  }
 
-			  if (user_access('sirius edit own user')) {
+			  if (variable_get('sirius_login_account_url')) {
+			  	$html .= '<a href="' . variable_get('sirius_login_account_url') . '">' . t('account') . '</a> / ';
+			  } else if (user_access('sirius edit own user')) {
 			    $html .= l(t('account'),'user/'.$user->uid.'/edit');
 			    $html .= ' / ';
 			  }
+
+
 			  $html .= l(t("logout"),"user/logout");
 		  $html .= '</div>'; // user-links-content
 	  }

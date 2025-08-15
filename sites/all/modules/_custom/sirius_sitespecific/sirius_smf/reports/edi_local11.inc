@@ -23,6 +23,7 @@ class Sirius_Smf_Report_Edi_Local11 extends Report_Cache_Report_Generator {
       'module' => 'sirius_smf',
       'file' => 'reports/edi_local11.inc',
       'row_encoding' => 'json',
+      'edi_output_format' => 'csv',
     );
 
     return parent::info($result);
@@ -79,21 +80,6 @@ class Sirius_Smf_Report_Edi_Local11 extends Report_Cache_Report_Generator {
     );
 
     return $form;
-  }
-
-  public function render_parameters($parameters) {
-    $parameters = $parameters['parameters'];
-
-    $html = sirius_jsonfield_util_render_all_values_new(
-      $this->form(), 
-      $parameters, 
-      array(
-        'skip_empty' => TRUE,
-        'no_fieldsets' => TRUE,
-      )
-    );
-
-    return $html;
   }
 
   public function pks(&$form_state) {

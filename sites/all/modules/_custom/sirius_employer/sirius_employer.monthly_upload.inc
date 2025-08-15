@@ -116,10 +116,10 @@ class Sirius_Employer_Monthly_Upload extends Sirius_Singleton {
     for ($i=1; $i<=12; ++$i) { $month_options[$i] = $i; }
     $form['month'] = array(
       '#type' => 'select',
-      '#title' => t('Month'),
+      '#title' => t('Work Month'),
       '#options' => $month_options,
       '#required' => TRUE,
-      '#default_value' => date('n'),
+      // '#default_value' => date('n'),
     );
 
     $year_options = array();
@@ -129,10 +129,10 @@ class Sirius_Employer_Monthly_Upload extends Sirius_Singleton {
     }
     $form['year'] = array(
       '#type' => 'select',
-      '#title' => t('Year'),
+      '#title' => t('Work Year'),
       '#options' => $year_options,
       '#required' => TRUE,
-      '#default_value' => date('Y'),
+      // '#default_value' => date('Y'),
     );
 
     $form['submit'] = array(

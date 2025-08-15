@@ -14,24 +14,56 @@ function sirius_smf_feed_ehrs_statement_form($form, &$form_state, $info, $data, 
 	// work date. (I.e. if you upload a July hours entry in August, it doesn't change your July invoice, it changes your August invoice.)
 	// So instead, we always show the invoice for the current month / year. You'll generally be uploading last month, so you'll want to see 
 	// this months's invoice.
-	// $year = $monthly->get_year($eup_node);
-	// $month = $monthly->get_month($eup_node);
-	$year = date('Y'); $month = date('n');
-	if (!$employer_node || !$year || !$month) { return sirius_form_error("System error: employer, year, or month not found."); }
+	
+	$start_year = $monthly->get_year($eup_node);
+	$start_month = $monthly->get_month($eup_node);
+	if (!$employer_node || !$start_year || !$start_month) { return sirius_form_error("System error: employer, year, or month not found."); }
+
+	$end_year = date('Y');
+	$end_month = date('n');
+
+	$interval_ids[] = "$start_year-$start_month";
+
+	$month = $start_month;
+	$year = $start_year;
+	$count = 0;
+
+	$interval_ids = array();
+	while (TRUE) {
+		$interval_ids[] = "$year-$month";
+
+		++$count;
+		++$month;
+		if ($month > 12) { $month = 1; ++$year; }
+
+		// Don't go past the end month
+		if ( ($year > $end_year) || ( ($year == $end_year) && ($month > $end_month) ) ) { break; }
+
+		// Don't show more than four months
+		if ($count > 4) { break; }
+	}
+	$interval_ids[] = "$end_year-$end_month";
+	$interval_ids = array_unique($interval_ids);
 
 	$ea = Sirius_Ledger_EA::getInstance();
 
-	$invoice_obj = sirius_ledger_invoice_obj();
-	$interval_id = "$year-$month";
-	$interval = $invoice_obj->interval_from_id($interval_id);
+	foreach ($interval_ids as $interval_id) {
+		$invoice_obj = sirius_ledger_invoice_obj();
+		$interval = $invoice_obj->interval_from_id($interval_id);
 
-	$account_nid = 2457512; // @todo
-	$form_state['account_nid'] = $account_nid;
+		$account_nid = 2457512; // @todo
+		$form_state['account_nid'] = $account_nid;
 
-	$ea_node = $ea->fetch($employer_node->nid, $account_nid, TRUE);
+		$ea_node = $ea->fetch($employer_node->nid, $account_nid, TRUE);
 
-	$invoice = $invoice_obj->invoice_load($employer_node->nid, $account_nid, $interval);
-	$html .= $invoice_obj->invoice_render($invoice);
+		$invoice = $invoice_obj->invoice_load($employer_node->nid, $account_nid, $interval);
+
+		$render_options = array();
+		if ($interval_id != "$end_year-$end_month") {
+			$render_options['hide_pending_payments'] = TRUE; 
+		}
+		$html .= $invoice_obj->invoice_render($invoice, $render_options);
+	}
 
 	$form['invoice'] = array('#markup' => $html);
 

@@ -1,29 +1,31 @@
 <?php
 
 function sirius_smf_node_tab_worker_autotag_history($worker_node) {
+	// Some lookups
+	sirius_require('sirius_smf', 'sirius_smf.eligibility_buildup.inc');
 	$worker_nid = $worker_node->nid;
-
-	$tids = array();
-	if ($form_state['values']['tags']) {
-		$tids = array_filter(array_values($form_state['values']['tags']));
-	}
-
-	// Load the employers (lookup)
 	$employers = sirius_employer_list();
-
-	// Load the tags (lookup)
-	$tags_by_id = sirius_taxonomy_load('sirius_contact_tags', 'field_sirius_id', 'full');
-
-	// Load the WYM nodes
-	$tmp = sirius_smf_wym_fetch_all($worker_node->nid);
-	$wym_nodes = array();
-	foreach ($tmp as $wym_nid => $wym_node) {
-		$ym = date('Y-m', strtotime($wym_node->field_sirius_date_start['und'][0]['value']));
-		$wym_nodes[$ym] = $wym_node;
+	$medical_type_tid = sirius_taxonomy_lookup_by_anything('sirius_trust_benefit_type', 'MEDICAL');
+	$dental_type_tid = sirius_taxonomy_lookup_by_anything('sirius_trust_benefit_type', 'DENTAL');
+	if (!$medical_type_tid || !$dental_type_tid) {
+		return sirius_page_error("Make sure that there is a benefit type with the name or ID 'DENTAL' and 'MEDICAL'.");
 	}
-	krsort($wym_nodes);
-	$ym_first = end(array_keys($wym_nodes));
-	if (!$ym_first) { $ym_first = '2022-01'; }
+
+	// Find the start date. This is the date of first hours.
+	$sql = "select * ";
+	$sql .= "from sirius_hours_cache ";
+	$sql .= "where worker_nid = :worker_nid ";
+	$sql .= "order by year, month, day limit 1 ";
+	$stmt = sirius_sql_query($sql, array(':worker_nid' => $worker_node->nid));
+	$hr = $stmt->fetchAssoc();
+	if ($hr) {
+		$y = $hr['year'];
+		$m = $hr['month'];
+		if (strlen($m) < 2) { $m = "0$m"; }
+		$ym_first = "$y-$m";
+	} else {
+		$ym_first = '2022-01';
+	}
 	if ($ym_first < '2010-01') { $ym_first = '2010-01'; }
 
 	// Get a list of months
@@ -60,216 +62,102 @@ function sirius_smf_node_tab_worker_autotag_history($worker_node) {
 		$m = $hr['month'];
 		if (strlen($m) < 2) { $m = "0$m"; }
 		$ym = "$y-$m";
-		if (!$months[$ym]) { continue; }
-
+		
 		$employer_nid = $hr['employer_nid'];
 		$months[$ym]['hours']['by_employer'][$employer_nid] += $hr['hours'];
 		$months[$ym]['hours']['total'] += $hr['hours'];
 	}
+
+	// Sort hours by employer
 	foreach ($months as $ym => $ignore) {
 		uksort($months[$ym]['hours']['by_employer'], function($a, $b) use ($ym, $months) { 
 			return $months[$ym]['hours']['by_employer'][$b] <=> $months[$ym]['hours']['by_employer'][$a];
 		}); 
 	}
 
-	// Load the hours thresholds. This requires the payperiod node for each month. There might be multiple thresholds. The default is 80.
-	$domain_nid = sirius_domain_nid();
-	foreach ($months as $ym => $ingore) {
-		$y = $months[$ym]['y'];
-		$m = $months[$ym]['m'];
-		foreach ($months[$ym]['hours']['by_employer'] as $employer_nid => $ignore2) {
-			// Find the payperiod
-			$payperiod_node = sirius_hour_payperiod_load($domain_nid, $worker_nid, $employer_nid, $y, $m, 1, FALSE);
-			if (!$payperiod_node) { continue; }
-			$payperiod_json = sirius_json_get($payperiod_node);
-			$elig_hours = $payperiod_json['smf']['elig_hrs'];
-			if (!$elig_hours) { $elig_hours = 80; }
-			$months[$ym]['hours']['elig'][] = $elig_hours;
-		}
-	}
-	foreach ($months as $ym => $ignore) {
-		$tmp = $months[$ym]['hours']['elig'];
-		if (!$tmp) { $tmp = array(80); }
-		$tmp = array_unique($tmp);
-		sort($tmp);
-		$months[$ym]['hours']['elig'] = $tmp;
-	}
-
-	// Pull the notes from each benefit node. Clean and uniquify them and break them out by month
-	$all_benefits_received = sirius_trust_fetch_worker_benefits($worker_node, 'direct', array('benefit_types' => $benefit_types));
-	foreach ($months as $ym => $month) {
-
-		$notes = array();
-		foreach ($all_benefits_received as $benefit_nid => $benefit_node) {
-			$start_ts = strtotime($benefit_node->field_sirius_date_start['und'][0]['value']);
-			if (!$start_ts) { continue; }
-			if ($start_ts > $month['ts']) { continue; }
-
-			if ($benefit_node->field_sirius_date_end['und'][0]['value']) {
-				$end_ts = strtotime($benefit_node->field_sirius_date_end['und'][0]['value']);
-				if ($end_ts < $month['ts']) { continue; }
-			}
-
-			$note = $benefit_node->field_sirius_notes['und'][0]['value'];
-			$note = preg_replace('/\s*coverage coming from\s*/i', '', $note);
-			$note = trim($note);
-			$note = preg_replace('/;$/', '', $note);
-			$notes[] = $note;
-		}
-		$notes = array_filter(array_unique($notes));
-		$months[$ym]['benefit_notes'] = $notes;
-	}
-
-	// Render the list of months
+	// Generate our table
 	$rows = array();
-	$count = 0;
-	foreach ($months as $ym => $month) {
-		$y = $month['y'];
-		$m = $month['m'];
+	$policy_lookup = $employer_lookup = $benefit_lookup = array();
+	foreach ($months as $col1_ym => $col1_record) {
+		$col1_ts = strtotime("$col1_ym-15");
+		$col2_ts = strtotime('-3 months', $col1_ts);
+		$col2_ym = date('Y-m', $col2_ts);
+		$col2_record = $months[$col2_ym];
 
-		// Get autotags for the month
-		$my_tids = sirius_fieldvals($wym_nodes[$ym], 'field_sirius_contact_tags', 'tid');
+		// Get the election
+		$election_node = sirius_trust_worker_election($worker_node, $col1_ts);
+
+		// Get the coverage
+		$search_params = array();
+		$search_params['worker_nid'] = $worker_nid;
+		$search_params['benefit_types'] = array($medical_type_tid);
+		$search_params['ts'] = $col1_ts;
+		$wb_nodes = sirius_trust_worker_benefits_search($search_params);
+
+		// Get the elected benefits
+		$benefit_names = array();
+		if ($election_node) {
+			$benefit_nids = sirius_fieldvals($election_node, 'field_sirius_trust_benefits', 'target_id');
+			foreach ($benefit_nids as $benefit_nid) {
+				if (!$benefit_lookup[$benefit_nid]) { $benefit_lookup[$benefit_nid] = node_load($benefit_nid); }
+				$benefit_type_tid = $benefit_lookup[$benefit_nid]->field_sirius_trust_benefit_type['und'][0]['tid'];
+				if (!in_array($benefit_type_tid, array($medical_type_tid, $dental_type_tid))) { continue; }
+				$benefit_names[] = $benefit_lookup[$benefit_nid]->title;
+			}
+		}
+
+		// Get the threshold
+		$threshold = NULL;
+		if ($election_node) {
+			$policy_nid = $election_node->field_sirius_policy['und'][0]['target_id'];
+			if (!$policy_lookup[$policy_nid]) { $policy_lookup[$policy_nid] = node_load($policy_nid); }
+			$threshold = Sirius_Smf_Eligibility_Plugin_Buildup::getInstance()->threshold_from_worker_and_policy($worker_node, $policy_lookup[$policy_nid]);
+		}
+
+		$col1_parts = $col2_parts = array();
+		$col1_parts[] = '<strong>' . date('F Y', $col1_ts) . '</strong>';
+		if ($wb_nodes) {
+			$col1_parts[] = 'Coverage: ' . '<strong>Yes</strong>';
+		} else {
+			$col1_parts[] = 'Coverage: ' . '<strong>No</strong>';
+		}
+
+		if ($threshold) {
+			if ($total >= $threshold) {
+				$col1_parts[] = 'Eligible: ' . '<strong>Yes</strong>';
+			} else {
+				$col1_parts[] = 'Eligible: ' . '<strong>No</strong>';
+			}
+		}
+
+		if ($benefit_names) {
+			$col1_parts[] = 'Election: ' . '<strong>' . join(', ', $benefit_names) . '</strong>';
+		}
+
+		$col2_parts[] = '<strong>' . date('F Y', $col2_ts) . '</strong>';
+		if (!$col2_record['hours']['by_employer']) { $col2_record['hours']['by_employer'] = array(); }
+		foreach ($col2_record['hours']['by_employer'] as $employer_nid => $amt) {
+			$col2_parts[] = $employers[$employer_nid] . ': ' . number_format($amt, 2);
+		}
+		$total = $col2_record['hours']['total'];
+		if (!$total) { $total = 0; }
+		$col2_parts[] = 'Total: ' . '<strong>' . number_format($total, 2) . '</strong>';
+
+		if ($threshold) {
+			$col2_parts[] = 'Required: ' . '<strong>' . number_format($threshold) . '</strong>';
+		}
+
+		if ($wb_nodes) {
+			$color = 'green';
+		} else {
+			$color = 'red';
+		}
 
 		$row = array();
-
-		// Column #1: Year/$month and FMLA/Disability status
-		$tag_ids = array(
-			'smf_autotag_status_disability' => 'Disability', 
-			'smf_autotag_status_fmla' => 'FMLA'
-		);
-		$html = '<strong>' . $ym . '</strong>';
-		if ($wym_nodes[$ym]) {
-			$parts = array();
-			foreach ($tag_ids as $tag_id => $tag_name) {
-				$tid = $tags_by_id[$tag_id]->tid;
-				if (in_array($tid, $my_tids)) {
-					$parts[] = $tag_name;
-				}
-			}
-			if ($parts) { $html .= '<br />' . '<strong>' . join(', ', $parts) . '</strong>'; }
-		}
-		$row[] = $html;
-
-		// Column #2: Employers and hours, highest hours first
-		$html = '';
-		$month_hours = $months[$ym]['hours']['by_employer'];
-		$total_hours = $months[$ym]['hours']['total'];
-		if (!$total_hours) { $total_hours = 0; }
-
-		$parts = array();
-		if (!$month_hours) {
-			$parts[]  = "[No hours found]";
-		} else {
-			foreach ($month_hours as $employer_nid => $amt) {
-				$parts[$employer_nid] = $employers[$employer_nid] . ': ' . number_format(round($amt)) . ' hrs';
-			}
-		}
-		$parts[] = '<strong>Total: ' . number_format(round($total_hours)) . ' hrs';
-		//  . '(req. ' . join(',', $months[$ym]['hours']['elig']) . ')</strong>';
-		$html = join('<br />', $parts);
-		$row[] = $html;
-
-		// Column #3: Plans and Elections
-		$tag_ids = array(
-			'smf_autotag_policy_8868661' => 'Legacy Plan', 
-			'smf_autotag_policy_8868663' => 'Event Center', 
-			'smf_autotag_policy_8868660' => 'Participation Agreement', 
-			'smf_autotag_policy_8868662' => 'Hotel Plan', 
-
-			'smf_autotag_election_type_1523' => 'Family',
-			'smf_autotag_election_type_1521' => 'Single+1',
-			'smf_autotag_election_type_1522' => 'Single',
-			'smf_autotag_election_type_no_election' => 'No Election',
-			'smf_autotag_election_type_no_election_type' => 'No Election Type',
-			'smf_autotag_election_type_1556' => 'Election Waived',
-		);
-		$html = $ym;
-		if (!$wym_nodes[$ym]) {
-			$html = '<div class="sirius_missing">' . "[Autotags not set]" . '</div>';
-		} else {
-			$parts = array();
-			foreach ($tag_ids as $tag_id => $tag_name) {
-				$tid = $tags_by_id[$tag_id]->tid;
-				if (in_array($tid, $my_tids)) {
-					$parts[] = $tag_name;
-				}
-			}
-			if (!$parts) {
-				$html = '[No benefits]';
-			} else {
-				$html = join('<br />', $parts);
-			}
-		}
-		$row[] = $html;
-
-		// Column #4: Benefits
-		$tag_ids = array(
-			'smf_autotag_benefit_2457502' => 'Kaiser', 
-			'smf_autotag_benefit_2457510' => 'Health Net', 
-			'smf_autotag_benefit_8871542' => 'Kaiser E', 
-			'smf_autotag_benefit_2457506' => 'MLK', 
-			'smf_autotag_benefit_2457516' => 'EHS', 
-
-			'smf_autotag_benefit_2457515' => 'Delta', 
-			'smf_autotag_benefit_3113314' => 'Liberty', 
-			'smf_autotag_benefit_2457514' => 'United Concordia', 
-			'smf_autotag_benefit_7173079' => 'Placeholder Historical Dental Plan', 
-
-			'smf_autotag_benefit_2457519' => 'VSP', 
-
-			'smf_autotag_benefit_2457517' => 'Life Insurance / AD&D', 
-		);
-		$html = $ym;
-		if (!$wym_nodes[$ym]) {
-			$html = '<div class="sirius_missing">' . "[Autotags not set]" . '</div>';
-		} else {
-			$parts = array();
-			foreach ($tag_ids as $tag_id => $tag_name) {
-				$tid = $tags_by_id[$tag_id]->tid;
-				if (in_array($tid, $my_tids)) {
-					$parts[] = $tag_name;
-				}
-			}
-			if (!$parts) {
-				$parts[] = '[No benefits]';
-			} 
-		}
-
-		$y3 = $y;
-		$m3 = $m-3;
-		if ($m3 < 1) { $m3 += 12; $y3--; }
-		if (strlen($m3) < 2) { $m3 = "0$m3"; }
-		$ym3 = "$y3-$m3";
-		$total3 = $months[$ym3]['hours']['total'];
-		if (!$total3) { $total3 = 0; }
-		$parts[] = "Coverage From " . $ym3 . ": " . number_format(round($total3)) . ' hrs';
-		if ($months[$ym]['benefit_notes']) {
-			$parts[] = join('<br />', $months[$ym]['benefit_notes']);
-		}
-		$html = join('<br />', $parts);
-		$row[] = $html;
-
-		// Column #5: Tools
-		$html = '';
-		if ($wym_nodes[$ym]) {
-			$html = l('&neArr;&nbsp;Details', 'sirius/smf/modal/wym/' . $wym_nodes[$ym]->nid, array('html' => TRUE, 'attributes' => array('class' => array('tool-button'))));
-		}
-		$row[] = $html;
-
+		$row[] = array('data' => join('<br>', $col2_parts), 'class' => array($color));
+		$row[] = array('data' => join('<br>', $col1_parts), 'class' => array($color));
 		$rows[] = $row;
-
-		++$count;
-		$m--;
-		if ($m < 1) { $m = 12; $y--; }
-		if (strlen($m) < 2) { $m = "0$m"; }
-		$ym = "$y-$m";
-		if ($count > 100) { break; }
-		if ($ym < $ym_first) { break; }
 	}
 	$header = array();
-
-	$html = '<hr>';
-	$html .= sirius_table_render($header, $rows);
-
-	return $html;
+	return sirius_table_render($header, $rows);
 }

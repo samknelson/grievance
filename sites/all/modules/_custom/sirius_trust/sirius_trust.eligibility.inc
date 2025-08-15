@@ -102,6 +102,7 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_balance.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_arrears.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_cardcheck.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_test_bymonth.inc');
 
   $items = array();
   Sirius_Trust_Elgibility_Plugin_Universal::getInstance()->setInfo($items);
@@ -114,6 +115,7 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
   Sirius_Trust_Elgibility_Plugin_Balance::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_Arrears::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_Cardcheck::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_Test_Bymonth::getInstance()->setInfo($items);
   return $items;
 }
 

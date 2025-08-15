@@ -1,6 +1,8 @@
 <?php
 
-function sirius_postal_lob_page_body($uuid) {
+function sirius_postal_lob_page_body() {
+  $args = func_get_args();
+  $uuid = join('/', $args);
   $client = Sirius_Postal_Client_Lob::getInstance();
   $body = $client->cache_get($uuid);
 

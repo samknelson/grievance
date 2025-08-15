@@ -35,11 +35,6 @@ function sirius_bulk_node_tab_medium_form($form, &$form_state, $bulk_node) {
 	$form['do_not_disturb'] = array(
 		'#type' => 'fieldset',
 		'#title' => t('Do Not Disturb'),
- 		'#states' => array('visible' => array(":input[name=\"medium\"]" => array(
- 			array('value' => 'sms'),
- 			array('value' => 'voice'),
- 			array('value' => 'choice'),
- 		))),
  	);
 
 	$options = sirius_do_not_disturb_list();

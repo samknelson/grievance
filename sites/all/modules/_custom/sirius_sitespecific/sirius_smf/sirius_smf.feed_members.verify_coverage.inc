@@ -181,17 +181,15 @@ function sirius_smf_feed_members_linked_benefits() {
   // - Healthnet, Kaiser & Kaiser Enhanced should create:
   // - - VSP
   // - - Express Scripts
-  // - - Hinge PT
   // - - Life Insurance
   // - - Carelon EAP
-  // - - Carelon Behavioral Health
   // - - AD&D
 
   $linked_benefits = &drupal_static(__FUNCTION__);
   if (!$linked_benefits) {
     $map_by_id = array();
     $map_by_id['M'] = array('3E', 'EXPRESSSCRIPTS', 'HINGEPT', '2', 'CARELONEAP', 'CARELONBEHAVIORALHEALTH', 'ADD');
-    $map_by_id['H'] = array('3', 'EXPRESSSCRIPTS', 'HINGEPT', '2', 'CARELONEAP', 'CARELONBEHAVIORALHEALTH', 'ADD');
+    $map_by_id['H'] = array('3', 'EXPRESSSCRIPTS', '2', 'CARELONEAP', 'ADD');
     $map_by_id['K'] = $map_by_id['KE'] = $map_by_id['H'];
 
     foreach ($map_by_id as $from_id => $to_ids) {
