@@ -28,14 +28,19 @@ function sirius_trust_election_wizard_benefits_form($form, &$form_state, $info, 
 	$params['scan_type'] = 'benefit_start';
 	$params['employer_node'] = $employer_node;
 	$params['skip_plugins'] = array('cardcheck', 'election');
+	$params['from_benefit_nids'] = array_keys($benefits);
+	if ($data['addr']['change'] == 'Yes') { $params['addr'] = $data['addr']['new']; }
+	$params['is_election'] = TRUE;
+
+	$automatic_benefits = node_load_multiple(array_keys(sirius_trust_policy_benefits_offered($policy_node, array('electable' => FALSE, 'worker_node' => $worker_node))));
+	$all_benefits = $benefits + $automatic_benefits;
+
+	foreach ($all_benefits as $benefit_nid => $benefit_node) {
+		$params['benefit_node'] = $benefit_node;
+		$eligibility_results_by_benefit[$benefit_nid] = sirius_trust_eligibility_plugin_check_all($params);
+	}
 
 	foreach ($benefits as $benefit_nid => $benefit_node) {
-		$params['benefit_node'] = $benefit_node;
-
-		if ($data['addr']['change'] == 'Yes') {
-			$params['addr'] = $data['addr']['new'];
-		}
-		$eligibility_results_by_benefit[$benefit_nid] = sirius_trust_eligibility_plugin_check_all($params);
 		if (!$eligibility_results_by_benefit[$benefit_nid]['success']) { continue; }
 		$benefit_type_tid = $benefit_node->field_sirius_trust_benefit_type['und'][0]['tid'];
 		$benefit_options_by_type[$benefit_type_tid][$benefit_nid] = $benefit_node->title;
@@ -71,7 +76,8 @@ function sirius_trust_election_wizard_benefits_form($form, &$form_state, $info, 
 	// For staff, show me the reason that I am or am not eligible.
 	if ($access->access('staff', $access_context)) {
 		$rows = array();
-		foreach ($benefits as $benefit_nid => $benefit_node) {
+
+		foreach ($all_benefits as $benefit_nid => $benefit_node) {
 			$result = $eligibility_results_by_benefit[$benefit_nid];
 
 			if (!$result['plugins']) {
@@ -230,6 +236,51 @@ function sirius_trust_election_wizard_benefits_form_submit($form, &$form_state) 
 	foreach ($tmp as $key => $benefit_nid) { $benefit_nids[] = $benefit_nid; }
 	$benefit_nids = array_filter(array_unique($benefit_nids));
 	$benefits = node_load_multiple($benefit_nids);
+
+	//
+  // Add any "non-electable" benefits for which we are eligible
+  //
+
+	$automatic_benefit_nids = array_keys(sirius_trust_policy_benefits_offered($policy_node, array('electable' => FALSE, 'worker_node' => $worker_node)));
+
+	foreach ($automatic_benefit_nids as $benefit_nid) {
+		$benefit_node = node_load($benefit_nid);
+
+		$params = array();
+		$params['policy_node'] = $policy_node;
+		$params['subscriber_worker_node'] = $worker_node;
+		$params['relationship_node'] = NULL;
+		$params['ts'] = time();
+		$params['shortcut'] = FALSE;
+		$params['scan_type'] = 'benefit_start';
+		$params['employer_node'] = $employer_node;
+		$params['skip_plugins'] = array('cardcheck', 'election');
+		$params['benefit_node'] = $benefit_node;
+		$params['from_benefit_nids'] = $benefit_nids;
+		if ($data['addr']['change'] == 'Yes') { $params['addr'] = $data['addr']['new']; }
+		$params['is_election'] = TRUE;
+
+		if ($data['addr']['change'] == 'Yes') {
+			$params['addr'] = $data['addr']['new'];
+		}
+
+		$result = sirius_trust_eligibility_plugin_check_all($params);
+
+		if ($result['plugins']) {
+			foreach ($result['plugins'] as $plugin_key => $sub_result) {
+				$plugin_info = sirius_trust_eligibility_plugin_info($plugin_key);
+				$msg = $sub_result['msg'];
+				if (!$result['success']) {
+					// drupal_set_message("... Automatic benefit " . $benefit_node->title . " failed eligibility plugin: $plugin_info[name]: $sub_result[msg]", 'warning');
+				}
+			}
+		}
+		if (!$result['success']) { continue; }
+
+		$benefit_nids[] = $benefit_nid;
+  }
+
+  $data['benefits']['all'] = $benefit_nids;
 
 	// Eligibility params
 	$params = array();

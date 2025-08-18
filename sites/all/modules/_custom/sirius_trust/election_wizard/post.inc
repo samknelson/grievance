@@ -89,7 +89,6 @@ function sirius_trust_election_wizard_post_post($info, &$data, $wizard_node, $cu
 	$worker_node = sirius_trust_election_wizard_get_worker($wizard_node);
 	$policy_node = sirius_trust_election_wizard_get_policy($data);
 
-
 	// 
 	// Create any new workers
 	// 
@@ -221,22 +220,15 @@ function sirius_trust_election_wizard_post_post($info, &$data, $wizard_node, $cu
   $election_node->field_sirius_worker['und'][0]['target_id'] = $worker_node->nid;
 
   // All of our elected benefits
-  $benefit_nids = array();
-  if ($data['benefits']['by_type']) {
-  	foreach ($data['benefits']['by_type'] as $type_tid => $benefit_nid) { 
-  		$benefit_nids[] = $benefit_nid;
-  	}
-  }
+  $benefit_nids = $data['benefits']['all'];
+  if (!$benefit_nids) { $benefit_nids = array(); }
+  $benefit_nids = array_filter($benefit_nids);
 
-  // Add any "non-electable" benefits
-	$benefit_nids = array_merge($benefit_nids, array_keys(sirius_trust_policy_benefits_offered($policy_node, array('electable' => FALSE, 'worker_node' => $worker_node))));
-
+  // Add the benefits to our election.
   $benefit_nids = array_unique(array_filter($benefit_nids));
-  if ($benefit_nids) {
-  	foreach ($benefit_nids as $benefit_nid) {
-		  $election_node->field_sirius_trust_benefits['und'][] = array('target_id' => $benefit_nid);
-  	}
-  }
+  foreach ($benefit_nids as $benefit_nid) {
+	  $election_node->field_sirius_trust_benefits['und'][] = array('target_id' => $benefit_nid);
+	}
 
   // $election_node->field_sirius_trust_election_type['und'][0]['tid'] = $data['election_type']['tid'];
 
