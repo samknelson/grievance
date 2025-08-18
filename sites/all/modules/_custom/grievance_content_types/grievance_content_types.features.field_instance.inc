@@ -29274,54 +29274,6 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
-  // Exported field_instance: 'node-sirius_worker-field_sirius_denorm_benefits'.
-  $field_instances['node-sirius_worker-field_sirius_denorm_benefits'] = array(
-    'bundle' => 'sirius_worker',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => 1,
-          'field_delimiter' => '',
-          'link' => 0,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 18,
-      ),
-      'sirius_worker' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_sirius_denorm_benefits',
-    'label' => 'Denormalize: Benefits',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 0,
-      'module' => 'multiple_selects',
-      'settings' => array(),
-      'type' => 'multiple_selects',
-      'weight' => 60,
-    ),
-  );
-
   // Exported field_instance: 'node-sirius_worker-field_sirius_denorm_level'.
   $field_instances['node-sirius_worker-field_sirius_denorm_level'] = array(
     'bundle' => 'sirius_worker',
@@ -38123,7 +38075,6 @@ If the file has multiple pages, then each page in the input document will use th
   t('Default Value');
   t('Default number of days');
   t('Definition');
-  t('Denormalize: Benefits');
   t('Denormalize: Level');
   t('Department');
   t('Departments');

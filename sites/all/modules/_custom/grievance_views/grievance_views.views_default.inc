@@ -33177,6 +33177,10 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_name_alt']['id'] = 'field_sirius_name_alt';
   $handler->display->display_options['fields']['field_sirius_name_alt']['table'] = 'field_data_field_sirius_name_alt';
   $handler->display->display_options['fields']['field_sirius_name_alt']['field'] = 'field_sirius_name_alt';
+  /* Field: Field: ID */
+  $handler->display->display_options['fields']['field_sirius_id']['id'] = 'field_sirius_id';
+  $handler->display->display_options['fields']['field_sirius_id']['table'] = 'field_data_field_sirius_id';
+  $handler->display->display_options['fields']['field_sirius_id']['field'] = 'field_sirius_id';
   /* Field: Taxonomy term: Hierarchical depth */
   $handler->display->display_options['fields']['hdepth']['id'] = 'hdepth';
   $handler->display->display_options['fields']['hdepth']['table'] = 'taxonomy_term_data';
