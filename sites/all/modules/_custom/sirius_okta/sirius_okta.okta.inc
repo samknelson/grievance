@@ -5,14 +5,24 @@ function sirius_okta_token_refresh() {
 }
 
 /**
+ * Implements hook_user_presave()
+ * 
+ * There *has* to be a better way to determine if an entity is actually a user
+ */
+
+function sirius_okta_user_presave(&$edit, $account, $category) {
+	$edit['sirius_okta_entity_is_a_user'] = TRUE;
+}
+
+/**
  * Implements hook_entity_postsave()
  * 
  * We have to do entity_postsave because user_update hasn't written to the database yet :(
  */
 
 function sirius_okta_entity_postsave($entity) {
-	// There has to be a better way to figure out if an entity is a user
-	if (!$entity->uid || !$entity->name || !$entity->pass || !$entity->mail) { return; }
+	// watchdog('whatever', '<pre>' . print_r($entity, 1) . '</pre>');
+	if (!$entity->sirius_okta_entity_is_a_user) { return; }
 
 	$okta = Sirius_Okta::getInstance();
 	if (!$okta->autosync_active()) { return array('success' => TRUE, 'msg' => 'Autosync is not active.'); }

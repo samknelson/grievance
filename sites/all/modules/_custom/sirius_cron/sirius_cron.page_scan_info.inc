@@ -6,6 +6,8 @@ function sirius_cron_node_tab_scan_info_access($scan_node) {
 }
 
 function sirius_cron_node_tab_scan_info($scan_node) {
+	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/minilog.css');
+
 	$scan_json = sirius_json_get($scan_node);
 
 	$scan_key = sirius_cron_scan_key($scan_node);

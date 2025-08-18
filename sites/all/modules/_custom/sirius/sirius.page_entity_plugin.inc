@@ -1,7 +1,7 @@
 <?php
 
 function sirius_node_tab_entity_plugin_form($form, &$form_state, $entity_node, $plugin_class, $plugin_uuid) {
-	$form['nav'] = array('#markup' => sirius_node_tab_entity_plugins_quicknav($entity_node, $plugin_class), '#weight' => -10);
+	$form['nav'] = array('#markup' => sirius_node_tab_entity_plugins_quicknav($entity_node, $plugin_class, $plugin_uuid), '#weight' => -10);
 
 	$form_state['entity_nid'] = $entity_node->nid;
 	$form_state['plugin_class'] = $plugin_class;
@@ -38,6 +38,6 @@ function sirius_node_tab_entity_plugin_form_submit($form, &$form_state) {
 	$plugin = sirius_plugin_entity_plugin($entity_node, $plugin_class, $plugin_uuid);
 	$plugin_key = $plugin['plugin'];
 	$info = sirius_plugin_info($plugin_class, $plugin_key);
-	drupal_set_message("Settings saved.");
-	return $info['instance']->entity_settings_form_submit($form, $form_state);
+	$result = SiriusResult::create($info['instance']->entity_settings_form_submit($form, $form_state));
+	$result->drupalSetMessage();
 }

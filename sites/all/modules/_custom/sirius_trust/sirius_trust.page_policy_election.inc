@@ -100,11 +100,29 @@ function sirius_trust_node_tab_policy_election_form($form, &$form_state, $policy
 	 		$formm['elections']['esignature']['def']['#title'] .= ' ' . l('(Manage)', 'sirius/esignature/admin');
 	 	}
 		$form['elections']['esignature']['statement'] = array(
-			'#title' => 'Statment',
+			'#title' => 'Statement',
 			'#type' => 'textarea',
 			'#default_value' => $policy_json['elections']['esignature']['statement'],
 			'#description' => t('E.g. "By signing below, I assert that all the information that I have provided in this application is true and accurate."'),
 	 	);
+
+
+		$form['elections']['esignature']['prefix'] = array(
+		  '#type' => 'text_format',
+		  '#title' => t('Prefix'),
+		  '#description' => t('Enter any text that should appear at the top of this page of the wizard'),
+		  '#default_value' => $policy_json['elections']['esignature']['prefix'],
+		  '#format' => 'sirius_form_editor',
+		);
+
+		$form['elections']['esignature']['suffix'] = array(
+		  '#type' => 'text_format',
+		  '#title' => t('Suffix'),
+		  '#description' => t('Enter any text that should appear at the bottom of this page of the wizard'),
+		  '#default_value' => $policy_json['elections']['esignature']['suffix'],
+		  '#format' => 'sirius_form_editor',
+		);
+
 	}
 
 	// ////////////////////////////////////
@@ -141,12 +159,38 @@ function sirius_trust_node_tab_policy_election_form($form, &$form_state, $policy
 
 	$form['elections']['benefits']['suffix'] = array(
 	  '#type' => 'text_format',
-	  '#title' => t('Prefix'),
+	  '#title' => t('Suffix'),
 	  '#description' => t('Enter any text that should appear at the bottom of this page of the wizard'),
 	  '#default_value' => $policy_json['elections']['benefits']['suffix'],
 	  '#format' => 'sirius_form_editor',
 	);
 
+	// ////////////////////////////////////
+	// Beneficiaries
+	// ////////////////////////////////////
+
+	$form['elections']['beneficiaries'] = array(
+		'#title' => 'Beneficiaries',
+		'#type' => 'fieldset',
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+	);
+
+	$form['elections']['beneficiaries']['prefix'] = array(
+	  '#type' => 'text_format',
+	  '#title' => t('Prefix'),
+	  '#description' => t('Enter any text that should appear at the top of this page of the wizard'),
+	  '#default_value' => $policy_json['elections']['beneficiaries']['prefix'],
+	  '#format' => 'sirius_form_editor',
+	);
+
+	$form['elections']['beneficiaries']['suffix'] = array(
+	  '#type' => 'text_format',
+	  '#title' => t('Suffix'),
+	  '#description' => t('Enter any text that should appear at the bottom of this page of the wizard'),
+	  '#default_value' => $policy_json['elections']['beneficiaries']['suffix'],
+	  '#format' => 'sirius_form_editor',
+	);
 	// ////////////////////////////////////
 	// Dependents
 	// ////////////////////////////////////
@@ -167,7 +211,7 @@ function sirius_trust_node_tab_policy_election_form($form, &$form_state, $policy
 
 	$form['elections']['dependents']['existing']['suffix'] = array(
 	  '#type' => 'text_format',
-	  '#title' => t('Suffix = Current Dpeendents Page'),
+	  '#title' => t('Suffix - Current Dependents Page'),
 	  '#default_value' => $policy_json['elections']['dependents']['existing']['suffix'],
 	  '#format' => 'sirius_form_editor',
 	);
@@ -183,6 +227,20 @@ function sirius_trust_node_tab_policy_election_form($form, &$form_state, $policy
 	  '#type' => 'text_format',
 	  '#title' => t('Suffix - New Dependent Page'),
 	  '#default_value' => $policy_json['elections']['dependents']['new']['suffix'],
+	  '#format' => 'sirius_form_editor',
+	);
+
+	$form['elections']['dependents']['drop']['prefix'] = array(
+	  '#type' => 'text_format',
+	  '#title' => t('Prefix - Drop Dependent Page'),
+	  '#default_value' => $policy_json['elections']['dependents']['drop']['prefix'],
+	  '#format' => 'sirius_form_editor',
+	);
+
+	$form['elections']['dependents']['drop']['suffix'] = array(
+	  '#type' => 'text_format',
+	  '#title' => t('Suffix - Drop Dependent Page'),
+	  '#default_value' => $policy_json['elections']['dependents']['drop']['suffix'],
 	  '#format' => 'sirius_form_editor',
 	);
 
@@ -219,10 +277,16 @@ function sirius_trust_node_tab_policy_election_form_submit($form, &$form_state) 
 	$policy_json['elections']['intro']['body'] 				= sirius_richtext_handle_input($form_state['values']['elections']['intro']['body']);
 	$policy_json['elections']['benefits']['prefix'] 	= sirius_richtext_handle_input($form_state['values']['elections']['benefits']['prefix']);
 	$policy_json['elections']['benefits']['suffix'] 	= sirius_richtext_handle_input($form_state['values']['elections']['benefits']['suffix']);
+	$policy_json['elections']['esignature']['prefix'] 	= sirius_richtext_handle_input($form_state['values']['elections']['esignature']['prefix']);
+	$policy_json['elections']['esignature']['suffix'] 	= sirius_richtext_handle_input($form_state['values']['elections']['esignature']['suffix']);
+	$policy_json['elections']['beneficiaries']['prefix'] 	= sirius_richtext_handle_input($form_state['values']['elections']['beneficiaries']['prefix']);
+	$policy_json['elections']['beneficiaries']['suffix'] 	= sirius_richtext_handle_input($form_state['values']['elections']['beneficiaries']['suffix']);
 	$policy_json['elections']['dependents']['existing']['prefix'] = sirius_richtext_handle_input($form_state['values']['elections']['dependents']['existing']['prefix']);
-	$policy_json['elections']['dependents']['existing']['suffix'] = sirius_richtext_handle_input($form_state['values']['elections']['dependents']['new']['suffix']);
-	$policy_json['elections']['dependents']['new']['prefix'] = sirius_richtext_handle_input($form_state['values']['elections']['dependents']['existing']['prefix']);
+	$policy_json['elections']['dependents']['existing']['suffix'] = sirius_richtext_handle_input($form_state['values']['elections']['dependents']['existing']['suffix']);
+	$policy_json['elections']['dependents']['new']['prefix'] = sirius_richtext_handle_input($form_state['values']['elections']['dependents']['new']['prefix']);
 	$policy_json['elections']['dependents']['new']['suffix'] = sirius_richtext_handle_input($form_state['values']['elections']['dependents']['new']['suffix']);
+	$policy_json['elections']['dependents']['drop']['prefix'] = sirius_richtext_handle_input($form_state['values']['elections']['dependents']['drop']['prefix']);
+	$policy_json['elections']['dependents']['drop']['suffix'] = sirius_richtext_handle_input($form_state['values']['elections']['dependents']['drop']['suffix']);
 	$policy_json['elections']['push']['body'] 				= sirius_richtext_handle_input($form_state['values']['elections']['push']['body']);
 	sirius_json_set($policy_node, $policy_json);
 	node_save($policy_node);

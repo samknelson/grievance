@@ -16,6 +16,8 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sir
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.views_taxonomy_restrict_by_parent.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.fmla.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.cobra.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.ms.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.elections.inc';
 
 /***
  * Implements hook_sirius_wizard_info()
@@ -169,7 +171,6 @@ function sirius_smf_denormalize_queue($node) {
  */
 
 function sirius_smf_node_view($node, $view_mode, $langcode) {
-  
   // SMF wants to hide industry and member status.
   if ($view_mode == 'full' && $node->type == 'sirius_worker') {
     unset($node->content['field_sirius_industry']);
@@ -225,19 +226,43 @@ function sirius_smf_node_access($node, $op, $account) {
 function sirius_smf_report_cache_info() {
   $items = array();
 
-  sirius_require('sirius_smf', 'sirius_smf.report_empstatus.inc');
-  sirius_require('sirius_smf', 'sirius_smf.report_emprates.inc');
-  // sirius_require('sirius_smf', 'sirius_smf.report_automsg.inc');
-  sirius_require('sirius_smf', 'sirius_smf.report_actuarialhours.inc');
-  sirius_require('sirius_smf', 'sirius_smf.report_autotag_interval.inc');
-  sirius_require('sirius_smf', 'sirius_smf.report_disability_without_fmla.inc');
+  sirius_require('sirius_smf', 'reports/empstatus.inc');
+  sirius_require('sirius_smf', 'reports/emprates.inc');
+  sirius_require('sirius_smf', 'reports/actuarialhours.inc');
+  sirius_require('sirius_smf', 'reports/autotag_interval.inc');
+  sirius_require('sirius_smf', 'reports/disability_without_fmla.inc');
+  sirius_require('sirius_smf', 'reports/multiindustry.inc');
+  sirius_require('sirius_smf', 'reports/benefit_ending_xtra.inc');
+  sirius_require('sirius_smf', 'reports/edi_local11.inc');
+  sirius_require('sirius_smf', 'reports/edi_hinge.inc');
+  sirius_require('sirius_smf', 'reports/edi_vsp.inc');
+  sirius_require('sirius_smf', 'reports/edi_healthnet.inc');
+  sirius_require('sirius_smf', 'reports/edi_kaiser.inc');
+  sirius_require('sirius_smf', 'reports/edi_carelon.inc');
+  sirius_require('sirius_smf', 'reports/edi_expressscripts.inc');
+  sirius_require('sirius_smf', 'reports/edi_delta.inc');
+  sirius_require('sirius_smf', 'reports/edi_dentwell.inc');
+  sirius_require('sirius_smf', 'reports/edi_liberty.inc');
+  sirius_require('sirius_smf', 'reports/edi_mlk.inc');
 
   Sirius_Smf_Report_Empstatus::getInstance()->setInfo($items);
   Sirius_Smf_Report_Emprates::getInstance()->setInfo($items);
-  // Sirius_Smf_Report_Automsg::getInstance()->setInfo($items);
   Sirius_Smf_Report_Actuarial_Hours::getInstance()->setInfo($items);
   Sirius_Smf_Report_Autotag_Interval::getInstance()->setInfo($items);
   Sirius_Smf_Report_Disabilitywithoutfmla::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Multiindustry::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Benefit_Ending_Xtra::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Local11::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Hinge::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Vsp::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Healthnet::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Kaiser::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Carelon::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_ExpressScripts::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Delta::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Dentwell::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Liberty::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_MLK::getInstance()->setInfo($items);
 
   return $items;
 }

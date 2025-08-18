@@ -5,7 +5,7 @@ function unite_export_union_hotel_guide_access() {
 	return TRUE;
 }
 
-function unite_export_union_hotel_guide_new($secs = 0) {
+function unite_export_union_hotel_guide($secs = 0) {
 	if (!$secs) { $secs = $_REQUEST["secs"]; }
 
 	$lookup_airports = unite_airports_list();
@@ -80,7 +80,7 @@ function unite_export_union_hotel_guide_new($secs = 0) {
 		'field_calc_airport_dist',
 		'field_airport_alt',
 		'field_calc_airport_dist_alt',
-		'field_convention_center',
+ 		'field_convention_center',
 		'field_calc_convention_dist',
 		'field_convention_center_attached',
 		'field_fh_meeting_room_count',
@@ -101,11 +101,12 @@ function unite_export_union_hotel_guide_new($secs = 0) {
 	}
 	$sql .= "where node.type = 'property' ";
 	$sql .= "and field_labor_activity_index_value is not null ";
+	$sql .= "and field_labor_activity_index_value > 0 ";
 	if ($secs) {
 		$sql .= "and changed >= :ts ";
 		$sql_args[':ts'] = time() - $secs;
 	}
-	// $sql .= "and nid = 37266 ";
+	$sql .= "and nid = 35395 ";
 	$sql .= "order by nid ";
 	$stmt = db_query($sql, $sql_args);
 
@@ -149,4 +150,28 @@ function unite_export_union_hotel_guide_new($secs = 0) {
 	fclose($fp);
 	// print "Found: $count\n";
 	exit();
+}
+
+
+
+function unite_export_feed_cache() {
+	$path = DRUPAL_ROOT . '/sites/default/files/unite_feed_cache';
+	$base_url = 'http://hotelsdb.unitehere.org/unite/export/app';
+	$date = date('Ymd', strtotime('-1 day'));
+
+	$urls = array(
+		'full' => $base_url . '/' . '20010101',
+		'today' => $base_url . '/' . $date,
+	);
+
+
+	$ctx = stream_context_create(array('http' => array('timeout' => 1000)));
+
+	foreach ($urls as $name => $url) {
+		print "Here with $url\n";
+		watchdog('unite_export_feed_cache', "Generation starting: $name :: $url :: $path/$name");
+		$data = file_get_contents($url, 0, $ctx);
+		file_put_contents($path . '/' . $name, $data);
+		watchdog('unite_export_feed_cache', "Generation complete: $name :: $url :: $path/$name");
+	}
 }

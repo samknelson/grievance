@@ -101,6 +101,19 @@ function sirius_smf_feed_members_row_verify($feed_node, $info, $data, &$row, $pr
   	if (!$result['success']) { $warnings[] = $result['msg']; }
 	}
 
+	// ID3
+	if ($precompute) {
+		$id3_raw = $row['ACN'];
+		if (!$id3_raw) { 
+			$warnings[] = 'No external ID found in column ACN.';
+		} else if (!preg_match('/^SMC.+/', $id3_raw)) {
+			$warnings[] = 'Invalid external ID found in column ACN (expected SMC....)';
+		}
+
+		$id3 = preg_replace('/^SMC/', '', $id3_raw);
+		$row['id3'] = $id3;
+	}
+
   // Looks good
   $result = array();
   $result['warnings'] = $warnings;

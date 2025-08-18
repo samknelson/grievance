@@ -51,12 +51,12 @@ function unite_node_tabs() {
 	);
 	*/
 
-	$node_tabs['property']['unite_fairhotel'] = array(
-		'title' => 'FairHotel',
+	$node_tabs['property']['unite_amenities'] = array(
+		'title' => 'Hotel Amenities',
 		'description' => '',
-		'callback' => 'unite_node_tab_fairhotel_edit',
+		'callback' => 'unite_node_tab_amenities_edit',
 		'permissions' => array('unite hotels user'),
-		'file' => 'unite.page_property_fairhotel_edit.inc',
+		'file' => 'unite.page_property_amenities_edit.inc',
 		'weight' => 1,
 	);
 
@@ -66,16 +66,16 @@ function unite_node_tabs() {
 		'callback' => 'unite_node_tab_casino_edit',
 		'permissions' => array('unite hotels user'),
 		'file' => 'unite.page_property_casino_edit.inc',
-		'weight' => 1,
+		'weight' => 2,
 	);
 
-	$node_tabs['property']['unite_amenities'] = array(
-		'title' => 'Amenities',
+	$node_tabs['property']['unite_restaurants'] = array(
+		'title' => 'Food Service',
 		'description' => '',
-		'callback' => 'unite_node_tab_amenities_edit',
+		'callback' => 'unite_node_tab_restaurants_edit',
 		'permissions' => array('unite hotels user'),
-		'file' => 'unite.page_property_amenities_edit.inc',
-		'weight' => 1,
+		'file' => 'unite.page_property_restaurants_edit.inc',
+		'weight' => 3,
 	);
 
 	$node_tabs['property']['unite_contract'] = array(
@@ -84,16 +84,29 @@ function unite_node_tabs() {
 		'callback' => 'unite_node_tab_contract_edit',
 		'permissions' => array('unite hotels user'),
 		'file' => 'unite.page_property_contract_edit.inc',
-		'weight' => 1,
+		'weight' => 4,
 	);
 
-	$node_tabs['hdb_airport']['unite_airport_properties'] = array(
-		'title' => 'Properties',
+	$node_tabs['property']['unite_fairhotel'] = array(
+		'title' => 'FairHotel',
 		'description' => '',
-		'callback' => 'unite_node_tab_airport_properties',
+		'callback' => 'unite_node_tab_fairhotel_edit',
 		'permissions' => array('unite hotels user'),
-		'file' => 'unite.page_airport_properties.inc',
+		'file' => 'unite.page_property_fairhotel_edit.inc',
+		'weight' => 5,
 	);
+
+
+	/*
+	$node_tabs['property']['unite_colocation'] = array(
+		'title' => 'Colocation',
+		'description' => '',
+		'callback' => 'unite_node_tab_property_colocation',
+		'permissions' => array('unite hotels user'),
+		'file' => 'unite.page_property_colocation.inc',
+		'weight' => 10,
+	);
+	*/
 
 	$node_tabs['hdb_convention_center']['unite_convention_properties'] = array(
 		'title' => 'Properties',
@@ -120,7 +133,7 @@ function unite_menu() {
   $items = array();
 
 	$items['unite/home'] = array(
-		'title' => 'UNITE HERE Hotels Database',
+		'title' => 'UNITE HERE Properties Database',
 		'page callback' => 'unite_page_home',
 		'access arguments' => array('unite hotels user'),
 		'type' => MENU_NORMAL_ITEM,
@@ -216,6 +229,16 @@ function unite_menu() {
     'type'             => MENU_LOCAL_ACTION,
     'context'          => MENU_CONTEXT_INLINE,
     'modal'            => TRUE,
+  );
+
+  $items['sirius/hotelsdb/changelog'] = array(
+    'title' => 'PropertiesDB Changelog',
+    'page callback' => 'unite_page_changelog',
+    'page arguments' => array(),
+    'access arguments' => array('sirius'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'unite.page_changelog.inc',
+    'weight' => 1,
   );
 
 

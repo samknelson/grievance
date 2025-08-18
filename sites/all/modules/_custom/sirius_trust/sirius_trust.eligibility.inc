@@ -20,8 +20,8 @@ function sirius_trust_eligibility_plugin_info($plugin_key) {
 	return $info_all[$plugin_key];
 }
 
-function sirius_trust_eligibility_plugin_check_all($policy_node, $benefit_node, $subscriber_worker_node, $relationship_node, $ts, $shortcut = FALSE) {
-	$plugins = sirius_trust_eligibility_plugins_enabled($policy_node, $benefit_node);
+function sirius_trust_eligibility_plugin_check_all($params = array()) {
+	$plugins = sirius_trust_eligibility_plugins_enabled($params['policy_node'], $params['benefit_node']);
 	if (!$plugins) { return array('success' => FALSE, 'plugins' => array()); }
 
 	$result = array('success' => TRUE);
@@ -33,10 +33,19 @@ function sirius_trust_eligibility_plugin_check_all($policy_node, $benefit_node, 
 	});
 
 	foreach ($plugins as $plugin_key) {
-		$sub_result = sirius_trust_eligibility_plugin_check($policy_node, $benefit_node, $subscriber_worker_node, $relationship_node, $ts, $plugin_key);
+		if ($params['skip_plugins'] && in_array($plugin_key, $params['skip_plugins'])) { 
+			$result['plugins'][$plugin_key] = array('success' => TRUE, 'msg' => 'Skipping this plugin');
+			continue;
+		}
+
+		$params['plugin_key'] = $plugin_key;
+		$sub_result = sirius_trust_eligibility_plugin_check($params);
 		if (!$sub_result['success']) {
 			$result['success'] = FALSE;
-			if ($shortcut) { break; }
+			if ($params['shortcut']) {
+				$result = $sub_result;
+				break;
+			}
 		}
 
 		$result['plugins'][$plugin_key] = $sub_result;
@@ -45,21 +54,29 @@ function sirius_trust_eligibility_plugin_check_all($policy_node, $benefit_node, 
 	return $result;
 }
 
-function sirius_trust_eligibility_plugin_check($policy_node, $benefit_node, $subscriber_worker_node, $relationship_node, $ts, $plugin_key) {
-	if (!$ts) { $ts = time(); }
-	sirius_trust_eligibility_plugin_load($plugin_key);
-	$plugin_info = sirius_trust_eligibility_plugin_info($plugin_key);
+function sirius_trust_eligibility_plugin_check($params = array()) {
+	if (!$params['ts']) { $params['ts'] = time(); }
+	sirius_trust_eligibility_plugin_load($params['plugin_key']);
+	$plugin_info = sirius_trust_eligibility_plugin_info($params['plugin_key']);
 
 	if (!$plugin_info || !$plugin_info['instance']) { return array('success' => FALSE, 'msg' => 'Plugin callback not specified.'); }
 
-	$settings = sirius_trust_eligibility_plugin_settings($policy_node, $benefit_node, $plugin_key);
+	$settings = sirius_trust_eligibility_plugin_settings($params['policy_node'], $params['benefit_node'], $params['plugin_key']);
 
-	$params = array();
-	$params['subscriber_worker_node'] = $subscriber_worker_node;
-	$params['policy_node'] = $policy_node;
-	$params['benefit_node'] = $benefit_node;
-	$params['relationship_node'] = $relationship_node;
-	$params['ts'] = $ts;
+	if ($params['scan_type'] && $settings['scan_types']) {
+		$scan_types = array_filter(array_values($settings['scan_types']));
+		if (!in_array($params['scan_type'], $scan_types)) {
+			return array('success' => TRUE, 'msg' => "Plugin not enabled for scan type $params[scan_type]");
+		}
+	}
+
+	// If the subsdriber passed, we may be able to skip the test.
+	if ($plugin_info['instance']->subscriber_only() && isset($params['subscriber_eligibility'])) {
+		$result = $params['subscriber_eligibility'];
+		$result['from_subscriber'] = TRUE;
+		return $result;
+	}
+
 	$params['plugin_info'] = $plugin_info;
 
 	return $plugin_info['instance']->check($settings, $params);
@@ -81,6 +98,11 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_ws.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_ms.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_geog.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_ageout.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_balance.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_arrears.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_cardcheck.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_test_bymonth.inc');
 
   $items = array();
   Sirius_Trust_Elgibility_Plugin_Universal::getInstance()->setInfo($items);
@@ -89,33 +111,12 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
   Sirius_Trust_Elgibility_Plugin_WS::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_MS::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_Geog::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_Ageout::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_Balance::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_Arrears::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_Cardcheck::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_Test_Bymonth::getInstance()->setInfo($items);
   return $items;
-
-	$items['ws'] = array(
-		'title' => 'Work Status',
-		'description' => 'Work status eligibility indicates that a dependent or subscriber must have a specific work status, or must be an an active member.',
-		'file' => 'sirius_trust.eligibility_plugin_ws.inc',
-		'module' => 'sirius_trust',
-		'callbacks' => array(
-			'settings' => 'sirius_trust_eligibility_plugin_ws_settings_form',
-			'check' => 'sirius_trust_eligibility_plugin_ws_check',
-		),
-		'execution_cost' => 5,
-	);
-
-	$items['ms'] = array(
-		'title' => 'Member Status',
-		'description' => 'Member Status eligibility indicates that a dependent or subscriber must have a specific member status.',
-		'file' => 'sirius_trust.eligibility_plugin_ms.inc',
-		'module' => 'sirius_trust',
-		'callbacks' => array(
-			'settings' => 'sirius_trust_eligibility_plugin_ms_settings_form',
-			'check' => 'sirius_trust_eligibility_plugin_ms_check',
-		),
-		'execution_cost' => 5,
-	);
-
-	return $items;
 }
 
 function sirius_trust_eligibility_plugin_load($plugin_key) {
@@ -128,25 +129,16 @@ function sirius_trust_eligibility_plugin_settings($policy_node, $benefit_node, $
 	return $policy_json['benefits'][$benefit_node->nid]['eligibility']['plugin'][$plugin_key]['settings'];
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class Sirius_Trust_Elgibility_Plugin extends Sirius_Singleton {
 	public $type = 'root';
 	public $name = 'Root';
 	public $description = 'Root eligibility plugin; must be overridden.';
+
+	// If this is NOT a subscriber-only test, then this function must be overridden
+	public function subscriber_only() {
+		return TRUE;
+	}
+
 
 	public function form($json) {
 		return array();

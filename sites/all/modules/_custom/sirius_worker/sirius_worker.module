@@ -4,6 +4,7 @@
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.permission.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.access.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.menu.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.user.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.member_status.inc";
@@ -18,8 +19,6 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.schedule_tor.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.history.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.create.inc";
-
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_employer_worker_list.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_list.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_user.inc";
@@ -314,6 +313,12 @@ function sirius_worker_node_presave($worker_node) {
   // Only for workers
   if ($worker_node->type != 'sirius_worker') { return; }
 
+  $worker_node->field_sirius_name['und'][0] = sirius_worker_name_canonicalize($worker_node->field_sirius_name['und'][0]);
+
+  if ($worker_node->field_sirius_address['und'][0]) {
+    $worker_node->field_sirius_address['und'][0] = sirius_worker_address_canonicalize($worker_node->field_sirius_address['und'][0]);
+  }
+
   // Only on insert
   if ($worker->nid) { return; }
 
@@ -461,6 +466,22 @@ function sirius_worker_node_view($node, $view_mode, $langcode) {
 
   // Render contact tags
   sirius_worker_contact_tags_node_view($node, $view_mode, $langcode);
+
+  // Address
+  sirius_worker_addr_node_view($node, $view_mode, $langcode);
+}
+
+function sirius_worker_addr_node_view(&$worker_node, $view_mode, $langcode) {
+  if ($worker_node->type != 'sirius_worker') { return; }
+  if (!$worker_node->content['field_sirius_address']) { return; }
+  $contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+  if (!$contact_node) { return; }
+  $accuracy = $contact_node->field_sirius_address_accuracy['und'][0]['value'];
+  if (!$accuracy) { return; }
+  $renderable = field_view_field('node', $contact_node, 'field_sirius_address_accuracy', 'full');
+  if ($renderable) {
+    $worker_node->content['field_sirius_address']['#suffix'] = render($renderable);
+  }
 }
 
 /**
@@ -606,4 +627,47 @@ function sirius_worker_sirius_denorm($item) {
 
 function sirius_worker_contact_get($worker_node) {
   return node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+}
+
+function sirius_worker_name_canonicalize($value) {
+  foreach (array('given', 'family', 'middle') as $key) {
+    $value[$key] = sirius_worker_name_canonicalize_part($value[$key]);
+  }
+  return $value;
+}
+
+function sirius_worker_address_canonicalize($value) {
+  $cols = array_keys(sirius_addr_cols());
+  foreach ($cols as $key) {
+    $value[$key] = strtoupper($value[$key]);
+  }
+  return $value;
+}
+
+function sirius_worker_name_canonicalize_part($string) {
+  $word_splitters = array(' ', '-', "O'", "L'", "D'", 'St.', 'Mc', 'Mac');
+  $lowercase_exceptions = array('the', 'van', 'den', 'von', 'und', 'der', 'de', 'di', 'da', 'of', 'and', "l'", "d'");
+  $uppercase_exceptions = array('III', 'IV', 'VI', 'VII', 'VIII', 'IX');
+
+  $string = strtolower($string);
+  foreach ($word_splitters as $delimiter) {
+    $words = explode($delimiter, $string);
+    $newwords = array();
+    foreach ($words as $word) {
+      if (in_array(strtoupper($word), $uppercase_exceptions)) {
+        $word = strtoupper($word);
+      } else if (!in_array($word, $lowercase_exceptions)) {
+        $word = ucfirst($word);
+      }
+
+      $newwords[] = $word;
+    }
+
+    if (in_array(strtolower($delimiter), $lowercase_exceptions)) {
+      $delimiter = strtolower($delimiter);
+    }
+
+    $string = join($delimiter, $newwords);
+  }
+  return $string;
 }

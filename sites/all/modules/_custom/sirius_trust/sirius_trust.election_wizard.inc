@@ -17,61 +17,75 @@ function sirius_trust_election_wizard_steps($data, $wizard_node) {
 
   $steps = array();
 
-	if (user_access('sirius trust staff')) {
+	// if (user_access('sirius trust staff')) {
   	$steps['policy'] = array(
   		'label' => 'Policy', 
   		'callback' => 'sirius_trust_election_wizard_policy_form',
-  		'file' => 'sirius_trust.election_wizard.policy.inc',
+		  'file' => 'election_wizard/policy.inc',
   		'module' => 'sirius_trust',
   	);
-  }
+  // }
 
-	$result = sirius_trust_election_wizard_get_policy($data);
-	if (!$result['success']) { drupal_set_message($result['msg'], 'error'); }
-	$policy_rnode = $result['data'];
+	$policy_node = sirius_trust_election_wizard_get_policy($data);
 
-	if ($policy_rnode) {
-		$policy_json = sirius_json_get($policy_rnode);
+	if ($policy_node) {
+		$policy_json = sirius_json_get($policy_node);
 		$intro = $policy_json['elections']['intro']['body'];
 		if (strlen($intro) > 10) {
 	  	$steps['intro'] = array(
 	  		'label' => 'Intro', 
 	  		'callback' => 'sirius_trust_election_wizard_intro_form',
-	  		'file' => 'sirius_trust.election_wizard.intro.inc',
+	  		'file' => 'election_wizard/intro.inc',
 	  		'module' => 'sirius_trust',
 	  	);
 	  }
 
+  	$steps['name'] = array(
+  		'label' => 'Name', 
+  		'callback' => 'sirius_trust_election_wizard_name_form',
+  		'callback_render' => 'sirius_trust_election_wizard_name_render',
+  		'callback_post' => 'sirius_trust_election_wizard_name_post',
+		  'file' => 'election_wizard/name.inc',
+  		'module' => 'sirius_trust',
+  	);
+
   	$steps['addr'] = array(
   		'label' => 'Address', 
   		'callback' => 'sirius_trust_election_wizard_addr_form',
-  		'file' => 'sirius_trust.election_wizard.addr.inc',
+  		'callback_render' => 'sirius_trust_election_wizard_addr_render',
+  		'callback_post' => 'sirius_trust_election_wizard_addr_post',
+		  'file' => 'election_wizard/addr.inc',
   		'module' => 'sirius_trust',
   	);
 
   	$steps['phone'] = array(
   		'label' => 'Phone', 
   		'callback' => 'sirius_trust_election_wizard_phone_form',
-  		'file' => 'sirius_trust.election_wizard.phone.inc',
+  		'callback_render' => 'sirius_trust_election_wizard_phone_render',
+  		'callback_post' => 'sirius_trust_election_wizard_phone_post',
+		  'file' => 'election_wizard/phone.inc',
   		'module' => 'sirius_trust',
   	);
 
   	$steps['email'] = array(
   		'label' => 'Email', 
   		'callback' => 'sirius_trust_election_wizard_email_form',
-  		'file' => 'sirius_trust.election_wizard.email.inc',
+  		'callback_render' => 'sirius_trust_election_wizard_email_render',
+  		'callback_post' => 'sirius_trust_election_wizard_email_post',
+		  'file' => 'election_wizard/email.inc',
   		'module' => 'sirius_trust',
   	);
 
-	  $disclaimer_rnids = array();
+	  $disclaimer_nids = array();
 	  if ($policy_json['elections']['disclaimer']['nids']) {
-	  	$disclaimer_rnids = array_filter(array_values($policy_json['elections']['disclaimer']['nids']));
+	  	$disclaimer_nids = array_filter(array_values($policy_json['elections']['disclaimer']['nids']));
 	  }
-	  if ($disclaimer_rnids) {
+	  if ($disclaimer_nids) {
 	  	$steps['disclaimers'] = array(
 	  		'label' => 'Disclaimer', 
 	  		'callback' => 'sirius_trust_election_wizard_disclaimers_form',
-	  		'file' => 'sirius_trust.election_wizard.disclaimers.inc',
+	  		// 'callback_render' => 'sirius_trust_election_wizard_disclaimers_render',
+			  'file' => 'election_wizard/disclaimers.inc',
 	  		'module' => 'sirius_trust',
 	  	);
 	  }
@@ -79,56 +93,124 @@ function sirius_trust_election_wizard_steps($data, $wizard_node) {
 	  $steps['benefits'] = array(
 	  	'label' => 'Benefits', 
 	  	'callback' => 'sirius_trust_election_wizard_benefits_form',
-  		'file' => 'sirius_trust.election_wizard.benefits.inc',
+  		'callback_render' => 'sirius_trust_election_wizard_benefits_render',
+		  'file' => 'election_wizard/benefits.inc',
   		'module' => 'sirius_trust',
 	  );
-  	$steps['dependents'] = array(
-  		'label' => 'Dependents', 
-  		'callback' => 'sirius_trust_election_wizard_dependents_form',
-  		'file' => 'sirius_trust.election_wizard.dependents.inc',
+
+	  // Add any cardchecks
+	  $benefits_bytype = $data['benefits']['by_type'];
+	  if (!$benefits_bytype) { $benefits_bytype = array(); }
+  	foreach ($benefits_bytype as $type_tid => $benefit_nid) {
+  		if (!$benefit_nid) { continue; }
+  		$benefit_node = node_load($benefit_nid);
+	  	$plugins = sirius_trust_eligibility_plugins_enabled($policy_node, $benefit_node);
+	  	if (!in_array('cardcheck', $plugins)) { continue; }
+			$settings = sirius_trust_eligibility_plugin_settings($policy_node, $benefit_node, 'cardcheck');
+			$entries = $settings['entries'];
+			if (!$entries) { $entries = array(); }
+			foreach ($entries as $delta => $entry) {
+				$cardcheck_definition_nid = $entry['definition_nid'];
+				if (!$cardcheck_definition_nid) { continue; }
+
+			  $steps['cardcheck_' . $cardcheck_definition_nid] = array(
+			  	'label' => sirius_node_title($cardcheck_definition_nid), 
+			  	'callback' => 'sirius_trust_election_wizard_cardcheck_form',
+		  		// 'callback_render' => 'sirius_trust_election_wizard_type_render',
+					// 'callback_post' => 'sirius_trust_election_wizard_cardcheck_post',
+				  'file' => 'election_wizard/cardcheck.inc',
+		  		'module' => 'sirius_trust',
+			  );
+			}
+		}
+
+		/*
+		// We no longer explicitly pick the election type.
+	  $steps['type'] = array(
+	  	'label' => 'Election Type', 
+	  	'callback' => 'sirius_trust_election_wizard_type_form',
+  		'callback_render' => 'sirius_trust_election_wizard_type_render',
+		  'file' => 'election_wizard/type.inc',
   		'module' => 'sirius_trust',
-  	);
+	  );
+	  */
 	}
 
-	if ($data['dependents']['general']['count_new'] > 0) {
-		for ($which=1; $which<=$data['dependents']['general']['count_new']; ++$which) {
-			if ($data['dependents']['new'][$which]['name_first']) {
-				$label .= "Dependent " . $data['dependents']['new'][$which]['name_first'] . ' ' . $data['dependents']['new'][$which]['name_last'];
-			} else {
-				$label .= "New Dependent #$which";
-			}
-			$steps["dependent_$which"] = array(
+	/*
+	$steps['dependents'] = array(
+		'label' => 'Dependents', 
+		'callback' => 'sirius_trust_election_wizard_dependents_form',
+		'callback_render' => 'sirius_trust_election_wizard_dependents_render',
+		'callback_post' => 'sirius_trust_election_wizard_dependents_post',
+	  'file' => 'election_wizard/dependents.inc',
+		'module' => 'sirius_trust',
+	);
+	*/
+
+
+	if ($data['dependents']['eligibility']) {
+		foreach ($data['dependents']['eligibility'] as $relationship_nid => $eligibility_data) {
+			$relationship_node = node_load($relationship_nid);
+			$contact_nid = $relationship_node->field_sirius_contact_alt['und'][0]['target_id'];
+			$label = "Dependent: " . sirius_node_title($contact_nid);
+			$steps["dependent_existing_$relationship_nid"] = array(
 				'label' => $label, 
-				'callback' => 'sirius_trust_election_wizard_dependent_new_form',
-	  		'file' => 'sirius_trust.election_wizard.dependent.inc',
+				'callback' => 'sirius_trust_election_wizard_dependent_existing_form',
+				'callback_render' => 'sirius_trust_election_wizard_dependent_existing_render',
+			  'file' => 'election_wizard/dependent_existing.inc',
 	  		'module' => 'sirius_trust',
 			);
 		}
 	}
+
+  $steps['dependent_new_count'] = array(
+  	'label' => 'New Dependents', 
+  	'callback' => 'sirius_trust_election_wizard_dependent_new_count_form',
+	  'file' => 'election_wizard/dependent_new_count.inc',
+		'module' => 'sirius_trust',
+  );
+
+	// Need a page for each new relationship which you want to add.
+	if ($data['dependents']['general']['count_new'] > 0) {
+		for ($which=1; $which<=$data['dependents']['general']['count_new']; ++$which) {
+			$label = "New Dependent #$which";
+			$steps["dependent_new_$which"] = array(
+				'label' => $label, 
+				'callback' => 'sirius_trust_election_wizard_dependent_new_form',
+	  		'callback_render' => 'sirius_trust_election_wizard_dependent_new_render',
+			  'file' => 'election_wizard/dependent_new.inc',
+	  		'module' => 'sirius_trust',
+			);
+		}
+	}
+
+	$steps['beneficiaries'] = array(
+		'label' => 'Beneficiaries', 
+		'callback' => 'sirius_trust_election_wizard_beneficiaries_form',
+		'callback_render' => 'sirius_trust_election_wizard_beneficiaries_render',
+		'callback_post' => 'sirius_trust_election_wizard_beneficiaries_post',
+	  'file' => 'election_wizard/beneficiaries.inc',
+		'module' => 'sirius_trust',
+	);
 
 	if ($policy_json) {
 	  if ($policy_json['elections']['esignature']['def']) {
 			$steps['signature'] = array(
 				'label' => 'Signature', 
 				'callback' => 'sirius_trust_election_wizard_signature_form',
-	  		'file' => 'sirius_trust.election_wizard.signature.inc',
+				'callback_render' => 'sirius_trust_election_wizard_signature_render',
+			  'file' => 'election_wizard/signature.inc',
 	  		'module' => 'sirius_trust',
 			);
 		}
 	}
 
-  $steps['push'] = array(
-  	'label' => 'Submit', 
-  	'callback' => 'sirius_trust_election_wizard_push_form',
-		'file' => 'sirius_trust.election_wizard.push.inc',
-		'module' => 'sirius_trust',
-  );
-
   if (user_access('sirius trust staff')) {
 		$steps['post'] = array(
 			'label' => 'Post', 
 			'callback' => 'sirius_trust_election_wizard_post_form',
-			'file' => 'sirius_trust.election_wizard.post.inc',
+			'callback_post' => 'sirius_trust_election_wizard_post_post',
+		  'file' => 'election_wizard/post.inc',
 			'module' => 'sirius_trust',
 		);
 	}
@@ -171,34 +253,34 @@ function sirius_trust_election_wizard_locked($wizard_node) {
 }
 
 function sirius_trust_election_wizard_get_worker($wizard_node) {
-	$ssn = $wizard_node->field_sirius_notes['und'][0]['value'];
-	if (!$ssn) { return array('success' => FALSE, 'msg' => 'There is no SSN for this election'); }
-	$result = sirius_proxy_call('sirius_worker_get_by_ssn', $ssn);
-	return $result;
+	return sirius_log_handler($wizard_node, 'sirius_worker');
 }
 
 function sirius_trust_election_wizard_get_policy($data) {
-	$policy_rnid = $data['policy']['policy_rnid'];
-	if (!$policy_rnid) { return array('success' => FALSE, 'msg' => 'No policy set for this election.'); }
-
-	// Need to get the policy. Which means a proxy call to node_load(), which we don't really want to allow. @todo.
-	// return array('success' => FALSE, 'msg' => "How do we load a proxy_nid like Maria # $policy_rnid?");
-	$result = sirius_proxy_call('sirius_proxy_node_load', $policy_rnid);
-	return $result;
+	$policy_nid = $data['policy']['policy_nid'];
+	return node_load($policy_nid);
 }
 
 function sirius_trust_election_set_title(&$wizard_node) {
-	$result = sirius_trust_election_wizard_get_worker($wizard_node);
-	if (!$result['success']) { return; }
-	$worker_rnode = $result['data'];
-	$title = 'Election: ' . $worker_rnode->title;
+	$worker_node = sirius_trust_election_wizard_get_worker($wizard_node);
+	$title = 'Election: ' . $worker_node->title;
 	if ($title != $wizard_node->title) {
 		$wizard_node->title = substr($title, 0, 255);
 		node_save($wizard_node);
 	}
 }
 
+function sirius_trust_election_wizard_get_employer($data) {
+	return node_load($data['employer']['employer_nid']);
+}
+
+function sirius_trust_election_wizard_get_election_type($data) {
+	return taxonomy_term_load($data['election_type']['tid']);
+}
+
 function sirius_trust_election_wizard_form_prep(&$form, &$form_state, $info, $data, $wizard_node, $current_step) {
+	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/ux.css');
+
 	$form_state['info'] = $info;
 	$form_state['data'] = $data;
 	$form_state['wizard_node'] = $wizard_node;
@@ -209,8 +291,11 @@ function sirius_trust_election_wizard_form_prep(&$form, &$form_state, $info, $da
 	$form['survey_wrap_open'] = array('#markup' => '<div id="survey_wrap" class="survey_wrap_inpage sirius-form">', '#weight' => -10);
 	$form['survey_wrap_close'] = array('#markup' => '</div>', '#weight' => 10);
 
+	$status = sirius_trust_election_wizard_get_status($wizard_node);
 
 	if (sirius_trust_election_wizard_locked($wizard_node)) {
+		$form['#disabled'] = TRUE; 
+	} else if ($current_step == 'post' && $status == 'posted') {
 		$form['#disabled'] = TRUE; 
 	} else {
 		$form['submit'] = array(
@@ -221,4 +306,9 @@ function sirius_trust_election_wizard_form_prep(&$form, &$form_state, $info, $da
 	}
 
 	return sirius_form_prep($form);
+}
+
+
+function sirius_trust_election_wizard_get_status($wizard_node) {
+	return $wizard_node->field_sirius_type['und'][0]['value'];
 }

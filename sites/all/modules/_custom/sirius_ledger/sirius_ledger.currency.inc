@@ -40,6 +40,10 @@ class Sirius_Ledger_Currency_Plugin extends Sirius_Singleton {
 	}
 
 	public function validate_amt($amt) {
+		$amt = trim($amt);
+		$amt = preg_replace('/[\$\,]/', '', $amt);
+		if (preg_match('/[^0-9\.]/', $amt)) { return array('success' => FALSE, 'msg' => 'Please enter only digits.'); }
+
 		if (!is_numeric($amt) || !($amt > 0)) { return array('success' => FALSE, 'msg' => 'Please enter a positive number.'); }
 
 		if ($amt != round($amt, 2)) { return array('success' => FALSE, 'msg' => 'Please enter a valid dollar amount.'); }
@@ -53,6 +57,7 @@ class Sirius_Ledger_Currency_Plugin extends Sirius_Singleton {
 		return array('success' => TRUE, 'amt' => $amt);
 	}
 }
+
 
 class Sirius_Ledger_Currency_Plugin_USD extends Sirius_Ledger_Currency_Plugin {
 	public $type = 'USD';

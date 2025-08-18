@@ -1,18 +1,48 @@
+.sirius_dashboard_items::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
 .sirius_dashboard_item {
 	padding: 10px;
 	margin: 10px;
 	border: 1px solid #cccccc;
+	background-color: #ffffff;
+	width: 200px;
+	float: left;
+	margin-right: 10px;
+	min-height: 250px;
+	border-radius: 10px;
+}
+
+.sirius_dashboard_item:hover {
+	border: 1px solid #e89a00;
+	background-color: #fadca2;
 }
 
 .sirius_dashboard_item_title {
 	font-weight: bold;
 	padding-bottom: 5px;
+	text-align: center;
+}
+
+.sirius_dashboard_item_count {
+	text-align: center;
+	font-size: 150%;
+	font-weight: bold;
 }
 
 .sirius_dashboard_priority {
 	font-weight: bold;
 	font-variant: small-caps;
 	font-family: arial, helvetica, sans-serif;
+}
+
+.sirius_dashboard_item_tools {
+	/* border-top: 1px solid #999999; */
+	padding-top: 10px;
+	margin-top: 10px;
 }
 
 .sirius_dashboard_priority_0 {
@@ -29,4 +59,8 @@
 
 .sirius_dashboard_priority_3 {
 	color: #b31307;
+}
+
+.sirius_dashboard_item ul {
+	padding-left: 20px;
 }

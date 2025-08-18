@@ -19,7 +19,7 @@ function sirius_trust_node_tab_worker_eligibility_form($form, &$form_state, $wor
 			$relationship_type_term = taxonomy_term_load($relationship_type_tid);
 			$dependent_contact_nid = $relationship_node->field_sirius_contact_alt['und'][0]['target_id'];
 			$dependent_worker_node = sirius_worker_get_by_contact_nid($dependent_contact_nid);
-			$dependent_options[$relationship_nid] = '(' . $relationship_type_term->name . ' to) ' . $dependent_worker_node->title;
+			$dependent_options[$relationship_nid] = $dependent_worker_node->title . ' (' . $relationship_type_term->field_sirius_name_alt['und'][0]['value'] . ')';
 		}
 
 		$form['relationship_nid'] = array(
@@ -39,6 +39,14 @@ function sirius_trust_node_tab_worker_eligibility_form($form, &$form_state, $wor
 		'#required' => TRUE,
 	);
 
+	$benefits = sirius_trust_benefit_options();
+
+	$form['benefit_nid'] = array(
+	  '#title' => t('Benefit'),
+		'#type' => 'select',
+		'#options' => array(NULL => t('-- All Benefits --')) + $benefits,
+	);
+
 	$form['date'] = array(
 	  '#title' => t('As Of'),
 		'#type' => 'date_popup',
@@ -48,6 +56,16 @@ function sirius_trust_node_tab_worker_eligibility_form($form, &$form_state, $wor
 		'#required' => TRUE,
 		'#date_format' => 'Y-m-d',
 		'#default_value' => date('Y-m-d'),
+	);
+
+	$form['scan_type'] = array(
+		'#type' => 'select',
+		'#title' => t('Scan Type'),
+		'#options' => array(
+			NULL => t('-- All Scan Types --'),
+			'benefit_start' => t('Benefit Start'),
+			'benefit_continue' => t('Benefit Continue'),
+		),
 	);
 
 	$form['submit'] = array(
@@ -80,12 +98,25 @@ function sirius_trust_node_tab_worker_eligibility_form_submit($form, &$form_stat
 		$dependent_worker_node = $worker_node;
 	}
 
-	$benefits = sirius_trust_benefits();
+	$benefit_nid = $form_state['values']['benefit_nid'];
+	if ($benefit_nid) {
+		$benefits = array($benefit_nid => node_load($benefit_nid));
+	} else {
+		$benefits = sirius_trust_benefits();
+	}
 	$results = array();
 
 	$rows = array();
 	foreach ($benefits as $benefit_nid => $benefit_node) {
-		$result = sirius_trust_eligibility_plugin_check_all($policy_node, $benefit_node, $worker_node, $relationship_node, $ts);
+		$params = array();
+		$params['policy_node'] = $policy_node;
+		$params['benefit_node'] = $benefit_node;
+		$params['subscriber_worker_node'] = $worker_node;
+		$params['relationship_node'] = $relationship_node;
+		$params['ts'] = $ts;
+		$params['shortcut'] = FALSE;
+		$params['scan_type'] = $form_state['values']['scan_type'];
+		$result = sirius_trust_eligibility_plugin_check_all($params);
 
 		if (!$result['plugins']) {
 			$paths = array(

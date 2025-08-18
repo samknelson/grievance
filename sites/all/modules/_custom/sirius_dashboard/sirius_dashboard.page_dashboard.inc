@@ -1,8 +1,6 @@
 <?php
 
 function sirius_dashboard_page_dashboard() {
-  drupal_add_css(drupal_get_path('module', 'sirius_dashboard') . '/css/dashboard.css', 'file');
-
 	$html .= '<div class="sirius_dashboard_wrapper" id="sirius_dashboard_content">';
 	$html .= sirius_dashboard_page_dashboard_content(FALSE);
 	$html .= '</div>';
@@ -25,47 +23,8 @@ function sirius_dashboard_page_dashboard() {
 function sirius_dashboard_page_dashboard_content($print_and_exit = TRUE) {
 	global $user;
 
-	$rows = array();
-	$roles = $user->roles;
-	if (!$roles) { $roles = array(); }
-	foreach ($roles as $rid => $role) {
-		$json = sirius_dashboard_items_by_role($rid);
-		if (!$json['item_list']) { continue; }
-
-		$item_list = $json['item_list'];
-		uksort($item_list, function($a, $b) use ($item_list) { return $item_list[$a]['weight'] <=> $item_list[$b]['weight']; });
-
-		foreach ($item_list as $uuid => $item) {
-			$new_rows = sirius_dashboard_item_data($json, $uuid);
-			if (is_array($new_rows)) {
-				foreach ($new_rows as $row_assoc) {
-					$priority = $item['priority'];
-					if (isset($row_assoc['priority'])) { $priority = $row_assoc['priority']; }
-
-					$title = $item['title'];
-					if (isset($row_assoc['title'])) { $title .= ': ' . $row_assoc['title']; }
-
-					$row = array();
-					$row[] = $title;
-					$row[] = sirius_dashboard_priority_render($priority);
-					$row[] = $row_assoc['count'];
-					$row[] = $row_assoc['tools'];
-					$row[] = $row_assoc['details'];
-					$rows[] = $row;
-				}
-			}
-		}
-	}
-
-	$header = array(
-		'Item Type',
-		'Priority',
-		'Count',
-		'Tools',
-		'Comments',
-	);
-
-	$html = theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
+	$items = sirius_dashboard_content();
+	$html = sirius_dashboard_render($items);
 
 	if ($print_and_exit) {
 		print $html;

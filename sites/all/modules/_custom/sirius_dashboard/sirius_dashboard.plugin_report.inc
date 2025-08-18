@@ -51,9 +51,19 @@ function sirius_dashboard_plugin_report_data($prefs, $options = array()) {
 	$report_type = $prefs['report_type'];
 	if (!$report_type) { return array(array('count' => 0, 'details' => '[Missing report type]')); }
 
-	$report_id = report_cache_most_recent($report_type);
 	$info = report_cache_info($report_type);
+
+	// New technique
+	if ($info['generator']) {
+		return $info['generator']->dashboard($prefs, $options);
+	}
+
+	//
+	// Legacy Support
+	// 
+
 	$instance_uuid = $prefs['instance'];
+	$report_id = report_cache_most_recent($report_type, $instance_uuid);
 
 	if (!$report_id) { 
 		return array(
@@ -80,7 +90,10 @@ function sirius_dashboard_plugin_report_data($prefs, $options = array()) {
 	$count = $parameters['meta']['dashboard']['count'];
 	$result['count'] = $count;
 	$ts = $parameters['meta']['ts']['completed'];
-	if (isset($count)) {
+	drupal_set_message("Here with $ts");
+	if (!$ts) {
+		$result['details'] = 'This report has never been run.';
+	} elseif (isset($count)) {
 		$result['details'] = "<strong>$count records</strong> found " . format_interval(time() - $ts) . ' ago.';
 	} else {
 		$result['details'] = "Last report run " . format_interval(time() - $ts) . ' ago.';

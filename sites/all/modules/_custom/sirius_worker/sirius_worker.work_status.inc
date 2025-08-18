@@ -59,3 +59,36 @@ function sirius_worker_work_status_history_callback(&$parent_node, $history) {
   	unset($parent_node->field_sirius_work_status['und']);
   }
 }
+
+/*
+function sirius_worker_work_status_set_month(&$worker_node, $ws_tid, $reason, $attachments, $json, $date) {
+	$start_date = date("Y-m-1 00:00:00", strtotime($date));
+	$start_ts = strtotime($start_date);
+	$end_ts = strtotime('+1 month', $start_ts);
+
+	drupal_set_message("Settings " . sirius_term_title($ws_tid) . " for the month of $start_date");
+
+  $history_key = 'worker:work_status';
+  $old_ws_tid = sirius_worker_history_asof($worker_node, $history_key, $start_ts);
+  if (!$old_ws_tid) { $old_ws_tid = sirius_taxonomy_lookup_by_anything('sirius_work_status', 'unknown'); }
+
+  if ($old_ws_tid == $ws_tid) {
+  	drupal_set_message("Status unchanged.");
+  	return array('success' => TRUE, 'msg' => 'Work status unchanged.');
+  } else {
+    drupal_set_message("Changing from " . sirius_term_title($old_ws_tid) . " to " . sirius_term_title($ws_tid));
+
+		drupal_set_message("A) Setting " . sirius_term_title($ws_tid) . " as of " . date('Y-m-d H:i:s', $start_ts));
+    $result = sirius_worker_work_status_set($worker_node, $ws_tid, $reason, $attachments, $json, $start_ts);
+    sirius_worker_history_calc($worker_node, $history_key);
+    if (!$result['success']) { return $result; }
+
+		drupal_set_message("B) Setting " . sirius_term_title($old_ws_tid) . " as of " . date('Y-m-d H:i:s', $start_ts));
+    $result = sirius_worker_work_status_set($worker_node, $old_ws_tid, $reason, $attachments, $json, $end_ts);
+    sirius_worker_history_calc($worker_node, $history_key);
+    if (!$result['success']) { return $result; }
+  }
+
+	return array('success' => TRUE);
+}
+*/

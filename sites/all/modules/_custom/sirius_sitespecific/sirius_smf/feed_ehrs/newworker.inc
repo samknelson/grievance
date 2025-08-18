@@ -39,7 +39,7 @@ function sirius_smf_feed_ehrs_newworker_form($form, &$form_state, $info, $data, 
 		'#value' => 'Confirm New Worker Creation',
 	);
 
-	return sirius_sms_feed_ehrs_form_prep($form, $form_state, $info, $data, $feed_node, $current_step);
+	return sirius_smf_feed_ehrs_form_prep($form, $form_state, $info, $data, $feed_node, $current_step);
 }
 
 function sirius_smf_feed_ehrs_newworker_form_submit($form, &$form_state) {
@@ -48,5 +48,5 @@ function sirius_smf_feed_ehrs_newworker_form_submit($form, &$form_state) {
 	$feed_node = node_load($form_state['feed_nid']);
 	$current_step = $form_state['current_step'];
 
-	sirius_wizard_submit($info, $data, $feed_node, $current_step, "New worker confirmed.");
+	sirius_wizard_submit($info, $data, $feed_node, $current_step, "New worker confirmed.", array('wizard_status' => 'incomplete', 'feed_status' => 'draft'));
 }
