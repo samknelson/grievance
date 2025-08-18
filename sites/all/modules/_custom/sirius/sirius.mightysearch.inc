@@ -73,8 +73,6 @@ function sirius_mightysearch_form_prepare_valuefield_from_path($form_state, $jso
 					} else if ($field_name == 'current_employer') {
 						$ms_options = drupal_map_assoc(array_values(sirius_employer_list()));
 						$element = array('#type' => 'select', '#options' => $ms_options);
-					} else if ($field_name == 'field_sirius_denorm_benefits') {
-						$element = array('#type' => 'select', '#options' => sirius_trust_benefit_options());
 					} else {
 						$element = array('#type' => 'textfield');
 					}
@@ -196,12 +194,6 @@ function sirius_mightysearch_paths($json_forms) {
   	unset($paths[':sirius_worker:core:field_sirius_phone:value']);
   	unset($paths[':sirius_worker:core:title:value']);
   	$paths[':sirius_worker:core:current_employer:title'] = ':sirius_worker:core:current_employer:title';
-
-  	// Trust-specific paths
-  	if (sirius_domain_component_enabled('trust')) {
-  		$paths[':sirius_worker:core:benefit_title'] = ':sirius_worker:core:benefit:name';
-  		$paths[':sirius_worker:core:field_sirius_denorm_benefits'] = ':sirius_worker:core:benefit:select';
-  	}
   }
 
   if ($json_forms['grievance_shop_contact']) {
@@ -802,23 +794,6 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 					$sql_parts['select_fields'] .= ", current_employer_node.title as current_employer_title ";
 				}
 				if ($criterion) { $where_name = 'current_employer_node.title'; }
-			} else if (in_array($field_name, array('field_sirius_denorm_benefits', 'benefit_title'))) {
-				if (!$sql_parts['joins_nodupe']["field_sirius_denorm_benefits"]) {
-					$sql_parts['joins'] .= "left join field_data_field_sirius_denorm_benefits worker_field_sirius_denorm_benefits on worker_field_sirius_denorm_benefits.entity_type = 'node' and worker_field_sirius_denorm_benefits.entity_id = worker_node.nid ";
-					$sql_parts['joins'] .= "left join node benefit_node on benefit_node.nid = worker_field_sirius_denorm_benefits.field_sirius_denorm_benefits_target_id ";
-					$sql_parts['joins_nodupe']["field_sirius_denorm_benefits"] = TRUE;
-				}
-				if (!$sql_parts['fields_nodupe']['field_sirius_denorm_benefits']) {
-					$sql_parts['fields_nodupe']['field_sirius_denorm_benefits'] = TRUE;
-					$sql_parts['select_fields'] .= ", group_concat(distinct benefit_node.title separator ' / ') as benefit_title ";
-				}
-				if ($criterion) { 
-					if ($field_name == 'field_sirius_denorm_benefits') {
-						$where_name = "worker_${field_name}.${field_name}_target_id";
-					} else if ($field_name == 'benefit_title') {
-						$where_name = 'benefit_node.title';
-					}
-				}
 			}
 		} else {
 			$path_for_query = '$.' . $which_form . '.results.' . preg_replace('/:/', '.', $path);
@@ -1541,8 +1516,6 @@ function sirius_mightysearch_render_result($json_forms, $hr, $full_path ) {
 				return $hr['worker_nid'];
 			} else if ($field_name == 'current_employer') { 
 				return $hr['current_employer_title'];
-			} else if ($field_name == 'field_sirius_denorm_benefits') {
-				return $hr['benefit_title'];
 			}
 		} else {
 			$json_form = $json_forms[$node_type][$which_form];
