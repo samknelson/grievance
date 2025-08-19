@@ -678,7 +678,10 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     $asof_ts = strtotime($context['asof_date']);
     if ($end_ts > $asof_ts) { return ''; }
 
-    return date('Ymd', $end_ts);
+    // Always the last day of the month. Round down.
+    if (date('d', $end_ts) < 5) { $end_ts = strtotime('-1 month', $end_ts); }
+
+    return date('Ymt', $end_ts);
   }
 
   public function phone($context, $which) {
