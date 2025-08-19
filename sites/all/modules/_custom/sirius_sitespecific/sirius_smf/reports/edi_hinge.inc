@@ -93,11 +93,11 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
 
       $this->is_qmsco($context);
 
-      $row['address1'] = $context['worker_node']->field_sirius_address['und'][0]['thoroughfare'];
-      $row['address2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
-      $row['city'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
-      $row['state'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['zip'] = $this->zip($context, 'worker_node');
+      $row['address1'] = $this->hinge_column($context, 'thoroughfare');
+      $row['address2'] = $this->hinge_column($context, 'premise');
+      $row['city'] = $this->hinge_column($context, 'locality');
+      $row['state'] = $this->hinge_column($context, 'administrative_area');
+      $row['zip'] = $this->hinge_column($context, 'zip');
       $row['email'] = $context['worker_node']->field_sirius_email['und'][0]['value'];
       $row['start_date'] = $this->coverage_start_date($context);
       $row['term_date'] = $this->coverage_end_date($context);
@@ -110,4 +110,22 @@ class Sirius_Smf_Report_Edi_Hinge extends Sirius_Trust_Provider_Edi_Report_Gener
 
     return array('is_multiple' => TRUE, 'rows' => $rows);
   }
+
+  public function hinge_column($context, $column) {
+    // First try to fetch the data directly from the worker.
+    if ($column == 'zip')       { $result = $this->zip($context, 'worker_node'); }
+    elseif ($column == 'phone') { $result = $this->phone($context, 'worker_node'); }
+    else                        { $result = $context['worker_node']->field_sirius_address['und'][0][$column]; }
+    if ($result) { return $result; }
+
+    // If the worker is QMSCO, we're done now.
+    if ($this->is_qmsco($context)) { return ''; }
+
+    // Otherwise, copy the data from the subscriber.
+    if ($column == 'zip')       { $result = $this->zip($context, 'subscriber_node'); }
+    elseif ($column == 'phone') { $result = $this->phone($context, 'subscriber_node'); }
+    else                        { $result = $context['subscriber_node']->field_sirius_address['und'][0][$column]; }
+    return $result;
+  }
+
 }
