@@ -202,6 +202,8 @@ class Sirius_Postal_Client_Lob extends Sirius_Postal_Client {
 
 	public function send_impl(&$params) {
 		$to = $params['to'];
+
+		if (!$params['mode']) { $params['mode'] = 'live'; }
 		
 		$auth = $this->init($params['mode']);
 		$settings = $this->settings();
