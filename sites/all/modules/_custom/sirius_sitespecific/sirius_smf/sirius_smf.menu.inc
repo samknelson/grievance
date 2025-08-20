@@ -177,11 +177,11 @@ function sirius_smf_node_tabs() {
   );
   */
 
-  $node_tabs['sirius_trust_worker_election']['oneoff_dentwell_election_2'] = array(
-    'title' => 'Oneoff Dentwell Election 2',
-    'callback' => 'sirius_smf_node_tab_oneoff_dentwell_election_2',
+  $node_tabs['sirius_trust_worker_election']['oneoff_dentwell_election_3'] = array(
+    'title' => 'Oneoff Dentwell Election 3',
+    'callback' => 'sirius_smf_node_tab_oneoff_dentwell_election_3',
     'permissions' => array('sirius trust staff'),
-    'file' => 'sirius_smf.oneoff_dentwell_election_2.inc',
+    'file' => 'sirius_smf.oneoff_dentwell_election_3.inc',
     'component' => 'trust',
     'type' => MENU_LOCAL_TASK,
     'weight' => 12,
