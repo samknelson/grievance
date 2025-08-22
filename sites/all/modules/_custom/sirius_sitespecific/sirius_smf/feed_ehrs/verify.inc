@@ -199,6 +199,7 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
 	}
 	*/
 
+	/*
 	// FMLA and disability workers have the number of hours automatically set to their threshold
 	if (in_array($row['hour_type_id'], array('fmla', 'disability'))) {
 		//
@@ -214,6 +215,7 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
 		$threshold = $plugin_info['instance']->threshold_from_worker_and_employer($worker_node, $employer_node);
 		if ($threshold > $row['hrs']) { $row['hrs'] = $threshold; }
 	}
+	*/
 
   // For disability, we need to look back in time and find out when they started.
   if ($row['hour_type_id'] == 'disability') {
@@ -284,6 +286,28 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
 			if (!$row[$key]) { $errors[] = "For new workers, a full name is required."; break; }
 		}
   }
+
+  // Validate Zip
+  if ($row['addr_postal_code'] && !sirius_addr_zip_validate($row['addr_postal_code'])) {
+  	$errors[] = "Zip code must be a valid five or nine digit zip code.";
+  }
+
+  // Validate state
+  if ($row['addr_administrative_area'] && !sirius_addr_state_code_validate($row['addr_administrative_area'])) {
+  	$errors[] = "State must be a valid two-letter code (e.g., CA, PA, MD).";
+  }
+
+  // Validate city
+  if ($row['addr_locality'] && !sirius_addr_city_validate($row['addr_locality'])) {
+  	$errors[] = "City cannot contain numbers or non-ASCII characters.";
+  }
+
+  // No bad characters
+	foreach (array('addr_thoroughfare', 'addr_locality', 'addr_administrative_area', 'addr_postal_code') as $key) {
+		if (!$row[$key]) { continue; }
+		if (!preg_match('/^[\x20-\x7E]*$/u', $row[$key])) { $errors[] = "Please ensure that the address has only printable ASCII characters."; }
+		if (preg_match('/\?/', $row[$key])) { $errors[] = "Please ensure that the address has only printable ASCII characters."; }
+	}
 
   if ($errors) { return array('success' => FALSE, 'msg' => join('<br>', $errors)); }
 
