@@ -210,23 +210,36 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
     if (!$context['worker_node']) { return ''; }
     if (!$context['employer_node']) { return ''; }
 
-    $industry_tid = $context['employer_node']->field_sirius_industry['und'][0]['tid'];
-    $ms_tid = sirius_worker_ms_by_industry($context['worker_node'], $industry_tid);
-    if (!$ms_tid) { return ''; }
+    // drupal_set_message($context['worker_node']->title);
+    $tss = array();
 
-    $history = sirius_worker_history($context['worker_node'], 'worker:member_status');
-    if (!$history) { return ''; }
+    // Can't be later than asof_ts
+    $tss[] = $context['asof_ts'];
 
-    $changes = array_reverse($history['changes'], TRUE);
-    if (!$changes) { return ''; }
- 
-    $last_ts = $context['asof_ts'];
-    foreach ($changes as $ts => $record) {
-      if ($ts > $last_ts) { continue; }
-      if (!in_array($ms_tid, $record['new_value'])) { break; }
-      $last_ts = $ts;
+    // Get date of first hours
+    $sql = 'select year, month '; 
+    $sql .= 'from sirius_hours_cache ';
+    $sql .= "where worker_nid = :worker_nid ";
+    $sql .= "order by year, month ";
+    $stmt = sirius_sql_query($sql, array(':worker_nid' => $context['worker_node']->nid));
+    $hr = $stmt->fetchAssoc();
+    if ($hr) {
+      $tss[] = strtotime($hr['year'] . '-' . $hr['month'] . '-1');
     }
-    return date('Ymd', $last_ts);
+
+    // Can't be later than start date
+    $date = $this->coverage_start_date($context);
+    if ($date) { $tss[] = strtotime($date); }
+
+    // Can't be later than start date
+    $date = $this->coverage_end_date($context);
+    if ($date) { $tss[] = strtotime($date); }
+
+    $ts = min($tss);
+    // foreach ($tss as $ts) { drupal_set_message(date('Ymd', $ts)); }
+    // drupal_set_message("Min: " . date('Ymd', $ts));
+
+    return date('Ymd', $ts);
   }
 
   public function pay_status_code($context) {
