@@ -131,6 +131,23 @@ function sirius_addr_format_oneline($addr) {
 	return $txt;
 }
 
+function sirius_addr_zip_validate($zip) {
+	if (preg_match('/^[0-9][0-9][0-9][0-9][0-9]$/', $zip)) { return TRUE; }
+	if (preg_match('/^[0-9][0-9][0-9][0-9][0-9]\-?[0-9][0-9][0-9][0-9]$/', $zip)) { return TRUE; }
+	return FALSE;
+}
+
+function sirius_addr_state_code_validate($state_code) {
+	$states = sirius_addr_states();
+	return $states[$state_code];
+}
+
+function sirius_addr_city_validate($city) {
+	if (preg_match('/\?/', $city)) { return FALSE; }
+	if (preg_match('/[0-9]/', $city)) { return FALSE; }
+	if (!preg_match('/^[\x20-\x7E]*$/', $city)) { return FALSE; }
+	return TRUE;
+}
 
 function sirius_addr_format_html($addr) {
 	// 123 Fake St.<br />Apt 11<br />Beacon, NY 12508	
