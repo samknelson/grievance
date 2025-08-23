@@ -15,7 +15,7 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
       'row_encoding' => 'json',
       'edi_carrier_name' => 'DELTA',
       'edi_group_number' => '17975',
-      'edi_tiers' => array('blended'),
+      'edi_tiers' => array('blended', 'terminated'),
       'edi_output_format' => 'fixed',
     );
 
@@ -24,6 +24,7 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
 
   public function edi_premium_tier($context) {
     if (!($this->is_subscriber($context))) { return NULL; }
+    if ($this->coverage_end_date($context)) { return 'terminated'; }
     return 'blended';
   }
 
@@ -234,8 +235,8 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
       $row['Benefit Package ID'] = '';
       $row['Benefit Package Effective Date'] = '';
       $row['Benefit Package Termination Date'] = '';
-      $row['Eligibility Effective Date'] =  $this->coverage_start_date($context);
-      $row['Eligibility Termination Date'] =  $this->coverage_end_date($context);
+      $row['Eligibility Effective Date'] = $this->coverage_start_date($context);
+      $row['Eligibility Termination Date'] = $this->coverage_end_date($context);
       $row['Mailing Address 1'] = $context['worker_node']->field_sirius_address['und'][0]['thoroughfare'];
       $row['Mailing Address 2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
       $row['Mailing Address 3'] = '';
