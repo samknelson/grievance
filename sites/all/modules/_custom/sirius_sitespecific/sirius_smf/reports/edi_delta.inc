@@ -15,7 +15,7 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
       'row_encoding' => 'json',
       'edi_carrier_name' => 'DELTA',
       'edi_group_number' => '17975',
-      'edi_tiers' => array('blended', 'terminated'),
+      'edi_tiers' => array('blended', 'no_coverage'),
       'edi_output_format' => 'fixed',
     );
 
@@ -24,7 +24,7 @@ class Sirius_Smf_Report_Edi_Delta extends Sirius_Trust_Provider_Edi_Report_Gener
 
   public function edi_premium_tier($context) {
     if (!($this->is_subscriber($context))) { return NULL; }
-    if ($this->coverage_end_date($context)) { return 'terminated'; }
+    if ($this->coverage_end_date($context)) { return 'no_coverage'; }
     return 'blended';
   }
 
