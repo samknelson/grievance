@@ -3,8 +3,8 @@
 sirius_require('sirius', 'Sirius/Batchrunner.inc');
 sirius_require('sirius', 'Sirius/Batchrunner_Node.inc');
 
-function sirius_smf_node_tab_oneoff_dentwell_election_3_form($form, &$form_state, $election_node) {
-	$form_state['election_nid'] = $election_node->nid;
+function sirius_smf_node_tab_oneoff_dentwell_election_3_form($form, &$form_state, $worker_node) {
+	$form_state['worker_nid'] = $worker_node->nid;
 
 	$form['#tree'] = TRUE;
 	$form['mode'] = array(
@@ -29,12 +29,12 @@ function sirius_smf_node_tab_oneoff_dentwell_election_3_form($form, &$form_state
 
 function sirius_smf_node_tab_oneoff_dentwell_election_3_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
-	$election_node = node_load($form_state['election_nid']);
+	$worker_node = node_load($form_state['worker_nid']);
 	$mode = $form_state['values']['mode'];
 
 	$runner = Sirius_Smf_Batchrunner_Oneoff_Dentwell_Election_3::getInstance();
 	$context = array('mode' => $form_state['values']['mode']);
-	return $runner->process_record($form_state['election_nid'], $context);
+	return $runner->process_record($form_state['worker_nid'], $context);
 	// return $runner->process_batch($context);
 	// return sirius_smf_oneoff_linked_benefit($form_state['values']['mode'], $election_node);
 }
@@ -102,8 +102,15 @@ class Sirius_Smf_Batchrunner_Oneoff_Dentwell_Election_3 extends Sirius_Batchrunn
 			return array('success' => TRUE);
 		}
 
+		/*
 		if (!in_array($lookups['delta'], sirius_fieldvals($prior_election_node, 'field_sirius_trust_benefits', 'target_id'))) {
 			sirius_minilog("Worker did not have delta previously.");
+			return array('success' => TRUE);
+		}
+		*/
+
+		if (in_array($lookups['dentwell'], sirius_fieldvals($prior_election_node, 'field_sirius_trust_benefits', 'target_id'))) {
+			sirius_minilog("Worker had dentwell previously.");
 			return array('success' => TRUE);
 		}
 
@@ -123,11 +130,19 @@ class Sirius_Smf_Batchrunner_Oneoff_Dentwell_Election_3 extends Sirius_Batchrunn
 
 		$new_election_node->field_sirius_date_start['und'][0]['value'] = date('Y-m-d') . ' 00:00:00';
 		$prior_election_node->field_sirius_date_end['und'][0]['value'] = date('Y-m-d', strtotime('-1 day')) . ' 00:00:00';
-		foreach ($new_election_node->field_sirius_trust_benefits['und'] as $delta => $ignore) {
-			if ($new_election_node->field_sirius_trust_benefits['und'][$delta]['target_id'] == $lookups['delta']) {
-				$new_election_node->field_sirius_trust_benefits['und'][$delta]['target_id'] = $lookups['dentwell'];
+
+		// Remove delta
+		$val = $new_election_node->field_sirius_trust_benefits['und'];
+		foreach ($val as $delta => $ignore) {
+			if ($val[$delta]['target_id'] == $lookups['delta']) {
+				unset($val[$delta]);
 			}
 		}
+
+		// Add dentwell
+		$val[] = array('target_id' => $lookups['dentwell']);
+		$val = array_values($val);
+		$new_election_node->field_sirius_trust_benefits['und'] = $val;
 
 		if ($mode != 'live') {
 			sirius_minilog("(Skipping save because mode = $mode)");
