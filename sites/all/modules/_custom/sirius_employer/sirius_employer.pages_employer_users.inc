@@ -41,6 +41,8 @@ function sirius_employer_node_tab_employer_users_add($employer_node) {
 function sirius_employer_node_tab_employer_users_add_form($form, &$form_state, $employer_node) {
 	$form_state['employer_node'] = $employer_node;
 
+	$password_hide = (variable_get('sirius_employer_userrmanage_password_hide', 'No') == 'Yes');
+
 	$new_uid = $_REQUEST['uid'];
 	if ($new_uid) {
 		$new_user = user_load($new_uid);
@@ -84,22 +86,24 @@ function sirius_employer_node_tab_employer_users_add_form($form, &$form_state, $
 	$form['phone'] = array(
 		'#type' => 'textfield', 
 		'#title' => 'Mobile Phone',
-		'#required' => TRUE,
+		// '#required' => TRUE,
 		'#default_value' => $new_user->field_grievance_phone['und'][0]['value'],
 	);
 
-	$form['password'] = array(
-		'#type' => 'password', 
-		'#title' => 'Password',
-		'#required' => ($new_uid ? FALSE : TRUE),
-	);
+	if (!$password_hide) {
+		$form['password'] = array(
+			'#type' => 'password', 
+			'#title' => 'Password',
+			'#required' => ($new_uid ? FALSE : TRUE),
+		);
 
-	$form['passwordv'] = array(
-		'#type' => 'password', 
-		'#title' => 'Password',
-		'#required' => TRUE,
-		'#required' => ($new_uid ? FALSE : TRUE),
-	);
+		$form['passwordv'] = array(
+			'#type' => 'password', 
+			'#title' => 'Password',
+			'#required' => TRUE,
+			'#required' => ($new_uid ? FALSE : TRUE),
+		);
+	}
 
 	$form['status'] = array(
 		'#type' => 'select', 
@@ -140,8 +144,11 @@ function sirius_employer_node_tab_employer_users_add_form($form, &$form_state, $
 }
 
 function sirius_employer_node_tab_employer_users_add_form_validate($form, &$form_state) {
-	if ($form_state['values']['password'] != $form_state['values']['passwordv']) {
-		form_set_error('password', 'The passwords do not match.');
+	$password_hide = (variable_get('sirius_employer_userrmanage_password_hide', 'No') == 'Yes');
+	if (!$password_hide) {
+		if ($form_state['values']['password'] != $form_state['values']['passwordv']) {
+			form_set_error('password', 'The passwords do not match.');
+		}
 	}
 	$new_uid = $form_state['values']['new_uid'];
 
@@ -156,7 +163,7 @@ function sirius_employer_node_tab_employer_users_add_form_validate($form, &$form
 		form_set_error('mail', 'Please enter a valid email address.');
 	}
 
-	if (!sirius_phone_validate($phone)) {
+	if ($phone && !sirius_phone_validate($phone)) {
 		form_set_error('phone', 'Please enter a valid phone number.');
 	}
 
@@ -198,7 +205,12 @@ function sirius_employer_node_tab_employer_users_add_form_submit($form, &$form_s
 	$new_user->mail = $mail;
 	$new_user->name = $name;
 	$new_user->field_grievance_shops['und'][0]['target_id'] = $employer_node->nid;
-	$new_user->field_grievance_phone['und'][0]['value'] = $phone;
+
+	if ($phone) {
+		$new_user->field_grievance_phone['und'][0]['value'] = $phone;
+	} else {
+		unset($new_user->field_grievance_phone['und']);
+	}
 
 	$domain_nid = $employer_node->field_sirius_domain['und'][0]['target_id'];
 	if ($domain_nid) { $new_user->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
@@ -221,9 +233,6 @@ function sirius_employer_node_tab_employer_users_add_form_submit($form, &$form_s
 	$new_user->status = $form_state['values']['status'];
 
 	$new_user = user_save($new_user, $edit);
-	//dpm($new_user);
-	// $form_state['rebuild'] = TRUE;
-	// return;
 
 	if ($new_uid) {
 		drupal_set_message(t('User @name has been updated.', array('@name' => $new_user->name)));
@@ -235,6 +244,29 @@ function sirius_employer_node_tab_employer_users_add_form_submit($form, &$form_s
 
 function sirius_employer_usermanage_admin() {
   $form = array();
+
+  $form['sirius_employer_userrmanage_password_hide'] = array(
+  	'#type' => 'select',
+  	'#title' => t('Hide Password?'),
+  	'#options' => array(
+  		NULL => t('-- Select --'),
+  		'No' => t('No'),
+  		'Yes' => t('Yes'),
+  	),
+  	'#default_value' => variable_get("sirius_employer_userrmanage_password_hide", 'No'),
+  	'#description' => t('Hide the password field? Select "Yes" if the users will authenticate through an offline system such as Okta, or if they will always set their own passwords.'),
+  );
+	$form["sirius_employer_userrmanage_$rid"] = array(
+		'#type' => 'select',
+		'#title' => $role,
+		'#options' => array(
+			'omit' => 'Omit',
+			'required' => 'Required',
+			'optional' => 'Optional',
+		),
+		'#default_value' => variable_get("sirius_employer_userrmanage_$rid", 'omit'),
+	);
+
 
   $roles = user_roles(TRUE);
   foreach ($roles as $rid => $role) {
