@@ -177,7 +177,7 @@ function sirius_smf_node_tabs() {
   );
   */
 
-  $node_tabs['sirius_trust_worker_election']['oneoff_dentwell_election_3'] = array(
+  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_dentwell_election_3'] = array(
     'title' => 'Oneoff Dentwell Election 3',
     'callback' => 'sirius_smf_node_tab_oneoff_dentwell_election_3',
     'permissions' => array('sirius trust staff'),
