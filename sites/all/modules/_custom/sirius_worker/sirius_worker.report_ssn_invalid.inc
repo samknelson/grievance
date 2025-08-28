@@ -23,7 +23,11 @@ class Sirius_Worker_Report_Ssn_Invalid extends Report_Cache_Report_Generator {
       'worker_nid' => 'Worker NID',
       'worker_title' => 'Worker Name',
       'worker_id' => 'Worker ID',
-      'ssn' => 'SSN',
+      'dob' => 'DOB',
+      'ssn' => 'Raw SSN',
+      'formatted' => 'Formatted SSN',
+      'msg' => 'Message',
+      'err' => 'Tag',
     );
   }
 
@@ -54,16 +58,15 @@ class Sirius_Worker_Report_Ssn_Invalid extends Report_Cache_Report_Generator {
       $sql .= "and field_sirius_domain_target_id is NULL ";
     }
     $sql .= "and field_sirius_ssn_value is not null ";
-    // For efficiency we could have said something "rlike '[0-0][0-9][0-9]\-?..." 
-    // but I'm worried that there might be additional SSN validation, like it can't begin with a certain prefix or something, So I'm
-    // loading all the SSN's and passing them to sirius's ssn_validate().
     $sql .= "and field_sirius_ssn_value != '' ";
     $sql .= "order by nid ";
 
     $stmt = sirius_sql_query($sql, $sql_args);
     $worker_nids = array();
     while ($hr = $stmt->fetchAssoc()) {
-      if (sirius_ssn_validate($hr['field_sirius_ssn_value'])) { continue; }
+      // For efficiency, filter here.
+      $result = sirius_ssn_validate_full($hr['field_sirius_ssn_value']);
+      if ($result['success']) { continue; }
       $worker_nids[] = $hr['nid'];
     }
     return array_chunk($worker_nids, 100, TRUE);
@@ -74,11 +77,19 @@ class Sirius_Worker_Report_Ssn_Invalid extends Report_Cache_Report_Generator {
     $worker_nids_with_multiple = array();
     foreach ($worker_nids as $worker_nid) {
       $worker_node = node_load($worker_nid);
+
+      $result = sirius_ssn_validate_full($worker_node->field_sirius_ssn['und'][0]['value']);
       $row = array();
       $row['worker_nid'] = $worker_nid;
       $row['worker_title'] = $worker_node->title;
       $row['worker_id'] = $worker_node->field_sirius_id['und'][0]['value'];
+      if ($worker_node->field_sirius_dob['und'][0]['value']) {
+        $row['dob'] = date('Y-m-d', strtotime($worker_node->field_sirius_dob['und'][0]['value']));
+      }
       $row['ssn'] = $worker_node->field_sirius_ssn['und'][0]['value'];
+      $row['formatted'] = $result['formatted'];
+      $row['msg'] = $result['msg'];
+      $row['err'] = $result['err'];
       $rows['rows']["$worker_nid"] = $row;
 
       $context['results']['dashboard']['count']++;
@@ -86,3 +97,4 @@ class Sirius_Worker_Report_Ssn_Invalid extends Report_Cache_Report_Generator {
     return $rows;
   }
 }
+
