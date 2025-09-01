@@ -49,6 +49,15 @@ function sirius_employer_sirius_config_links_alter(&$links) {
 	return $links;
 }
 
+/**
+ * Implements hook_sirius_backlinks_from_node_alter
+ */
+
+function sirius_employer_sirius_backlinks_from_node_alter(&$links, $node) {
+  if ($node->type != 'sirius_bu') { return; }
+  $links["sirius/employer/bu"] = array('name' => "All Bargaining Units");
+}
+
 /***
  * Implements hook_report_cache_info() 
  */
