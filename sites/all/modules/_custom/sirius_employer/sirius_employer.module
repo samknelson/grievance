@@ -10,6 +10,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_em
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.feed.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.feed_dispatch_check.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.feed_employer.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.bu.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.pages_employer_users.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.pages_me.inc";
