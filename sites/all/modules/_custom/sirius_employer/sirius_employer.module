@@ -31,7 +31,22 @@ function sirius_employer_sirius_domain_component_info() {
     	'title' => 'Employer - EIN',
     	'description' => 'Support for per-employer employee IDs',
     ),
+    'employer:bu' => array(
+    	'title' => 'Employer - Bargaining Units',
+    	'description' => 'Support for bargaining units',
+    ),
   );
+}
+
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+function sirius_employer_sirius_config_links_alter(&$links) {
+	$links['employer']['title'] = 'Employer';
+	$links['employer']['links']['sirius/employer/config/usermanage'] = array('title' => 'Employer User Manager', 'description' => 'Configure tools for allowing employers to manage their own users.');
+	$links['employer']['links']['sirius/employer/bu'] = array('title' => 'Bargaining Units');
+	return $links;
 }
 
 /***
