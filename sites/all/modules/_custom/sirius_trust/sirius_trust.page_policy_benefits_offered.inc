@@ -31,7 +31,7 @@ function sirius_trust_node_tab_policy_benefits_offered_form($form, &$form_state,
 function sirius_trust_node_tab_policy_benefits_offered_form_submit($form, &$form_state) {
 	$policy_node = node_load($form_state['policy_nid']);
 	$policy_json = sirius_json_get($policy_node);
-	$policy_json['benefits'] = $form_state['values']['benefits'];
+	$policy_json['benefits']['enabled'] = $form_state['values']['benefits']['enabled'];
 	sirius_json_set($policy_node, $policy_json);
 	node_save($policy_node);
 	drupal_set_message("Benefits saved.");

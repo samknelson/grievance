@@ -47,13 +47,15 @@ function sirius_smf_feed_members_row_process($feed_node, $info, $data, $row) {
   	'L' => 'administrative_area',
   	'M' => 'postal_code',
   );
-  foreach ($addr_fields as $field_name => $col) {
-    if ($row["$field_name"]) {
-      $need_country = TRUE;
-      $worker_node->field_sirius_address['und'][0][$col] = $row[$field_name];
+  if (preg_match('/[1-9]/',$row['M'])) {
+    foreach ($addr_fields as $field_name => $col) {
+      if ($row["$field_name"]) {
+        $need_country = TRUE;
+        $worker_node->field_sirius_address['und'][0][$col] = $row[$field_name];
+      }
     }
+    if ($need_country) { $worker_node->field_sirius_address['und'][0]['country'] = 'US'; }
   }
-  if ($need_country) { $worker_node->field_sirius_address['und'][0]['country'] = 'US'; }
 
   // Phone
   if ($row['phone']) {
@@ -73,6 +75,11 @@ function sirius_smf_feed_members_row_process($feed_node, $info, $data, $row) {
   // Birth date
   if ($row['dob']) {
   	$worker_node->field_sirius_dob['und'][0]['value'] = $row['dob'];
+  }
+
+  // id3
+  if ($row['id3']) {
+    $worker_node->field_sirius_id3['und'][0]['value'] = $row['id3'];
   }
 
 	$worker_node = node_submit($worker_node);
@@ -104,18 +111,6 @@ function sirius_smf_feed_members_row_process($feed_node, $info, $data, $row) {
 		sirius_log('smf:import', 'raw', 'Raw import data', $log_text, $log_key, array($worker_node->nid));
 	}
 
-	// ////////////////////////////////////////////////////////
-  // Elections
-	// ////////////////////////////////////////////////////////
-
-	if ($row['elections']) {
-		foreach ($row['elections'] as $date => $election_node) {
-			if (!$election_node->needs_save) { continue; }
-			$election_node->field_sirius_worker['und'][0]['target_id'] = $worker_node->nid;
-			node_save($election_node);
-		}
-	}
-
   // ////////////////////////////////////////////////////////
   // Elections
   // ////////////////////////////////////////////////////////
@@ -142,6 +137,18 @@ function sirius_smf_feed_members_row_process($feed_node, $info, $data, $row) {
     }
   }
   // drupal_set_message("Worker NID: " . $worker_node->nid);
+
+  // ////////////////////////////////////////////////////////
+  // Tag
+  // ////////////////////////////////////////////////////////
+
+  $contact_node = sirius_worker_contact_get($worker_node);
+  $tag_tid = sirius_domain_variable_get('sirius_trust_member_tid');
+  if ($contact_node && $tag_tid) {
+    $contact_node->no_recurse = TRUE;
+    $result = sirius_contact_tag_add($contact_node, $tag_tid);
+    if (!$result['success']) { $warnings[] = "Tag failed: " . $result['msg']; }
+  }
 
   // ////////////////////////////////////////////////////////
   // Member status (aka "MS"; this also assigns industries

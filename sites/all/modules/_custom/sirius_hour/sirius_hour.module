@@ -75,7 +75,6 @@ function sirius_hour_node_presave($node) {
       $ts = strtotime($orig_date) + 24*60*60*15;
       $new_date = date('Y-m-01 00:00:00', $ts);
       $node->field_sirius_date_start['und'][0]['value'] = $new_date;
-      drupal_set_message("Set $new_date from $orig_date");
     }
 
     if ($node->field_sirius_datetime_completed['und'][0]['value'] && !$node->field_sirius_date_end['und'][0]['value']) {
@@ -83,7 +82,6 @@ function sirius_hour_node_presave($node) {
       $ts = strtotime($orig_date) - 24*60*60*15;
       $new_date = date('Y-m-t 00:00:00', $ts);
       $node->field_sirius_date_end['und'][0]['value'] = $new_date;
-      drupal_set_message("Set $new_date from $orig_date");
     }
   }
 
@@ -104,7 +102,7 @@ function sirius_hour_payperiod_set_title($node) {
 	if ($employer_nid) { $title .= substr(sirius_node_title($employer_nid), 0, 55); } else { $title .= '[no worker]'; }
 
 	$title .= ' / ';
-	if ($node->field_sirius_date_start['und']) { $title .= sirius_date_date($node, 'field_sirius_datetime', 'Y-m-d'); } else { $title .= '[no date]'; }
+	if ($node->field_sirius_date_start['und']) { $title .= sirius_date_date($node, 'field_sirius_date_start', 'Y-m'); } else { $title .= '[no date]'; }
 
 	$node->title = $title;
 }
@@ -127,6 +125,18 @@ function sirius_hour_report_cache_info() {
 
 function sirius_hour_sirius_domain_component_info() {
   return array(
+    'hour' => array(
+      'title' => 'Hour',
+      'description' => 'Allow payperiod and hours entries',
+    ),
+    'hour:simple' => array(
+      'title' => 'Hour - Simple',
+      'description' => 'Allow simple monthly hours, with just a single entry for a given worker / employer',
+    ),
+    'hour:complex' => array(
+      'title' => 'Hour - Complex',
+      'description' => 'Allow complex monthly hours, with multiple entries for a given worker / employer',
+    ),
     'hour:reconcile' => array(
       'title' => 'Hour - Reconcile',
       'description' => 'Allow multiple sources for hours, and reconcile which is "live".',
@@ -138,7 +148,6 @@ function sirius_hour_sirius_domain_component_info() {
   );
 }
 
-
 /**
  * Implements hook_sirius_config_links_alter()
  */
@@ -149,4 +158,27 @@ function sirius_hour_sirius_config_links_alter(&$links) {
   }
   $links['hour']['links']['sirius/hour/config'] = array('title' => 'Hour settings', 'description' => 'General settings for hour tracking.');
   $links['hour']['links']['sirius/hour/search/month'] = array('title' => 'Month Search', 'description' => 'Raw hour search (by month)');
+}
+
+/**
+ * Implements hook_sirius_dashboard_info
+ */
+
+function sirius_hour_sirius_dashboard_plugin_info() {
+  $plugins = array();
+
+  $plugins['hour_dashboard'] = array(
+    'title' => 'Hour: Worker Summary',
+    'description' => '',
+    'file' => 'sirius_hour.dashboard_worker.inc',
+    'module' => 'sirius_hour',
+    'callbacks' => array(
+      'data' => 'sirius_hour_dashboard_worker_data',
+      // 'config' => 'sirius_denorm_dashboard_config',
+      // 'prefs' => 'sirius_denorm_dashboard_prefs',
+    ),
+    'proxy' => TRUE,
+  );
+
+  return $plugins;
 }

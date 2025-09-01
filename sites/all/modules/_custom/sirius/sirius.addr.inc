@@ -131,6 +131,23 @@ function sirius_addr_format_oneline($addr) {
 	return $txt;
 }
 
+function sirius_addr_zip_validate($zip) {
+	if (preg_match('/^[0-9][0-9][0-9][0-9][0-9]$/', $zip)) { return TRUE; }
+	if (preg_match('/^[0-9][0-9][0-9][0-9][0-9]\-?[0-9][0-9][0-9][0-9]$/', $zip)) { return TRUE; }
+	return FALSE;
+}
+
+function sirius_addr_state_code_validate($state_code) {
+	$states = sirius_addr_states();
+	return $states[$state_code];
+}
+
+function sirius_addr_city_validate($city) {
+	if (preg_match('/\?/', $city)) { return FALSE; }
+	if (preg_match('/[0-9]/', $city)) { return FALSE; }
+	if (!preg_match('/^[\x20-\x7E]*$/', $city)) { return FALSE; }
+	return TRUE;
+}
 
 function sirius_addr_format_html($addr) {
 	// 123 Fake St.<br />Apt 11<br />Beacon, NY 12508	
@@ -153,77 +170,65 @@ function sirius_geofield_enabled($entity_type, $entity, $field = NULL, $instance
 }
 
 function sirius_addr_node_presave($node) {
-	sirius_addr_node_presave_geometry($node);
-	sirius_addr_node_presave_county($node);
-}
+	// Only if the node has an address
+	if (!isset($node->field_sirius_address)) { return; }
 
-function sirius_addr_node_presave_geometry($node) {
-	// Set the address JSON from geocoder
-	$field_name = 'field_address';
-	if (isset($node->{$field_name})) {
-		$entity_type = 'node';
-		$entity = $node;
+	// Only if mapping is enabled
+	if (!sirius_geofield_enabled('node', $node)) { return; }
 
-		$field_instance = field_info_instance('node', 'field_address_geofield', $node->type);
-    $handler = geocoder_get_handler($field_instance['widget']['settings']['geocoder_handler']);
-    $target_info = field_info_field($field_instance['field_name']);
-    $field_info = geocoder_widget_get_field_info($entity_type, $field_instance, $entity);
-    $items = geocoder_widget_get_entity_field_value($entity_type, $field_instance, $entity);
-    $item = $items[0];
+	$field_instance = field_info_instance('node', 'field_sirius_address_geo', $node->type);
+  $handler = geocoder_get_handler($field_instance['widget']['settings']['geocoder_handler']);
+  $target_info = field_info_field($field_instance['field_name']);
+  $field_info = geocoder_widget_get_field_info('node', $field_instance, $node);
+  $items = geocoder_widget_get_entity_field_value('node', $field_instance, $node);
+  $item = $items[0];
 
-    // Get the handler-specific-settings.
-    if (isset($field_instance['widget']['settings']['handler_settings'][$handler['name']])) {
-      $handler_settings = $field_instance['widget']['settings']['handler_settings'][$handler['name']];
-    }
-    else {
-      $handler_settings = array();
-    }
-    $geometry = geocoder_cache_get($handler['name'], $item, $handler_settings);
+  // Get the handler-specific-settings.
+  if (isset($field_instance['widget']['settings']['handler_settings'][$handler['name']])) {
+    $handler_settings = $field_instance['widget']['settings']['handler_settings'][$handler['name']];
+  }
+  else {
+    $handler_settings = array();
+  }
+  $geometry = geocoder_cache_get($handler['name'], $item, $handler_settings);
+	$geometry_json = json_decode(json_encode($geometry), TRUE);
 
-    if ($geometry) { 
-			$node->field_address_canon_accuracy['und'][0]['value'] = $geometry->data['geocoder_accuracy'];
-    } else {
-    	unset($node->field_address_canon_accuracy['und'][0]['value']);
-    }
+  // Set the accuracy
+  if ($geometry) {
+		$node->field_sirius_address_accuracy['und'][0]['value'] = $geometry->data['geocoder_accuracy'];
+  } else {
+  	unset($node->field_sirius_address_accuracy['und'][0]);
+  }
 
-    if ($geometry && ($geometry->data['geocoder_accuracy'] == 'ROOFTOP') && $geometry->data['geocoder_formatted_address']) {
-    	$node->field_address_canon['und'][0]['value'] = $geometry->data['geocoder_formatted_address'];
-    } else {
-	    $node->field_address_canon['und'][0]['value'] = sirius_addr_format_oneline($item);
-    }
+  // Set the canonical address
+  if ($geometry && ($geometry->data['geocoder_accuracy'] == 'ROOFTOP') && $geometry->data['geocoder_formatted_address']) {
+  	$node->field_sirius_address_canon['und'][0]['value'] = $geometry->data['geocoder_formatted_address'];
+  } else {
+    $node->field_sirius_address_canon['und'][0]['value'] = sirius_addr_format_oneline($item);
+  }
 
-    if ($geometry) {
-	    $json = sirius_json_get($node);
-	    $json['addr'][$field_name]['geometry'] = $geometry;
-	    sirius_json_set($node, $json);
-	  }
+  // Set the county
+	$county_name = sirius_addr_get_component_name($geometry_json, 'administrative_area_level_2');
+	if ($county_name) {
+		$node->field_sirius_address_county['und'][0]['value'] = $county_name;
+	} else {
+		unset($node->field_sirius_address_county['und'][0]);
 	}
-}
 
-function sirius_addr_node_presave_county($node) {
-	$field_names = array(
-		'field_county' => 'field_address',
-		// 'field_sirius_county' => 'field_sirius_address',
-	);
-
-	foreach ($field_names as $to_field_name => $from_field_name) {
-		// Never overwrite existing values
-		if ($node->{$to_field_name}['und'][0]['value']) { continue; }
-
-		// Check to see if our geocoder gave us a county
-		$json = sirius_json_get($node);
-		$geometry_json = $json['addr'][$from_field_name]['geometry'];
-		$county_name = sirius_addr_get_component_name($geometry_json, 'administrative_area_level_2');
-		if (!$county_name) { continue; }
-
-		// Set the county
-		$node->{$to_field_name}['und'][0]['value'] = $county_name;
-	}
+	// Store the full geometry in the node
+  $json = sirius_json_get($node);
+  $json['addr']['field_sirius_address']['geometry'] = $geometry_json;
+  sirius_json_set($node, $json);
 }
 
 
 function sirius_addr_form_alter_node(&$form, &$form_state, $form_id) {
 	// Hide canonical addresses on the node form. They are always set automatically.
+	if (isset($form['field_sirius_address_canon'])) { $form['field_sirius_address_canon']['#access'] = FALSE; }
+	if (isset($form['field_sirius_address_accuracy'])) { $form['field_sirius_address_accuracy']['#access'] = FALSE; }
+	if (isset($form['field_sirius_address_county'])) { $form['field_sirius_address_county']['#access'] = FALSE; }
+
+	// Legacy support for HotelsDB
 	if (isset($form['field_address_canon'])) { $form['field_address_canon']['#access'] = FALSE; }
 	if (isset($form['field_address_canon_accuracy'])) { $form['field_address_canon_accuracy']['#access'] = FALSE; }
 }

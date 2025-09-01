@@ -110,7 +110,7 @@ class Sirius_Ledger_Charge_Plugin extends Sirius_Plugin {
 	  // 
 		// If the amount has changed, insert a new record
 		// 
-		
+
 		if ($amt == $previous_total) {
 			sirius_minilog("Previous total was " . number_format($previous_total, 2) . ". The ledger will not be updated.");
 			$entry['ledger_amount'] = 0;

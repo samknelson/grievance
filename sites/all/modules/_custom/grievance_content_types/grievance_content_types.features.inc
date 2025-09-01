@@ -251,6 +251,14 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'sirius_bu' => array(
+      'name' => t('Sirius Bargaining Unit'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'sirius_bulk' => array(
       'name' => t('Sirius Bulk'),
       'base' => 'node_content',

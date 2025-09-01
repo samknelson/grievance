@@ -18,6 +18,40 @@ class Sirius_Postal_Client_Lob extends Sirius_Postal_Client {
 
 	private $_auth;
 
+	public function cache_set($uuid, $body) {
+		if (!$uuid) { return; }
+		$sql = "insert into sirius_postal_lob_cache ";
+		$sql .= "(cache_uuid, cache_body) ";
+		$sql .= "values (:cache_uuid, :cache_body) ";
+		$sql .= "on duplicate key update cache_body = :cache_body";
+		$sql_args = array();
+		$sql_args[':cache_uuid'] = $uuid;
+		$sql_args[':cache_body'] = $body;
+		$sql_args[':cache_created'] = time();
+		$stmt = sirius_sql_query($sql, $sql_args);
+		return;
+	}
+
+	public function cache_get($uuid) {
+		if (!$uuid) { return; }
+		$sql = "select * from sirius_postal_lob_cache ";
+		$sql .= "where cache_uuid = :cache_uuid";
+		$sql_args = array();
+		$sql_args[':cache_uuid'] = $uuid;
+		$stmt = sirius_sql_query($sql, $sql_args);
+		$hr = $stmt->fetchAssoc();
+		return $hr['cache_body'];
+	}
+
+	public function cache_cleanup() {
+		$sql = "delete from sirius_postal_lob_cache where cache_created < :cutoff";
+
+		$sql_args = array();
+		$sql_args[':cutoff'] = time() - 60*60*24*7;
+		
+		$stmt = db_query($sql, $sql_args);
+	}
+
   public function settings_form() { 
 	  $form['info'] = array(
 	  	'#markup' => '<p>API keys for the Lob service can be obtained <a href="https://dashboard.lob.com/settings/api-keys" target="_blank">here</a>.</p>',
@@ -168,6 +202,8 @@ class Sirius_Postal_Client_Lob extends Sirius_Postal_Client {
 
 	public function send_impl(&$params) {
 		$to = $params['to'];
+
+		if (!$params['mode']) { $params['mode'] = 'live'; }
 		
 		$auth = $this->init($params['mode']);
 		$settings = $this->settings();
@@ -203,14 +239,17 @@ class Sirius_Postal_Client_Lob extends Sirius_Postal_Client {
 			$tokens['sirius']['letterhead']['title'] = '';
 			$body = token_replace($body, $tokens, array('clear' => TRUE));
 
-			// return array('success' => FALSE, 'msg' => 'Dev');
+			$this->cache_set($params['id'], $body);
+
+			global $base_url;
+			$body_url = $base_url . '/sirius/postal/lob/body/' . $params['id'];
 
 			$apiInstance = new OpenAPI\Client\Api\LettersApi($auth);
 			$letter_editable = new OpenAPI\Client\Model\LetterEditable(
 			  array(
 			    "description"     => "Letter " . $params['id'],
 			    "from"     				=> $from,
-			    "file"     				=> $body,
+			    "file"     				=> $body_url,
 			    'address_placement' => 'insert_blank_page',
 			    "color"    				=> $color,
 			    "to"     					=> $to_addr,
@@ -352,9 +391,9 @@ class Sirius_Postal_Client_Lob extends Sirius_Postal_Client {
 
   .page-content {
     position: relative;
-    width: 7in;
+    width: 6.5in;
     height: 10.625in;
-    left: 0.75in;
+    left: 1.25in;
     top: 0.1875in;
   }
 

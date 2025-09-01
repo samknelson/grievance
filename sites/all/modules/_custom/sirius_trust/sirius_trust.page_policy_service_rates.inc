@@ -41,7 +41,7 @@ function sirius_trust_node_tab_policy_service_rates_form($form, &$form_state, $p
     $default_weight = $item['weight'];
     if (!$default_weight) { $default_weight = 10 * ($delta+1); }
 
-		$title = sirius_ledger_policy_rate_title($item, $lookups);
+		$title = '';
 
 		$accordion_title = $title ."<span class=\"sirius_event_weight_indicator\">Sort Order: $default_weight</span>";
 

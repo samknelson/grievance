@@ -55,6 +55,8 @@ function sirius_worker_member_status_set($worker_node, $new_ms_term, $tf, $reaso
   // Build a map fom industry to ms
   $industry_ms_map = sirius_worker_member_status_industry_map();
   $new_industry_tids = $industry_ms_map[$new_ms_tid];
+
+  if (!$new_industry_tids) { $new_industry_tids = array(); }
   $clear_ms_tids = array();
 
   $msg = "";
@@ -66,6 +68,7 @@ function sirius_worker_member_status_set($worker_node, $new_ms_term, $tf, $reaso
     // Clear any MS in the same industry
     if ($new_industry_tids) {
       foreach ($my_ms_tids as $ms_tid) {
+        if (!$industry_ms_map[$ms_tid]) { $industry_ms_map[$ms_tid] = array(); }
         if (array_intersect($new_industry_tids, $industry_ms_map[$ms_tid])) {
           $clear_ms_tids[] = $ms_tid;
           $ms_term = taxonomy_term_load($ms_tid);
@@ -93,7 +96,9 @@ function sirius_worker_member_status_set($worker_node, $new_ms_term, $tf, $reaso
   foreach ($my_ms_tids as $ms_tid) { $value[] = array('tid' => $ms_tid); }
   $worker_node->field_sirius_member_status['und'] = $value;
   $industry_tids = array();
+  if (!$my_ms_tids) { $my_ms_tids = array(); }
   foreach ($my_ms_tids as $ms_tid) {
+    if (!$industry_ms_map[$ms_tid]) { $industry_ms_map[$ms_tid] = array(); }
     foreach ($industry_ms_map[$ms_tid] as $industry_tid) {
       $industry_tids[$industry_tid] = TRUE;
     }
@@ -268,16 +273,16 @@ function sirius_worker_member_status_history_callback(&$parent_node, $history) {
   if (!$my_ms_tids) { $my_ms_tids = array(); }
   $value = array();
   foreach ($my_ms_tids as $ms_tid) { $value[] = array('tid' => $ms_tid); }
-  $worker_node->field_sirius_member_status['und'] = $value;
+  $parent_node->field_sirius_member_status['und'] = $value;
   $industry_tids = array();
   foreach ($my_ms_tids as $ms_tid) {
     foreach ($industry_ms_map[$ms_tid] as $industry_tid) {
       $industry_tids[$industry_tid] = TRUE;
     }
   }
-  $worker_node->field_sirius_industry = array();
+  $parent_node->field_sirius_industry = array();
   foreach ($industry_tids as $industry_tid => $ignore) {
-    $worker_node->field_sirius_industry['und'][] = array('tid' => $industry_tid);
+    $parent_node->field_sirius_industry['und'][] = array('tid' => $industry_tid);
   }
 }
 

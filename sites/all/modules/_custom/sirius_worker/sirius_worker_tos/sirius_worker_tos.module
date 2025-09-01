@@ -1,0 +1,86 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_worker_tos') . '/sirius_worker_tos.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_worker_tos') . '/sirius_worker_tos.permission.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_worker_tos') . '/sirius_worker_tos.access.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_worker_tos') . '/sirius_worker_tos.tos.inc';
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_worker_tos_sirius_domain_component_info() {
+  return array(
+    'worker:tos' => array(
+      'title' => 'Worker - Call In / Out',
+      'description' => 'Support for "call in / out" self-reporting.',
+    ),
+  );
+}
+
+/** 
+ * Implements hook_sirius_access_info
+ */
+
+function sirius_worker_tos_sirius_access_info() {
+  $infos = array();
+  Sirius_Worker_Tos_Access::getInstance()->setInfo($infos);
+  return $infos;
+}
+
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+function sirius_worker_tos_sirius_config_links_alter(&$links) {
+  $links['worker']['links']['sirius/worker/tos'] = array('title' => 'Call In / Out', 'description' => 'Configure settings for the "Call In / Out" tools.');
+}
+
+/**
+ * Implements hook_sirius_backlinks_from_node_alter
+ */
+
+function sirius_worker_tos_sirius_backlinks_from_node_alter(&$links, $tos_node) {
+  if ($tos_node->type != 'sirius_log') { return; }
+  if ($tos_node->field_sirius_category['und'][0]['value'] != 'tos') { return; }
+
+  $tos = Sirius_Worker_Tos::getInstance();
+  $worker_node = $tos->worker($tos_node);
+  $worker_nid = $worker_node->nid;
+  unset($links["node/$worker_nid/sirius_worker_log"]);
+  $links["node/$worker_nid/sirius_worker_schedule/tos-archive"] = array('name' => "Worker");
+}
+
+/**
+ * Implements hook_sirius_flood_info
+ */
+
+function sirius_worker_tos_sirius_flood_info() {
+  $info['sirius_worker_tos_activate'] = array(
+    'title' => 'Worker TOS: Activate a Call In / Out',
+    'threshold_default' => 3,
+    'window_default' => 60*15,
+    'description' => 'A user attempted to activate a Call In / Out',
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_worker_tos_sirius_cron_scan_info() {
+  $items['worker_tos_reminder'] = array(
+    'title' => 'Worker TOS: reminders',
+    'description' => 'Send reminders to workers who are on a call out absence',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_worker_tos_cron_reminders',
+    'multidomain' => TRUE,
+    'multidomain_include_root' => TRUE,
+    'component' => 'worker:tos',
+  );
+
+  return $items;
+}
+

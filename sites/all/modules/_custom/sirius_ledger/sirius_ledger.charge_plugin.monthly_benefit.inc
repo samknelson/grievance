@@ -40,6 +40,6 @@ class Sirius_Ledger_Charge_Plugin_Monthly_Benefit extends Sirius_Ledger_Charge_P
 			return array('success' => TRUE);
 		}
 
-		return parent::generate_charges($context, $mode);
+		return parent::charge($context, $mode);
 	}
 }

@@ -18,7 +18,7 @@ function sirius_ledger_payperiod_set($payperiod_node, $mode, $options = array())
 	$context['payperiod_node'] = $payperiod_node;
 	$context['employer_node'] = node_load($payperiod_node->field_grievance_shop['und'][0]['target_id']);
 	$context['worker_node'] = node_load($payperiod_node->field_sirius_worker['und'][0]['target_id']);
-	$context['ts'] = sirius_fieldval($payperiod_node, 'field_sirius_datetime', 'ts');
+	$context['ts'] = sirius_fieldval($payperiod_node, 'field_sirius_date_end', 'ts');
 	$context['trigger'] = 'hourly';
 
 	sirius_minilog_indent();

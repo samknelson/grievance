@@ -35,7 +35,7 @@ function sirius_smf_feed_ehrs_disability_unapproved_form($form, &$form_state, $i
 		'#value' => 'Confirm Disability',
 	);
 
-	return sirius_sms_feed_ehrs_form_prep($form, $form_state, $info, $data, $feed_node, $current_step);
+	return sirius_smf_feed_ehrs_form_prep($form, $form_state, $info, $data, $feed_node, $current_step);
 }
 
 function sirius_smf_feed_ehrs_disability_unapproved_form_submit($form, &$form_state) {
@@ -44,5 +44,5 @@ function sirius_smf_feed_ehrs_disability_unapproved_form_submit($form, &$form_st
 	$feed_node = node_load($form_state['feed_nid']);
 	$current_step = $form_state['current_step'];
 
-	sirius_wizard_submit($info, $data, $feed_node, $current_step, "Un-Approved Disability Confirmed.");
+	sirius_wizard_submit($info, $data, $feed_node, $current_step, "Un-Approved Disability Confirmed.", array('feed_status' => 'draft'));
 }

@@ -1610,7 +1610,10 @@ function grievance_content_types_ds_layout_settings_info() {
       ),
       'right' => array(
         10 => 'field_sirius_address',
-        11 => 'field_sirius_address_geo',
+        11 => 'field_sirius_address_canon',
+        12 => 'field_sirius_address_accuracy',
+        13 => 'field_sirius_address_county',
+        14 => 'field_sirius_address_geo',
       ),
     ),
     'fields' => array(
@@ -1625,6 +1628,9 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_sirius_contact_tags' => 'left',
       'field_sirius_source' => 'left',
       'field_sirius_address' => 'right',
+      'field_sirius_address_canon' => 'right',
+      'field_sirius_address_accuracy' => 'right',
+      'field_sirius_address_county' => 'right',
       'field_sirius_address_geo' => 'right',
     ),
     'classes' => array(),

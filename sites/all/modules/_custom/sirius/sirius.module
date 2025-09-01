@@ -161,6 +161,7 @@ function sirius_sirius_cron_scan_info() {
 function sirius_entity_presave($entity, $type) {
   if ($type == 'node') {
     if ($entity->type == 'sirius_worker') { sirius_contact_sync_from_worker($entity); }
+    if ($entity->type == 'grievance_shop_contact') { sirius_contact_sync_from_grievance_shop_contact($entity); }
   }
   if ($type == 'user') { sirius_contact_sync_from_user($entity); }
 }
@@ -370,7 +371,12 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'sirius_worker_node_form') {
     if (!user_access('sirius admin')) {
       $form['field_sirius_denorm_level']['#access'] = FALSE;
-      $form['field_sirius_denorm_benefits']['#access'] = FALSE;
+    }
+  }
+
+  if ($form_id == 'grievance_shop_contact_node_form') {
+    if (!user_access('sirius admin')) {
+      $form['field_sirius_contact']['#access'] = FALSE;
     }
   }
 
@@ -642,6 +648,35 @@ function sirius_user_edit_access($account) {
   }
   
   return user_edit_access($account);
+}
+
+/**
+ * Implements hook_sirius_pageicon_render
+ */
+
+function sirius_sirius_pageicon($context) {
+  return;
+
+  // For example ...
+  if (!$context['node']) { return; }
+
+  if ($context['node']->type == 'sirius_worker') {
+    $icon = '<i class="fas fa-portrait"></i>';
+  }
+
+  $result = array();
+  if ($icon) { $result['icon'] = $icon; }
+  return $result;
+}
+
+function sirius_pageicon_render() {
+  $node = menu_get_object('node');
+  $result = module_invoke_all('sirius_pageicon', array('node' => $node, 'path' => current_path()));
+
+  if ($result['icon']) {
+    $html = '<span class="sirius-pageicon">' . $result['icon'] . '</span>';
+  }
+  return $html;
 }
 
 /**

@@ -68,7 +68,7 @@ function sirius_sched_render_full($scheds) {
 		if (!$display_type) { $display_type = $sched['type']; }
 
 		$display_status = $sched['json']['display']['status'];
-		$details = $sched['json']['display']['details'];
+		$details = substr(sirius_text_to_html($sched['json']['display']['details']), 0, 1000);
 
 		$row = array();
 		$row[] = $datestr;

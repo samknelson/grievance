@@ -40,31 +40,40 @@ function sirius_smf_feed_dependents_row_verify_relationship($feed_node, $info, $
   // reltype = Y/QMSCO:  BPA-DEP2-BD / Z
   // If not found: earlier of BPA-DEP2-EFF / AC or BPA-DEP2-EFF2 / AY
 
-  if (in_array($reltype_id, array('SP', 'ES'))) { $start_date_raw = $row['AF']; }
-  if (in_array($reltype_id, array('C', 'H', 'Y', 'QMSCO')))   { $start_date_raw = $row['Z']; }
+  if (in_array($reltype_id, array('SP', 'ES'))) { $start_date_raw = $row['AF'] + 0; }
+  if (in_array($reltype_id, array('C', 'H', 'Y', 'QMSCO')))   { $start_date_raw = $row['Z'] + 0; }
   if (!$start_date_raw) {
-    $a = $row['AC'];
-    $b = $row['AY'];
+    $a = $row['AC'] + 0;
+    $b = $row['AY'] + 0;
     if ($a && $b) { $start_date_raw = min($a, $b); }
     else if ($a)  { $start_date_raw = $a; }
     else if ($b)  { $start_date_raw = $b; }
-    else          { return array('success' => FALSE, 'msg' => "No start date (nothing in columns AC or AY) for the relationship."); }
+    else          { 
+      // return array('success' => FALSE, 'msg' => "No start date (nothing in columns AC or AY) for the relationship.");
+      $start_date_raw = '19000101';
+    }
   }
   $year = substr($start_date_raw, 0, 4);
   $month = substr($start_date_raw, 4, 2);
-  $day = '01';
-  if (!$year || $year <= 1900 || !$month || $month < 1 || $month > 12) { return array('success' => FALSE, 'msg' => "Invalid or missing relationship effective date."); }
+
+  $day = substr($start_date_raw, 6, 2);
+  if (!$day) { $day = 1; }
+  $day += 0;
+  if (!$year || $year < 1900 || !$month || $month < 1 || $month > 12 || $day < 1 || $day > 31) {
+    return array('success' => FALSE, 'msg' => "Invalid or missing relationship effective date.");
+  }
   if (strlen($month) < 2) { $month = "0$month"; }
+  if (strlen($day) < 2) { $day = "0$day"; }
   $start_date = "$year-$month-$day 00:00:00";
 
   // End date:
   // reltype = SP: BPA-DEP2-DIV-DATE / AH
   // reltype = ES: BPA-DEP2-DIV-DATE / AH if it exists; else later of BPA-DEP2-TERM / AL or BPA-DEP2-TERM2 / AX
 
-  if (in_array($reltype_id, array('SP', 'ES'))) { $end_date_raw = $row['AH']; }
+  if (in_array($reltype_id, array('SP', 'ES'))) { $end_date_raw = $row['AH'] + 0; }
   if (!$end_date_raw && ($reltype_id == 'ES')) {
-    $a = $row['AL'];
-    $b = $row['AX'];
+    $a = $row['AL'] + 0;
+    $b = $row['AX'] + 0;
     if ($a && $b) { $end_date_raw = min($a, $b); }
     else if ($a)  { $end_date_raw = $a; }
     else if ($b)  { $end_date_raw = $b; }
@@ -73,7 +82,9 @@ function sirius_smf_feed_dependents_row_verify_relationship($feed_node, $info, $
     $year = substr($end_date_raw, 0, 4);
     $month = substr($end_date_raw, 4, 2);
     $day = '01';
-    if (!$year || $year <= 1900 || !$month || $month < 1 || $month > 12) { return array('success' => FALSE, 'msg' => "Invalid or missing relationship effective date."); }
+    if (!$year || $year <= 1900 || !$month || $month < 1 || $month > 12) {
+      return array('success' => FALSE, 'msg' => "Invalid or missing relationship end date.");
+    }
     if (strlen($month) < 2) { $month = "0$month"; }
     $end_date = "$year-$month-$day 00:00:00";
   }

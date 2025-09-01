@@ -30,6 +30,18 @@ function sirius_trust_node_tab_policy_benefit_eligibility_plugin_form($form, &$f
 	}
 
 	$subform = $plugin_info['instance']->form($policy_json['benefits'][$benefit_node->nid]['eligibility']['plugin'][$plugin_key]['settings']);
+
+	$subform['scan_types'] = array(
+		'#type' => 'checkboxes',
+		'#title' => t('Scan Types'),
+		'#options' => array(
+			'benefit_start' => t('Require for benefit to start'),
+			'benefit_continue' => t('Require for benefit to continue'),
+		),
+		'#description' => 'Select when this eligibility plugin must be met<ul><li>"Benefit Start" is for requirements that must be met in order for the benefit to be elected, such as a geographical or a relationship requirement.</li><li>"Benefit Continue" is checked each month and a benefit is discontinued if the requirement is not met; it is appropriate for requirements such as an hours threshold or an election requirement.</ul>',
+		'#default_value' => sirius_form_array_default_value($policy_json['benefits'][$benefit_node->nid]['eligibility']['plugin'][$plugin_key]['settings']['scan_types']),
+	);
+
 	if (!$subform) {
 		$form['nosettings'] = array('#markup' => '<p><em>' . t('There are no settings for this plugin') . '</em></p>');
 		return $form;

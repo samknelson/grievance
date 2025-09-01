@@ -19,39 +19,32 @@ function sirius_trust_page_election_wizard_launch() {
 
 function sirius_trust_page_election_wizard_launch_form($form, &$form_state) {
 	// Get the list of employers;
-	$result = sirius_proxy_call('sirius_employer_list', array());
-	if (!$result['success']) { return sirius_form_error($result['msg']); }
-	$employer_options = $result['data'];
+	$employer_options = sirius_employer_list();
 
 	// Get our current employer.
 	if (user_access('sirius trust staff')) {
-		$form['employer_rnid'] = array(
+		$form['employer_nid'] = array(
 			'#type' => 'select',
 			'#title' => t('Employer'),
 			'#options' => array(NULL => t('-- Select --')) + $employer_options,
 		);
 	} else {
-		$employer_rnid = sirius_proxy_get_user_employer_nid();
-		if (!$employer_rnid) { return sirius_form_error("There is no employer associated with the current user."); }
-		$form['employer_rnid'] = array(
-			'#type' => 'value',
-			'#value' => $employer_rnid,
-		);
+		$employer_node = sirius_employer_get();
+		if (!$employer_node) { return sirius_form_error("There is no employer associated with the current user."); }
+		$employer_nid = $employer_node->nid;
 	}
 
 	// Admins can pick their policy
 	if (user_access('sirius trust staff')) {
-		$result = sirius_proxy_call('sirius_ledger_policy_list');
-		if (!$result['success']) { return sirius_form_error($result['msg']); }
-		$policies = $result['data'];
+		$policies = sirius_ledger_policy_list();
 
 		$policy_options = array();
 		if ($policies) {
 			$policy_options = array();
-			foreach ($policies as $policy_rnid => $policy_rnode) {
-				$policy_options[$policy_rnid] = $policy_rnode->title;
+			foreach ($policies as $policy_nid => $policy_node) {
+				$policy_options[$policy_nid] = $policy_node->title;
 			}
-			$form['policy_rnid'] = array(
+			$form['policy_nid'] = array(
 				'#type' => 'select',
 				'#title' => t('Policy'),
 				'#options' => array(NULL => t('-- Select --')) + $policy_options,
@@ -80,35 +73,33 @@ function sirius_trust_page_election_wizard_launch_form_validate($form, &$form_st
 }
 
 function sirius_trust_page_election_wizard_launch_form_submit($form, &$form_state) {
-
 	$ssn = sirius_ssn_format($form_state['values']['ssn']);
-	$employer_rnid = $form_state['values']['employer_rnid'];
+	$employer_nid = $form_state['values']['employer_nid'];
 
 	// Fetch the worker
-	$result = sirius_proxy_call('sirius_worker_get_by_ssn', $ssn);
-	if (!$result['success']) { drupal_set_message($result['msg'], 'error'); return; }
-	if (!$result['data']) { drupal_set_message('No worker found with that SSN.', 'error'); return; }
-	$worker_rnode = $result['data'];
+	$worker_node = sirius_worker_get_by_ssn($ssn);
+	if (!$worker_node) {
+		drupal_set_message('No worker found with that SSN.', 'error');
+		return;
+	}
 
 	// Verify that the worker is currently employed by the employer
-	if ($employer_rnid) {
-		if ($worker_rnode->field_grievance_shop['und'][0]['target_id'] != $employer_rnid) {
+	if ($employer_nid) {
+		if ($worker_node->field_grievance_shop['und'][0]['target_id'] != $employer_nid) {
 			drupal_set_message('That worker is not a current employee.', 'error'); 
 			return;
 		}
 	}
 
 	// Get the policy
-	$policy_rnid = $_REQUEST['policy_rnid'];
-	if (!$policy_rnid) {
-		$result = sirius_proxy_call('sirius_ledger_policy_lookup', 'trust', $worker_rnode);
-		if (!$result['success']) { drupal_set_message($result['msg'], 'error'); return; }
-		$policy_rnode = $result['data'];
-		if (!$policy_rnode) {
-			drupal_set_message("No policy found for worker " . $worker_rnode->title, 'error');
+	$policy_nid = $_REQUEST['policy_nid'];
+	if (!$policy_nid) {
+		$policy_node = sirius_ledger_policy_lookup('trust', $worker_node);
+		if (!$policy_node) {
+			drupal_set_message("No policy found for worker " . $worker_node->title, 'error');
 			return;
 		}
-		$policy_rnid = $policy_rnode->nid;
+		$policy_nid = $policy_node->nid;
 	}
 
 	// Check for an existing election
@@ -128,7 +119,7 @@ function sirius_trust_page_election_wizard_launch_form_submit($form, &$form_stat
 	  $wizard_node = sirius_log(
 	    'trust:election_wizard', 
 	    'draft', 
-	    $worker_rnode->title, 
+	    $worker_node->title, 
 	    'Election',
 	    $ssn, 
 	    array(),
@@ -138,8 +129,8 @@ function sirius_trust_page_election_wizard_launch_form_submit($form, &$form_stat
 	}
 
 	$wizard_json = sirius_json_get($wizard_node);
-	$wizard_json['wizard']['trust_election']['policy']['policy_rnid'] = $policy_rnid;
-	$wizard_json['wizard']['trust_election']['policy']['employer_rnid'] = $employer_rnid;
+	$wizard_json['wizard']['trust_election']['policy']['policy_nid'] = $policy_nid;
+	$wizard_json['wizard']['trust_election']['policy']['employer_nid'] = $employer_nid;
 	$wizard_json['wizard']['trust_election']['steps']['policy']['complete'] = TRUE;
 	sirius_json_set($wizard_node, $wizard_json);
 	node_save($wizard_node);

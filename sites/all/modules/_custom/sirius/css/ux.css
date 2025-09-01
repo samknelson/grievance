@@ -123,3 +123,16 @@
 	padding: 5px;
 	font-size: 85%;
 }
+
+.sirius_text_inactive,
+.sirius_text_gray,
+.sirius_text_grey { color: #666666; }
+.sirius_text_error,
+.sirius_text_red { color: #990000; }
+.sirius_text_green,
+.sirius_text_success { color: #009900; }
+.sirius_text_warning,
+.sirius_text_yellow { color: #999900; }
+.sirius_text_blue { color: #000099; }
+.sirius_text_white { color: #ffffff; }
+.sirius_text_black { color: #000000; }

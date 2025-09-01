@@ -114,7 +114,7 @@ function sirius_bulk_deliver_batch($bulk_node, $force = FALSE) {
   	$result = sirius_bulk_deliver_entry($log_nid);
   	++$count; 
   	if ($result['success']) { ++$count_success; } else { ++$count_error; }
-  	sirius_minilog("Delivery to recipient #$log_nid via " . $result['medium'] . ": " . $result['to'] . ': ' . $result['msg']);
+  	sirius_minilog("Delivery to recipient #$log_nid via " . $result['medium'] . ": " . print_r($result['to'], 1) . ': ' . $result['msg']);
   }
 
 	return array('success' => TRUE, 'msg' => "Attempted delivery of $count messages, with $count_success success and $count_error error.");;
@@ -138,6 +138,7 @@ function sirius_bulk_deliver_entry($log_nid) {
 	if (!$contact_node) { 
 		$result = array('success' => FALSE, 'msg' => 'No contact node'); 
 	} else {
+
 		// Get the medium
 		$medium = $bulk_node->field_sirius_bulk_medium['und'][0]['value'];
 		if ($medium == 'choice') {
@@ -152,6 +153,10 @@ function sirius_bulk_deliver_entry($log_nid) {
 
 		// Get the recipient
 		if ($medium == 'email') { $to = sirius_email_format($contact_node->field_sirius_email['und'][0]['value']); }
+		else if ($medium == 'postal') {
+			$postal_client = sirius_postal_client_instance();
+			$to = $postal_client->addr_from_node($contact_node);
+		}
 		else { $to = sirius_phone_format($contact_node->field_sirius_phone['und'][0]['value']); }
 
 		$result = sirius_bulk_deliver_impl(
@@ -160,6 +165,7 @@ function sirius_bulk_deliver_entry($log_nid) {
 			$to,
 			array(
 				'contact_node' => $contact_node,
+				'worker_node' => $worker_node,
 				'handler_nids' => array($log_node->nid)
 			)
 		);
@@ -187,13 +193,42 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $deliver_args = arra
 	$handler_nids = $deliver_args['handler_nids'];
 	if (!$handler_nids) { $handler_nids = array($bulk_node->nid); }
 
+	$tokens = $deliver_args;
+	$aliases = array();
+	$aliases['contact_node'] = 'node';
+	$aliases['worker_node'] = 'node';
+
+	if ($tokens['contact_node']) {
+		$tokens['worker_node'] = sirius_worker_get_by_contact_nid($tokens['contact_node']->nid);
+	}
+
 	if (!$to) { return array('success' => FALSE, 'msg' => 'No recipient.'); }
 	$params = array();
 	$params['handler_nids'] = $handler_nids;
 	$params['to'] = $to;
-	$params['subject'] = $bulk_node->title;
-	$params['body'] = $bulk_node->body['und'][0]['value'];
-	$params['sms'] = $bulk_node->field_sirius_sms['und'][0]['value'];
+
+	// Clear token failures
+	sirius_token_failures_clear();
+
+	// Replace tokens in our message
+	$token_replace_options =  array();
+	$token_replace_options['clear'] = TRUE;
+	$token_replace_options['aliases'] = $aliases;
+
+	$params['subject'] = token_replace($bulk_node->field_grievance_notify_subject['und'][0]['value'], $tokens, $token_replace_options);
+	$params['body'] = token_replace($bulk_node->body['und'][0]['value'], $tokens, $token_replace_options);
+	$params['sms'] = token_replace($bulk_node->field_sirius_sms['und'][0]['value'], $tokens, $token_replace_options);
+
+	// Check for token failures
+	$failures = sirius_token_failures_fetch();
+	if ($failures) {
+		$msg = "Token replacement failed: ";
+		foreach ($failures as $name => $value) {
+			$msg .= "$name ==> $value";
+		}
+		return array('success' => FALSE, 'msg' => $msg);
+	}
+
 	$params['voice'] = $json['voice']['text']['human'];
 	$params['voice_machine'] = $json['voice']['text']['machine'];
 	$params['callerid_nid'] = $bulk_node->field_sirius_callerids['und'][0]['target_id'];
@@ -211,7 +246,11 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $deliver_args = arra
 	$params['amd']['MachineDetection'] = 'DetectMessageEnd';
 
 	if (!$is_test) {
-		$params['X-Sirius-Id'] = "UNIQUE/bulk/" . $bulk_node->nid . '/' . $to;
+		if (is_array($to)) {
+			$params['X-Sirius-Id'] = "UNIQUE/bulk/" . $bulk_node->nid . '/' . md5(json_encode($to));
+		} else {
+			$params['X-Sirius-Id'] = "UNIQUE/bulk/" . $bulk_node->nid . '/' . $to;
+		}
 	}
 
 	if ($medium == 'email') {

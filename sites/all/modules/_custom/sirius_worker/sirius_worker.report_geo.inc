@@ -16,10 +16,12 @@ class Sirius_Worker_Report_Geo extends Report_Cache_Report_Generator {
         ),
       ),
       'preview' => array(
+        /*
         'default_display_fields' => array(
           'worker_title',
           'distance',
         ),
+        */
         'preview_links' => TRUE,
       ),
     );
@@ -31,8 +33,14 @@ class Sirius_Worker_Report_Geo extends Report_Cache_Report_Generator {
     return array(
       'contact_nid' => 'Contact NID',
       'worker_nid' => 'Worker NID',
-      'worker_title' => 'Worker Name',
-      'distance' => 'Distance',
+      'distance' => 'Distance in Miles',
+      'worker_title' => 'Name',
+      'worker_ssn' => 'SSN',
+      'worker_address_thoroughfare' => 'Address',
+      'worker_address_premise' => 'Address 2',
+      'worker_address_locality' => 'City',
+      'worker_address_administrative_area' => 'State',
+      'worker_address_postal_code' => 'Zip',
     );
   }
 
@@ -101,7 +109,7 @@ class Sirius_Worker_Report_Geo extends Report_Cache_Report_Generator {
     while ($hr = $stmt->fetchAssoc()) {
       $records[] = $hr;
     }
-    return array_chunk($records, 1000, TRUE);
+    return array_chunk($records, 100, TRUE);
   }
 
   public function batch($records, $values, &$context) {
@@ -115,11 +123,18 @@ class Sirius_Worker_Report_Geo extends Report_Cache_Report_Generator {
       $distance = round(sirius_addr_latlon_distance($lat, $lon, $record['lat'], $record['lon']), 4);
       if ($distance > $radius) { continue; }
 
+      $worker_node = node_load($record['worker_nid']);
+
       $row = array();
       $row['worker_nid'] = $record['worker_nid'];
       $row['contact_nid'] = $record['contact_nid'];
       $row['distance'] = $distance;
       $row['worker_title'] = sirius_node_title($row['worker_nid']);
+      $row['worker_ssn'] = $worker_node->field_sirius_ssn['und'][0]['value'];
+      foreach (array('thoroughfare', 'premise', 'locality', 'administrative_area', 'postal_code') as $key) {
+        $row["worker_address_$key"] = $worker_node->field_sirius_address['und'][0][$key];
+      }
+
       $rows['rows'][$record['worker_nid']] = $row;
 
       $context['results']['dashboard']['count']++;

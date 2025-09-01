@@ -15,14 +15,14 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.ac
 // require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.import.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.export.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.fairhotel.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.airports.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.casino.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.amenities.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.airports.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.restaurants.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.contract.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.report_changed_status.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.oneoffs.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_property.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_airport.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_convention.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_actor.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_relationship.inc";
@@ -48,7 +48,6 @@ function unite_sirius_wizard_info() {
 
   // $items += sirius_ledger_feed_charges_info();
   $items += unite_feed_property_info();
-  $items += unite_feed_airport_info();
   $items += unite_feed_convention_info();
   $items += unite_feed_actor_info();
   $items += unite_feed_relationship_info();
@@ -71,13 +70,15 @@ function unite_node_presave($node) {
 	if ($node->type == 'actor') {
 		unite_actor_node_presave($node);
 	}
+
+	unite_addr_node_presave($node);
 }
 
 function unite_calc_distances($property_node) {
 	$calc_fields = array(
+		'field_convention_center' => 'field_calc_convention_dist',
 		'field_airport' => 'field_calc_airport_dist', 
 		'field_airport_alt' => 'field_calc_airport_dist_alt',
-		'field_convention_center' => 'field_calc_convention_dist'
 	);
 
 	foreach ($calc_fields as $source_field => $target_field) {
@@ -220,12 +221,10 @@ function unite_form_alter(&$form, &$form_state, $form_id) {
 
   // Hide computed fields
 	if (in_array($form_id, array('property_node_form', 'unite_node_tab_amenities_edit_form'))) {
-		$form['field_relationships']['#access'] = FALSE;
+		// $form['field_relationships']['#access'] = FALSE;
 		$form['field_calc_owner_last_updated']['#access'] = FALSE;
 		$form['field_calc_operator_last_updated']['#access'] = FALSE;
-		$form['field_calc_airport_dist']['#access'] = FALSE;
-		$form['field_calc_airport_dist_alt']['#access'] = FALSE;
-		$form['field_calc_convention_dist']['#access'] = FALSE;
+ 		$form['field_calc_convention_dist']['#access'] = FALSE;
 	}
 
   // Hide fields from special groups
@@ -234,6 +233,7 @@ function unite_form_alter(&$form, &$form_state, $form_id) {
 		foreach (unite_amenities_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
 		foreach (unite_contract_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
 		foreach (unite_fairhotel_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
+		foreach (unite_restaurants_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
 	}
 
 	if ($form_id == 'actor_node_form') {
@@ -397,3 +397,134 @@ function unite_report_cache_info() {
 
   return $items;
 }
+
+/**
+ * Implements hook_sirius_pageicon_render
+ */
+
+function unite_sirius_pageicon($context) {
+  if (!$context['node']) { return; }
+
+  if ($context['node']->type == 'actor') {
+  	$actor_type_tid = $context['node']->field_actor_type['und'][0]['tid'];
+  	$actor_type_name = sirius_term_title($actor_type_tid);
+  	if ($actor_type_name == 'Airport') {
+  		$icon = '<i class="fas fa-plane"></i>';
+  	} else {
+    	$icon = '<i class="far fa-building"></i>';
+    }
+  } else if ($context['node']->type == 'property') {
+    if ($context['node']->field_is_casino['und'][0]['value'] == 'Y') {
+      $icon = '<i class="fas fa-dice"></i>';
+    } else if ($context['node']->field_is_fs['und'][0]['value'] == 'Y') {
+      $icon = '<i class="fas fa-utensils"></i>';
+    } else {
+      $icon = '<i class="fas fa-concierge-bell"></i>';
+    }
+  } else if ($context['node']->type == 'property_actor') {
+    $icon = '<i class="fas fa-arrows-alt-h"></i>';
+  }
+
+  $result = array();
+  if ($icon) { $result['icon'] = $icon; }
+  return $result;
+}
+
+
+
+
+
+
+
+//
+// A bit of history here.
+// - Originally, I wrote some clever code for the HotelsDB. 
+//   It ran during hook_node_presave, and set fields like "address_canonical" and "address_accuracy". 
+//   I sloppily put the code into the file "sirius.addr.inc" for no particularly good reason, except that it
+//   was "about addresses" and someday Sirius might want it.
+// 
+// - Sirius decided that it did want it. But has a slightly different schema and slighly different needs.
+// 
+// - In an ideal world, I'd update the HotelsDB to use the Sirius fields. But that would be a nontrivial data migration
+//   project, and would require a lot of backwards-compatability testing.
+//
+// - So I'm moving the code into this file, and leaving it as a mostly copy-and-paste.
+// 
+// - Some day, we should make the HotelsDB fields be the same as the Sirius fields, and we can then throw this code away.
+//
+
+function unite_addr_node_presave($node) {
+	unite_addr_node_presave_geometry($node);
+	unite_addr_node_presave_county($node);
+}
+
+function unite_addr_node_presave_geometry($node) {
+	// Set the address JSON from geocoder
+	$field_name = 'field_address';
+	if (isset($node->{$field_name})) {
+		$entity_type = 'node';
+		$entity = $node;
+
+		$field_instance = field_info_instance('node', 'field_address_geofield', $node->type);
+    $handler = geocoder_get_handler($field_instance['widget']['settings']['geocoder_handler']);
+    $target_info = field_info_field($field_instance['field_name']);
+    $field_info = geocoder_widget_get_field_info($entity_type, $field_instance, $entity);
+    $items = geocoder_widget_get_entity_field_value($entity_type, $field_instance, $entity);
+    $item = $items[0];
+
+    // Get the handler-specific-settings.
+    if (isset($field_instance['widget']['settings']['handler_settings'][$handler['name']])) {
+      $handler_settings = $field_instance['widget']['settings']['handler_settings'][$handler['name']];
+    }
+    else {
+      $handler_settings = array();
+    }
+    $geometry = geocoder_cache_get($handler['name'], $item, $handler_settings);
+
+    if ($geometry) { 
+			$node->field_address_canon_accuracy['und'][0]['value'] = $geometry->data['geocoder_accuracy'];
+    } else {
+    	unset($node->field_address_canon_accuracy['und'][0]['value']);
+    }
+
+    if ($geometry && ($geometry->data['geocoder_accuracy'] == 'ROOFTOP') && $geometry->data['geocoder_formatted_address']) {
+    	$node->field_address_canon['und'][0]['value'] = $geometry->data['geocoder_formatted_address'];
+    } else {
+	    $node->field_address_canon['und'][0]['value'] = sirius_addr_format_oneline($item);
+    }
+
+    if ($geometry) {
+	    $json = sirius_json_get($node);
+	    $json['addr'][$field_name]['geometry'] = $geometry;
+	    sirius_json_set($node, $json);
+	  }
+	}
+}
+
+function unite_addr_node_presave_county($node) {
+	$field_names = array(
+		'field_county' => 'field_address',
+		// 'field_sirius_county' => 'field_sirius_address',
+	);
+
+	foreach ($field_names as $to_field_name => $from_field_name) {
+		// Never overwrite existing values
+		if ($node->{$to_field_name}['und'][0]['value']) { continue; }
+
+		// Check to see if our geocoder gave us a county
+		$json = sirius_json_get($node);
+		$geometry_json = $json['addr'][$from_field_name]['geometry'];
+		$county_name = sirius_addr_get_component_name($geometry_json, 'administrative_area_level_2');
+		if (!$county_name) { continue; }
+
+		// Set the county
+		$node->{$to_field_name}['und'][0]['value'] = $county_name;
+	}
+}
+
+
+
+
+
+
+

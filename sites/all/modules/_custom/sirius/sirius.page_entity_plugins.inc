@@ -22,11 +22,11 @@ function sirius_node_tab_entity_plugins_access($entity, $plugin_class) {
 	return TRUE;
 }
 
-function sirius_node_tab_entity_plugins_quicknav($entity_node, $plugin_class) {
+function sirius_node_tab_entity_plugins_quicknav($entity_node, $plugin_class, $my_plugin_uuid = NULL) {
 	$plugins = sirius_plugin_entity_plugins($entity_node, $plugin_class);
 
 	$base_path = current_path();
-	$base_path = preg_replace('/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', '', $base_path);
+	$base_path = preg_replace('/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.*$/', '', $base_path);
 
 	$links = array();
 	$link = array();
@@ -35,8 +35,10 @@ function sirius_node_tab_entity_plugins_quicknav($entity_node, $plugin_class) {
 	$links[] = $link;
 
 	foreach ($plugins as $plugin_uuid => $plugin) {
+		$link = array();
 		$link['title'] = $plugin['title'];
 		$link['path'] = "$base_path/$plugin_uuid";
+		if ($plugin_uuid == $my_plugin_uuid) { $link['current'] = TRUE; }
 		$links[] = $link;
 	}
 

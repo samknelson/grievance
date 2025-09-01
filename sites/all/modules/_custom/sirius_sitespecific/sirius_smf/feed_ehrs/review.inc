@@ -35,17 +35,11 @@ function sirius_smf_feed_ehrs_review_form($form, &$form_state, $info, $data, $wi
 	$currency = sirius_ledger_currency_from_account_nid($account_nid);
 	$balance_render = $currency->render_amt($balance);
 
-
-
-
-
 	$html = '<p>' . t('Thank you for completing the monthly hours upload.') . '</p>';
 	$html .= l('View All Invoices and Monitor Payment Status', 'node/' . $employer_node->nid . '/grievance_shop_ledger', array('attributes' => array('class' => array('tool-button'))));
 
 	$form['html'] = array('#markup' => $html);
 
-
-
-	return sirius_sms_feed_ehrs_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
+	return sirius_smf_feed_ehrs_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
 }
 

@@ -42,7 +42,7 @@ function sirius_smf_feed_ehrs_high_hrs_form($form, &$form_state, $info, $data, $
 		'#value' => 'Confirm and Continue',
 	);
 
-	return sirius_sms_feed_ehrs_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
+	return sirius_smf_feed_ehrs_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
 }
 
 function sirius_smf_feed_ehrs_high_hrs_form_submit($form, &$form_state) {
@@ -51,5 +51,5 @@ function sirius_smf_feed_ehrs_high_hrs_form_submit($form, &$form_state) {
 	$wizard_node = $form_state['wizard_node'];
 	$current_step = $form_state['current_step'];
 
-	sirius_wizard_submit($info, $data, $wizard_node, $current_step, "Confirmed.", array('nonsequential' => FALSE));
+	sirius_wizard_submit($info, $data, $wizard_node, $current_step, "Confirmed.", array('nonsequential' => FALSE, 'feed_status' => 'draft'));
 }

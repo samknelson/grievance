@@ -40,24 +40,48 @@ function sirius_ledger_node_tab_ea_stripe_payment_form($form, &$form_state, $ea_
 	$currency = sirius_ledger_currency_from_account_nid($account_nid);
 	$balance_render = $currency->render_amt($balance);
 
-	$form['amount'] = array(
+	$form['intro'] = array(
+		'#markup' => sirius_fakerender_field('Balance:', $balance_render),
+	);
+
+	$form['which'] = array(
+		'#type' => 'select',
+		'#title' => t('I want to:'),
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'full' => t('Pay full balance'),
+			'partial' => t('Pay partial amount'),
+		),
+	);
+
+	$form['amt_full'] = array('#type' => 'value', '#value' => $balance);
+
+	$form['amt_partial'] = array(
 		'#type' => 'textfield',
 		'#title' => 'Payment Amount',
 		'#size' => 6,
 		'#field_prefix' => '$',
-		'#prefix' => sirius_fakerender_field('Total Due:', $balance_render),
+ 		'#states' => array(
+ 			'visible' => array(
+ 				":input[name=\"which\"]" => array(
+ 					array('value' => 'partial'),
+ 				),
+ 			)
+ 		),
 	);
 
 	$form['paymentmethod'] = array(
 		'#type' => 'select',
 		'#title' => 'Payment Method',
 		'#options' => array(NULL => t('-- Select --')) + $paymentmethods_options,
+		'#required' => TRUE,
 	);
 
 	$form['confirm'] = array(
 		'#type' => 'checkbox',
 		'#title' => 'Yes, please charge the amount entered above to the selected payment method.',
 		'#required' => TRUE,
+		'#prefix' => '<br />',
 	);
 
 	$form['submit'] = array(
@@ -68,6 +92,32 @@ function sirius_ledger_node_tab_ea_stripe_payment_form($form, &$form_state, $ea_
 	return $form;
 }
 
+
+
+
+
+function sirius_ledger_node_tab_ea_stripe_payment_form_validate($form, &$form_state) {
+	sirius_require('sirius_ledger', 'sirius_ledger.stripe.inc');
+	$ea_node = node_load($form_state['ea_nid']);
+
+	$ea = Sirius_Ledger_EA::getInstance();
+	$entity_node = $ea->entity_node($ea_node);
+	$account_node = $ea->account_node($ea_node);
+	$currency = sirius_ledger_currency_from_account_nid($account_node->nid);
+
+	$which = $form_state['values']['which'];
+	if ($which == 'full') {
+		$amt = $form_state['values']['amt_full'];
+	} else {
+		$amt = $form_state['values']['amt_partial'];
+	}
+
+	$result = $currency->validate_amt($amt);
+	if (!$result['success']) {
+		form_set_error("amt_partial", $result['msg']);
+	}
+}
+
 function sirius_ledger_node_tab_ea_stripe_payment_form_submit($form, &$form_state) {
 	sirius_require('sirius_ledger', 'sirius_ledger.stripe.inc');
 	$ea_node = node_load($form_state['ea_nid']);
@@ -75,6 +125,7 @@ function sirius_ledger_node_tab_ea_stripe_payment_form_submit($form, &$form_stat
 	$ea = Sirius_Ledger_EA::getInstance();
 	$entity_node = $ea->entity_node($ea_node);
 	$account_node = $ea->account_node($ea_node);
+	$currency = sirius_ledger_currency_from_account_nid($account_node->nid);
 
 	$service = sirius_ledger_service();
 	$access = sirius_access_instance('ledger');
@@ -93,10 +144,20 @@ function sirius_ledger_node_tab_ea_stripe_payment_form_submit($form, &$form_stat
 		return;
 	}
 
-	$amount = $form_state['values']['amount'];
-	$paymentmethod_id = $form_state['values']['paymentmethod'];
+	$which = $form_state['values']['which'];
+	if ($which == 'full') {
+		$amt = $form_state['values']['amt_full'];
+	} else {
+		$amt = $form_state['values']['amt_partial'];
+	}
+	$result = $currency->validate_amt($amt);
+	if (!$result['success']) {
+		drupal_set_message($result['msg'], 'error');
+		return;
+	}
+	$amt = $result['amt'];
 
-	$currency = sirius_ledger_currency_from_account_nid($account_node->nid);
+	$paymentmethod_id = $form_state['values']['paymentmethod'];
 	
 	$paymentmethod_json = array();
 	foreach ($paymentmethods_json['data'] as $idx => $tmp) {
@@ -107,16 +168,18 @@ function sirius_ledger_node_tab_ea_stripe_payment_form_submit($form, &$form_stat
 
 	$result = $service->paymentmethod_charge(
 		$entity_node, 
-		$amount,
+		$amt,
 		$account_node->nid,
 		$paymentmethod_id
 	);
 
 	if (!$result['success']) {
 		drupal_set_message("Transaction failed: " . $result['msg'], 'error');
-		return;
+		return $result;
 	}
 
-	drupal_set_message("A charge of " . $currency->render_amt($amount) . " has been applied to " . $paymentmethods_options[$paymentmethod_id] . ". When it clears, the account balance will be updated to reflect the payment.");
+	drupal_set_message("A charge of " . $currency->render_amt($amt) . " has been applied to " . $paymentmethods_options[$paymentmethod_id] . ". When it clears, the account balance will be updated to reflect the payment.");
+
+	return $result;
 }
 

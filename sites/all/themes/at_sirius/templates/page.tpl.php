@@ -85,7 +85,10 @@ if (at_sirius_is_popup()) {
         <?php print $breadcrumb; ?>
         <?php print render($title_prefix); ?>
         <?php if ($title): ?>
-          <h1 id="page-title"><?php print $title; ?></h1>
+          <h1 id="page-title">
+            <?php print sirius_pageicon_render(); ?>
+            <?php print $title; ?>
+          </h1>
         <?php endif; ?>
         <?php print render($title_suffix); ?>
 
