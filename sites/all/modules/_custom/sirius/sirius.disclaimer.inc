@@ -213,9 +213,12 @@ function sirius_disclaimer_accept($host_node, $disclaimer_nodes, $options = arra
 			$json['disclaimer'][$disclaimer_nid]['accepted'] = TRUE;
 		}
 
+		$ts = $options['ts'];
+		if (!$ts) { $ts = time(); }
+
 		$acceptance = array();
 		if ($options['acceptance']) { $acceptance = $options['acceptance']; }
-		$acceptance['ts'] = time();
+		$acceptance['ts'] = $ts;
 		$acceptance['uid'] = $user->uid;
 		$acceptance['user_name'] = $user->name;
 		$acceptance['title'] = $disclaimer_node->title;
@@ -234,13 +237,15 @@ function sirius_disclaimer_accept($host_node, $disclaimer_nodes, $options = arra
  	sirius_jsonfield_util_node_json_set($host_node, $json);
 	node_save($host_node);
 
-	if ($notify_html) {
-		$notify_html = sirius_domain_variable_get('sirius_disclaimer_notify_intro', 'The following disclaimer(s) have been accepted.') . $notify_html;
-    $params = array();
-    $params['body'] = $notify_html;
-    $params['subject'] =  sirius_domain_variable_get('sirius_disclaimer_notify_subject', 'The following disclaimer(s) have been accepted.');
-    $params['to'] = $user->mail;
-    sirius_email_send($params);
+	if (!$options['skip_notify']) {
+		if ($notify_html) {
+			$notify_html = sirius_domain_variable_get('sirius_disclaimer_notify_intro', 'The following disclaimer(s) have been accepted.') . $notify_html;
+	    $params = array();
+	    $params['body'] = $notify_html;
+	    $params['subject'] =  sirius_domain_variable_get('sirius_disclaimer_notify_subject', 'The following disclaimer(s) have been accepted.');
+	    $params['to'] = $user->mail;
+	    sirius_email_send($params);
+		}
 	}
 }
 
