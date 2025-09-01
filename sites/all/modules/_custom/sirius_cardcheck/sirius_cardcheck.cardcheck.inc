@@ -61,6 +61,24 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 			}
 		}
 
+		// The BU
+		if (sirius_domain_component_enabled('employer:bu')) {
+			$bu_options = sirius_employer_bu_list();
+
+			if ($bu_options) {
+				$form['bu'] = array(
+					'#type' => 'select',
+					'#title' => 'Bargaining Unit',
+					'#options' => array(NULL => t('-- Select --')) + $bu_options,
+					'#required' => TRUE,
+					'#default_value' => $cardcheck['bu'],
+				);
+				if ($status != 'unsigned') {
+					$form['bu']['#disabled'] = TRUE;
+				}
+			}
+		}
+
 		// The disclaimer
 		$form['disclaimer'] = sirius_disclaimer_render_form(
 			$disclaimer, 
@@ -207,6 +225,9 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 
 		// Save the custom fields
 	  sirius_jsonfield_util_results_set($cardcheck_json, 'customfield', $form_state['values']['customfield']);
+
+	  // Save the BU
+	  $cardcheck['bu'] = $form_state['values']['bu'];
 
 		// Save the acceptance
 		$cardcheck['acceptance'] = array();
