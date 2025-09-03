@@ -61,6 +61,25 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 			}
 		}
 
+		// The BU
+		if (sirius_domain_component_enabled('employer:bu')) {
+			$bu_options = sirius_employer_bu_list();
+
+			if ($bu_options) {
+				$form['bu'] = array(
+					'#type' => 'select',
+					'#title' => 'Bargaining Unit',
+					'#options' => array(NULL => t('-- Select --')) + $bu_options,
+					'#default_value' => $cardcheck['bu'],
+				);
+				if ($status == 'unsigned') {
+					$form['bu']['#required'] = TRUE;
+				} else {
+					$form['bu']['#disabled'] = TRUE;
+				}
+			}
+		}
+
 		// The disclaimer
 		$form['disclaimer'] = sirius_disclaimer_render_form(
 			$disclaimer, 
@@ -99,6 +118,13 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 					'hide_submit' => TRUE,
 				)
 			);
+		} elseif ($cardcheck['acceptance']['offline']['complete']) {
+			$html = '<div class="sirius_callout_basic">';
+			$html .= '<strong>' . t('Offline Signature On File') . '</strong>';
+			$html .= sirius_fakerender_field('Date:', $cardcheck['acceptance']['offline']['date']);
+			$html .= sirius_fakerender_field('Filename:', $cardcheck['acceptance']['offline']['filename']);
+			$html .= '</div>';
+			$form['esig'] = array('#markup' => $html);
 		} else {
 			$esignature = sirius_jsonfield_util_esignature_get($cardcheck_json, 'esig');
 			if ($esignature) { 
@@ -208,6 +234,9 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 		// Save the custom fields
 	  sirius_jsonfield_util_results_set($cardcheck_json, 'customfield', $form_state['values']['customfield']);
 
+	  // Save the BU
+	  $cardcheck['bu'] = $form_state['values']['bu'];
+
 		// Save the acceptance
 		$cardcheck['acceptance'] = array();
 		$cardcheck['acceptance']['ts'] = time();
@@ -315,6 +344,128 @@ class Sirius_Cardcheck extends Sirius_Singleton {
     $cardcheck_node->title = $title;
     node_save($cardcheck_node);
     return $cardcheck_node;
+	}
+
+
+
+
+
+
+
+
+	public function cardcheck_offline_form($form, &$form_state, $cardcheck_node, $options = array()) {
+		drupal_add_css(drupal_get_path('module', 'sirius') . '/css/ux.css');
+		$form['#tree'] = TRUE;
+		$form_state['cardcheck_nid'] = $cardcheck_node->nid;
+		$status = $this->status($cardcheck_node);
+
+		if (sirius_domain_component_enabled('employer:bu')) {
+			$bu_options = sirius_employer_bu_list();
+
+			if ($bu_options) {
+				$form['bu'] = array(
+					'#type' => 'select',
+					'#title' => 'Bargaining Unit',
+					'#options' => array(NULL => t('-- Select --')) + $bu_options,
+					'#required' => TRUE,
+				);
+				$form['bu']['#required'] = TRUE;
+			}
+		}
+
+		$form['signature_date'] = array(
+			'#title' => t('Signature Date'),
+			'#type' => 'date_popup',
+			'#attributes' => array(
+				'autocomplete' => 'off',
+			),
+			'#required' => TRUE,
+			'#date_format' => 'Y-m-d',
+		);
+
+		$form['filename'] = array(
+			'#title' => t('Filename'),
+			'#type' => 'textfield',
+		);
+
+		$form['submit'] = array(
+			'#type' => 'submit',
+			'#value' => t('Submit'),
+		);
+
+		return $form;
+	}
+
+	public function cardcheck_offline_form_submit($form, &$form_state) {
+		global $user;
+
+		$cardcheck_node = node_load($form_state['cardcheck_nid']);
+		$result = SiriusResult::create(
+			$this->accept_offline(
+				$cardcheck_node,
+				$form_state['values']
+			)
+		);
+
+		$result->drupalSetMessage();
+		return $result;
+	}
+
+	public function accept_offline(&$cardcheck_node, $values) {
+		if ($this->status($cardcheck_node) != 'unsigned') {
+			return array('success' => FALSE, 'msg' => "Only unsigned card checks can be accepted.");
+		}
+
+		$date = $values['signature_date'];
+		if (!$date) {
+			return array('success' => FALSE, 'msg' => 'Please enter a signature date.');
+		}
+		$ts = strtotime($date);
+
+		$definition_node = $this->get_definition_node($cardcheck_node);
+
+		$definition_json = sirius_json_get($definition_node);
+		$definition = $definition_json['cardcheck_definition'];
+
+		$cardcheck_json = sirius_json_get($cardcheck_node);
+		$cardcheck = $cardcheck_json['cardcheck'];
+
+		$disclaimer_nid = $definition['disclaimer_nid'];
+		$disclaimer_node = node_load($disclaimer_nid);
+		$disclaimer_json = sirius_json_get($disclaimer_node);
+		$disclaimer = $disclaimer_json['disclaimer'];
+
+		sirius_jsonfield_util_esignature_set($cardcheck_json, 'esig', array());
+
+		// Save the custom fields
+	  sirius_jsonfield_util_results_set($cardcheck_json, 'customfield', $values['customfield']);
+
+	  // Save the BU
+	  $cardcheck['bu'] = $values['bu'];
+
+	  global $user;
+		// Save the acceptance
+		$cardcheck['acceptance'] = array();
+		$cardcheck['acceptance']['ts'] = strtotime($date);
+		$cardcheck['acceptance']['uid'] = $user->uid;
+		$cardcheck['acceptance']['user_name'] = $user->name;
+
+		$cardcheck['acceptance']['offline'] = array();
+		$cardcheck['acceptance']['offline']['complete'] = TRUE;
+		$cardcheck['acceptance']['offline']['filename'] = $values['filename'];
+		$cardcheck['acceptance']['offline']['date'] = $date;
+
+		$cardcheck_json['cardcheck'] = $cardcheck;
+
+		sirius_json_set($cardcheck_node, $cardcheck_json);
+
+		$this->status_set($cardcheck_node, 'signed');
+		node_save($cardcheck_node);
+
+		// Accept the disclaimer
+		sirius_disclaimer_accept($cardcheck_node, array($disclaimer_node), array('skip_notify' => TRUE, 'ts' => $ts));
+
+		return array('success' => TRUE, 'msg' => 'Offline cardcheck accepted.');
 	}
 
 	public function test_cardcheck_node($definition_nid) {

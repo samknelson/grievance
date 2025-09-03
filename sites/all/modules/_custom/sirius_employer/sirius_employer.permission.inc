@@ -55,6 +55,26 @@ function sirius_employer_permission() {
 }
 
 /**
+ * Implements hook_node_access
+ */
+
+function sirius_employer_node_access($node, $op, $account) {
+  // Get the node type
+  if (is_object($node)) { $type = $node->type; } else { $type = $node; }
+
+  // Specific checks by node type
+  if ($type == 'sirius_bu') { return sirius_employer_node_access_bu($node, $op, $account); }
+
+  // We know nothing.
+  return NODE_ACCESS_IGNORE;
+}
+
+function sirius_employer_node_access_bu($node, $op, $account) {
+  if ($op == 'view') { return user_access('sirius'); }
+  return user_access('sirius employer admin');
+}
+
+/**
  * @todo: We are beginning the process of moving access control into the Access class.
  *        This process is JUST STARTING.
  *        So don't expect too much from this at the moment. In the mean time, access control is

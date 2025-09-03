@@ -58,6 +58,16 @@ function sirius_cardcheck_node_tabs() {
     'skip_node_view_check' => TRUE,
   );
 
+  $node_tabs['sirius_log']['sirius_log_cardcheck_offline'] = array(
+    'title' => 'Offline Cardcheck',
+    'description' => '',
+    'callback' => 'sirius_cardcheck_node_tab_cardcheck_offline',
+    'permissions' => array('sirius cardcheck admin'),
+    'file' => 'sirius_cardcheck.page_cardcheck_offline.inc',
+    'component' => 'cardcheck',
+    'skip_node_view_check' => TRUE,
+  );
+
   sirius_node_tab_set_module('sirius_cardcheck', $node_tabs);
 
   return $node_tabs;
