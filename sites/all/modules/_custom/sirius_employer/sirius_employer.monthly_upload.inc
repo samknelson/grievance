@@ -159,6 +159,19 @@ class Sirius_Employer_Monthly_Upload extends Sirius_Singleton {
     drupal_goto("node/" . $eup_node->nid . '/sirius_smf_ehrs_wizard'); // @todo
   }
 
+  public function employer_landing_form_validate($form, &$form_state) {
+    $year = $form_state['values']['year'] + 0;
+    $month = $form_state['values']['month'] + 0;
+
+    $year_now = date('Y') + 0;
+    $month_now = date('m') + 0;
+
+    if ($year > $year_now || ($year == $year_now && $month >= $month_now)) {
+      form_set_error("year", "Please select a prior month.");
+      return;
+    }
+  }
+
   public function render_tools($eup_node) {
     return l('View', 'node/' . $eup_nid, array('attributes' => array('class' => array('tool-button'))));
   }
