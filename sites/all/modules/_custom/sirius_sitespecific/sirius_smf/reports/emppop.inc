@@ -221,7 +221,7 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
         $sql .= "and month = :m ";
         $stmt = sirius_sql_query($sql, array(':worker_nid' => $worker_nid, ':y' => $y, ':m' => $m));
         $hr = $stmt->fetchAssoc();
-        $row['hours_' . $i] = roun($hr['c'], 2);
+        $row['hours_' . $i] = round($hr['c'], 2);
         --$m;
         if ($m < 1) { $m = 12; --$y; }
       }
