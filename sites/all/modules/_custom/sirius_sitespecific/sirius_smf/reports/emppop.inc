@@ -30,6 +30,7 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
     $fields['life'] = 'Life';
     $fields['medical'] = 'Medical';
     $fields['dependent_count'] = 'Dependent Count';
+    $fields['tier'] = 'Tier';
     $fields['hours_0'] = 'Hours This Month';
     $fields['hours_1'] = 'Hours Prev 1';
     $fields['hours_2'] = 'Hours Prev 2';
@@ -212,6 +213,14 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
       $count = count($dependent_nids) - 1;
       if ($count < 0) { $count = 0; }
       $row['dependent_count'] = $count;
+
+      if ($count == 1) {
+        $row['tier'] = 'single';
+      } else if ($count == 2) {
+        $row['tier'] = 'single plus one';
+      } else if ($count > 2) {
+        $row['tier'] = 'family';
+      }
 
       $y = $parameters['year']+0;
       $m = $parameters['month']+0;
