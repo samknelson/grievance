@@ -29,7 +29,7 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
     $fields['election'] = 'Election';
     $fields['life'] = 'Life';
     $fields['medical'] = 'Medical';
-    $fields['dependent_count'] = 'Dependent Count';
+    $fields['covered_lives'] = 'Covered Lives';
     $fields['tier'] = 'Tier';
     $fields['hours_0'] = 'Hours This Month';
     $fields['hours_1'] = 'Hours Prev 1';
@@ -210,9 +210,9 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
         $dependent_nid = $wb_node->field_sirius_worker['und'][0]['target_id'];
         $dependent_nids[$dependent_nid]++;
       }
-      $count = count($dependent_nids) - 1;
+      $count = count($dependent_nids);
       if ($count < 0) { $count = 0; }
-      $row['dependent_count'] = $count;
+      $row['covered_lives'] = $count;
 
       if ($count == 1) {
         $row['tier'] = 'single';
