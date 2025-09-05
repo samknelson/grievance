@@ -26,6 +26,7 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
     $fields['worker_nid'] = 'Worker NID';
     $fields['first_name'] = 'Frst Name';
     $fields['last_name'] = 'Last Name';
+    $fields['election'] = 'Election';
     $fields['life'] = 'Life';
     $fields['medical'] = 'Medical';
     $fields['dependent_count'] = 'Dependent Count';
@@ -225,6 +226,9 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
         --$m;
         if ($m < 1) { $m = 12; --$y; }
       }
+
+      $election_node = sirius_trust_worker_election($worker_node, $ts);
+      if ($election_node) { $row['election'] = 'Y'; } else { $row['election'] = 'N'; }
 
       $rows[$worker_nid] = $row;
     }
