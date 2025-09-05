@@ -196,7 +196,7 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
       $wb_node = reset($probe);
       if ($wb_node) {
         $benefit_node = node_load($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
-        $row['medical'] = $benefit_node->title;
+        $row['medical'] = $benefit_node->field_sirius_id['und'][0]['value'];
       }
 
       $params = array();
