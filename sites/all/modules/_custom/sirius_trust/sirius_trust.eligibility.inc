@@ -95,6 +95,7 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_universal.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_election.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_reltype.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_relationship_active.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_ws.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_ms.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_geog.inc');
@@ -108,6 +109,7 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
   Sirius_Trust_Elgibility_Plugin_Universal::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_Election::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_Reltype::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_Relationship_Active::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_WS::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_MS::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_Geog::getInstance()->setInfo($items);
