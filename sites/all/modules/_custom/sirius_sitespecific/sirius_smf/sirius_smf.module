@@ -18,6 +18,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sir
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.cobra.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.ms.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.elections.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.register.inc';
 
 /***
  * Implements hook_sirius_wizard_info()
@@ -43,6 +44,7 @@ function sirius_smf_sirius_wizard_info() {
 
 function sirius_smf_sirius_config_links_alter(&$links) {
   $links['smf']['title'] = 'SMF';
+  $links['smf']['links']['smf/register/config'] = array('title' => 'Registration Settings');
   $links['smf']['links']['sirius/smf/views-taxonomy-restrict-by-parent-config'] = array('title' => 'Views Taxonomy Restrict by Parent');
 }
 
@@ -227,6 +229,7 @@ function sirius_smf_report_cache_info() {
   $items = array();
 
   sirius_require('sirius_smf', 'reports/empstatus.inc');
+  sirius_require('sirius_smf', 'reports/emppop.inc');
   sirius_require('sirius_smf', 'reports/emprates.inc');
   sirius_require('sirius_smf', 'reports/actuarialhours.inc');
   sirius_require('sirius_smf', 'reports/autotag_interval.inc');
@@ -246,6 +249,7 @@ function sirius_smf_report_cache_info() {
   sirius_require('sirius_smf', 'reports/edi_mlk.inc');
 
   Sirius_Smf_Report_Empstatus::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Emppop::getInstance()->setInfo($items);
   Sirius_Smf_Report_Emprates::getInstance()->setInfo($items);
   Sirius_Smf_Report_Actuarial_Hours::getInstance()->setInfo($items);
   Sirius_Smf_Report_Autotag_Interval::getInstance()->setInfo($items);

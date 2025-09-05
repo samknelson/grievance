@@ -13,7 +13,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       'module' => 'sirius_smf',
       'file' => 'reports/edi_kaiser.inc',
       'row_encoding' => 'json',
-      'edi_tiers' => array('single', 'single+1', 'family'),
+      'edi_tiers' => array('single', 'single+1', 'family', 'no_coverage'),
       'edi_output_format' => 'fixed',
     );
 
@@ -37,6 +37,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
 
   public function edi_premium_tier($context) {
     if (!($this->is_subscriber($context))) { return NULL; }
+    if ($this->coverage_end_date($context)) { return 'no_coverage'; }
 
     $count = count($context['dependent_relationship_nodes']);
     if ($count == 0) { return 'single'; }
