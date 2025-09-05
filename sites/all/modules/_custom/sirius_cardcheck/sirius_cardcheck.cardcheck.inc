@@ -42,7 +42,7 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 			if ($acceptance) {
 				$html = "<div class=\"sirius_callout_basic sirius_callout_success\">";
 				$html .= "<h2>" . t('Card Check Accepted') . '</h2>';
-				$html .= sirius_fakerender_field('Accepted on:', date('l, F j, g:i A', $acceptance['ts']));
+				$html .= sirius_fakerender_field('Accepted on:', date('l, F j, Y', $acceptance['ts']));
 				$html .= sirius_fakerender_field('Accepted by:', $acceptance['user_name']);
 				$html .= '</div>';
 				$form['acceptance'] = array('#markup' => $html);
@@ -54,7 +54,7 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 			if ($revocation) {
 				$html = "<div class=\"sirius_callout_basic sirius_callout_error\">";
 				$html .= "<h2>" . t('Card Check Revoked') . '</h2>';
-				$html .= sirius_fakerender_field('Revoked on:', date('l, F j, g:i A', $revocation['ts']));
+				$html .= sirius_fakerender_field('Revoked on:', date('l, F j, Y', $revocation['ts']));
 				$html .= sirius_fakerender_field('Revoked by:', $revocation['user_name']);
 				$html .= '</div>';
 				$form['revocation'] = array('#markup' => $html);

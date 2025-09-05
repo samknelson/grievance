@@ -37,10 +37,10 @@ function sirius_cardcheck_node_tab_worker($worker_node) {
 
   		$notes = array();
   		if ($acceptance['ts']) {
-  			$notes[] = 'Accepted: ' . date('l, F j, g:i A', $acceptance['ts']);
+  			$notes[] = 'Accepted: ' . date('l, F j, Y', $acceptance['ts']);
   		}
   		if ($revocation['ts']) {
-  			$notes[] = 'Revoked: ' . date('l, F j, g:i A', $revocation['ts']);
+  			$notes[] = 'Revoked: ' . date('l, F j, Y', $revocation['ts']);
   		}
 
   		$definition_node = sirius_log_handler($cardcheck_node, 'sirius_json_definition');
