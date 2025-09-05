@@ -26,9 +26,11 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
     $fields['worker_nid'] = 'Worker NID';
     $fields['first_name'] = 'Frst Name';
     $fields['last_name'] = 'Last Name';
+    $fields['election'] = 'Election';
     $fields['life'] = 'Life';
     $fields['medical'] = 'Medical';
-    $fields['dependent_count'] = 'Dependent Count';
+    $fields['covered_lives'] = 'Covered Lives';
+    $fields['tier'] = 'Tier';
     $fields['hours_0'] = 'Hours This Month';
     $fields['hours_1'] = 'Hours Prev 1';
     $fields['hours_2'] = 'Hours Prev 2';
@@ -194,7 +196,7 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
       $wb_node = reset($probe);
       if ($wb_node) {
         $benefit_node = node_load($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
-        $row['medical'] = $benefit_node->title;
+        $row['medical'] = $benefit_node->field_sirius_id['und'][0]['value'];
       }
 
       $params = array();
@@ -208,9 +210,17 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
         $dependent_nid = $wb_node->field_sirius_worker['und'][0]['target_id'];
         $dependent_nids[$dependent_nid]++;
       }
-      $count = count($dependent_nids) - 1;
+      $count = count($dependent_nids);
       if ($count < 0) { $count = 0; }
-      $row['dependent_count'] = $count;
+      $row['covered_lives'] = $count;
+
+      if ($count == 1) {
+        $row['tier'] = 'single';
+      } else if ($count == 2) {
+        $row['tier'] = 'single plus one';
+      } else if ($count > 2) {
+        $row['tier'] = 'family';
+      }
 
       $y = $parameters['year']+0;
       $m = $parameters['month']+0;
@@ -221,10 +231,13 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
         $sql .= "and month = :m ";
         $stmt = sirius_sql_query($sql, array(':worker_nid' => $worker_nid, ':y' => $y, ':m' => $m));
         $hr = $stmt->fetchAssoc();
-        $row['hours_' . $i] = roun($hr['c'], 2);
+        $row['hours_' . $i] = round($hr['c'], 2);
         --$m;
         if ($m < 1) { $m = 12; --$y; }
       }
+
+      $election_node = sirius_trust_worker_election($worker_node, $ts);
+      if ($election_node) { $row['election'] = 'Y'; } else { $row['election'] = 'N'; }
 
       $rows[$worker_nid] = $row;
     }
