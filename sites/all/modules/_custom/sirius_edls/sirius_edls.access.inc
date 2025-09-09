@@ -274,6 +274,23 @@ class Sirius_Edls_Access extends Sirius_Access {
       if ($is_employer_reader) { return TRUE; }
     }
 
+    // Trashlock
+    if (in_array($action, array('sheet_trashlock_set', 'sheet_trashlock_clear'))) {
+      // Can only toggle
+      $trashlock = sirius_edls_sheet_trashlock_get($sheet_node);
+      if ($trashlock && ($action == 'sheet_trashlock_set')) { return FALSE; }
+      if (!$trashlock && ($action == 'sheet_trashlock_clear')) { return FALSE; }
+
+      // Coordinators can set any sheet to "draft"
+      if ($is_employer_coordinator) { return TRUE; }
+
+      // Labor advisors can edit sheets that are not in "lock"
+      if ($is_worker_advisor && ($sheet_status != 'lock')) { return TRUE; }
+
+      // Oh well
+      return FALSE;
+    }
+
     // Set sheet to "Draft"
     if ($action == 'sheet_status_draft') {
       // Can't update reserved sheets
@@ -321,6 +338,9 @@ class Sirius_Edls_Access extends Sirius_Access {
 
     // Set sheet to "Trash"
     if ($action == 'sheet_status_trash') {
+      // Can't trash if trashlock
+      if (sirius_edls_sheet_trashlock_get($sheet_node)) { return FALSE; }
+      
       // Can't update reserved sheets
       if ($sheet_reserved) { return FALSE; }
 
