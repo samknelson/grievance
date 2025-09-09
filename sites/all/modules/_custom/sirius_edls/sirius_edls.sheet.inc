@@ -107,6 +107,11 @@ function sirius_edls_sheet_status_set($sheet_node, $new_status) {
 		}
 	}
 
+	// If the new status is anything except draft or trash, do a trash-lock
+	if ($new_status != 'trash' && $new_status != 'draft') {
+		sirius_edls_sheet_trashlock_set($sheet_node);
+	}
+
 	// Queue any pending notifications
 	sirius_edls_notify_queue($sheet_node, $new_status);
 
@@ -223,4 +228,27 @@ function sirius_edls_sheet_export($sheet_node) {
 	
 	fclose($fp);
 	drupal_exit();
+}
+
+function sirius_edls_sheet_trashlock_set($sheet_node) {
+	$sheet_json = sirius_json_get($sheet_node);
+	$sheet_json['edls']['trashlock'] = TRUE;
+	sirius_json_set($sheet_node, $sheet_json);
+	node_save($sheet_node);
+
+	return array('success' => TRUE, 'msg' => 'Track lock set.');
+}
+
+function sirius_edls_sheet_trashlock_clear($sheet_node) {
+	$sheet_json = sirius_json_get($sheet_node);
+	$sheet_json['edls']['trashlock'] = FALSE;
+	sirius_json_set($sheet_node, $sheet_json);
+	node_save($sheet_node);
+
+	return array('success' => TRUE, 'msg' => 'Track lock cleared.');
+}
+
+function sirius_edls_sheet_trashlock_get($sheet_node) {
+	$sheet_json = sirius_json_get($sheet_node);
+	return $sheet_json['edls']['trashlock'];
 }
