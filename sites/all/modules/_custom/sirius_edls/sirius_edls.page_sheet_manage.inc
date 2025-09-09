@@ -40,6 +40,14 @@ function sirius_edls_node_tab_sheet_manage_form($form, &$form_state, $sheet_node
 		$actions['sheet_notify_cancel'] = 'Cancel All Notifications';
 	}
 
+	if ($access->access('sheet_trashlock_set', array('sheet_node' => $sheet_node))) {
+		$actions['sheet_trashlock_set'] = 'Set Trash Lock';
+	}
+
+	if ($access->access('sheet_trashlock_clear', array('sheet_node' => $sheet_node))) {
+		$actions['sheet_trashlock_clear'] = 'Clear Trash Lock';
+	}
+
 	if (!$actions) { return sirius_form_error('You do not have permission to perform any actions on this sheet.'); }
 
 	$form['action'] = array(
@@ -178,6 +186,16 @@ function sirius_edls_node_tab_sheet_manage_form_submit($form, &$form_state) {
 
 	if ($action == 'sheet_notify_cancel') {
 		$result = sirius_edls_sheet_notify_cancel($sheet_node);
+		$msg = $result['msg'];
+	}
+
+	if ($action == 'sheet_trashlock_set') {
+		$result = sirius_edls_sheet_trashlock_set($sheet_node);
+		$msg = $result['msg'];
+	}
+
+	if ($action == 'sheet_trashlock_clear') {
+		$result = sirius_edls_sheet_trashlock_clear($sheet_node);
 		$msg = $result['msg'];
 	}
 
