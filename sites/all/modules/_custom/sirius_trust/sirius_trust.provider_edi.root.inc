@@ -246,6 +246,23 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 	// 
 
 	public function entity_push($entity_nid, $plugin_uuid, $report_id) {
+		$result = $this->entity_push_impl($entity_nid, $plugin_uuid, $report_id);
+
+		$category = 'trust:edi:push';
+		if ($result['success']) { $type = 'success'; } else { $type = 'error'; }
+		$message = $result['msg'];
+		$summary = $result['msg'];
+		$notes = $plugin_uuid;
+		$handler_nids = array($entity_nid);
+		$attachments = array();
+		$json = array();
+		$json['result'] = $result;
+		$json['log'] = sirius_minilog_render_html();
+
+		sirius_log($category, $type, $message, $summary, $notes, $handler_nids, $attachments, $json);
+	}
+
+	public function entity_push_impl($entity_nid, $plugin_uuid, $report_id) {
 	  sirius_minilog("Entity NID:  " . $entity_nid);
 	  sirius_minilog("Plugin UUID: " . $plugin_uuid);
 	  sirius_minilog("Report ID:   " . $report_id);
@@ -399,8 +416,38 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 	}
 
 	public function entity_generate_form_submit($form, &$form_state) {
+		$plugin_uuid = $form_state['plugin_uuid'];
+		$entity_nid = $form_state['entity_nid'];
+		$report_id = $form_state['values']['report_id'];
+
 		$form_state['values']['redirect'] = array('path' => current_path());
 		$form_state['values']['success_msg'] = 'The report has been generated.';
+
+		$result = $this->entity_generate($entity_nid, $plugin_uuid, $report_id, $form, $form_state);
+
+		return $result;
+	}
+
+	public function entity_generate($entity_nid, $plugin_uuid, $report_id, $form, &$form_state) {
+		$result = $this->entity_generate_impl($entity_nid, $plugin_uuid, $report_id, $form, $form_state);
+
+		$category = 'trust:edi:generate';
+		if ($result['success']) { $type = 'success'; } else { $type = 'error'; }
+		$message = $result['msg'];
+		$summary = $result['msg'];
+		$notes = $plugin_uuid;
+		$handler_nids = array($entity_nid);
+		$attachments = array();
+		$json = array();
+		$json['result'] = $result;
+		$json['log'] = sirius_minilog_render_html();
+
+		sirius_log($category, $type, $message, $summary, $notes, $handler_nids, $attachments, $json);
+
+		return $result;
+	}
+
+	public function entity_generate_impl($entity_nid, $plugin_uuid, $report_id, $form, &$form_state) {
 	  $result = report_cache_form_submit($form, $form_state);
 	  return array('success' => TRUE, 'msg' => 'Report generated.');
 	}
@@ -535,5 +582,33 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 		if (!is_dir($dir)) { drupal_mkdir($dir, NULL, TRUE); }
 
 		return $dir;
+	}
+
+	public function last_log_entry($entity_node, $plugin_uuid, $category) {
+		$sql_args = array();
+		$sql = "select nid ";
+		$sql .= "from node ";
+		$sql .= "join field_data_field_sirius_log_handler on field_data_field_sirius_log_handler.entity_type = 'node' and field_data_field_sirius_log_handler.entity_id = node.nid ";
+		$sql .= "join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+		$sql .= "join field_data_field_sirius_notes on field_data_field_sirius_notes.entity_type = 'node' and field_data_field_sirius_notes.entity_id = node.nid ";
+		$sql .= "where node.type = 'sirius_log' ";
+
+		$sql .= "and field_sirius_log_handler_target_id = :entity_nid ";
+		$sql_args[':entity_nid'] = $entity_node->nid;
+
+		$sql .= "and field_sirius_notes_value = :plugin_uuid ";
+		$sql_args[':plugin_uuid'] = $plugin_uuid;
+
+		$sql .= "and field_sirius_category_value = :category ";
+		$sql_args[':category'] = $category;
+
+		$sql .= "order by created desc limit 1 ";
+		$stmt = sirius_sql_query($sql, $sql_args);
+		$hr = $stmt->fetchAssoc();
+		return node_load($hr['nid']);
+	}
+
+	public function list_plugins($entity_node) {
+		return sirius_plugin_entity_plugins($entity_node, $this->plugin_class());
 	}
 }
