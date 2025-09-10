@@ -36,9 +36,12 @@ function sirius_trust_page_providers_edi() {
 
 			foreach (array($generate_log, $push_log) as $log_node) {
 				if ($log_node) {
-					if ($log_node->field_sirius_type['und'][0]['value'] == 'success') {
+					if (in_array($log_node->field_sirius_type['und'][0]['value'], array('success', 'complete'))) {
 						$color = 'green';
 						$msg = 'Success';
+					} else if (in_array($log_node->field_sirius_type['und'][0]['value'], array('start'))) {
+						$color = 'yellow';
+						$msg = 'Running';
 					} else {
 						$color = 'red';
 						$msg = 'Error';
