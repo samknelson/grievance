@@ -405,6 +405,7 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 		sirius_jsonfield_util_set_defaults($form['parameters'], $settings['report_parameters']);
 		$form['parameters']['entity_nid'] = array('#type' => 'value', '#value' => $form_state['entity_nid']);
 		$form['parameters']['plugin_uuid'] = array('#type' => 'value', '#value' => $form_state['plugin_uuid']);
+		$form['parameters']['is_trust_edi'] = array('#type' => 'value', '#value' => TRUE);
 
 
 	  $form['submit'] = array(
@@ -429,17 +430,45 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 	}
 
 	public function entity_generate($entity_nid, $plugin_uuid, $report_id, $form, &$form_state) {
-		$result = $this->entity_generate_impl($entity_nid, $plugin_uuid, $report_id, $form, $form_state);
-
+		// Log the start
 		$category = 'trust:edi:generate';
-		if ($result['success']) { $type = 'success'; } else { $type = 'error'; }
-		$message = $result['msg'];
-		$summary = $result['msg'];
+		$type = 'start';
+		$message = 'Generation starting.';
+		$summary = 'Generation starting.';
 		$notes = $plugin_uuid;
 		$handler_nids = array($entity_nid);
 		$attachments = array();
 		$json = array();
 		$json['result'] = $result;
+		$json['log'] = sirius_minilog_render_html();
+
+		sirius_log($category, $type, $message, $summary, $notes, $handler_nids, $attachments, $json);
+
+		$result = $this->entity_generate_impl($entity_nid, $plugin_uuid, $report_id, $form, $form_state);
+
+		return $result;
+	}
+
+	public function handle_report_cache_callback($context) {
+		$parameters = $context['results']['values']['parameters'];
+		if (!$parameters) { return; }
+		if (!$parameters['is_trust_edi']) { return; }
+		if (!$parameters['entity_nid']) { return; }
+		if (!$parameters['plugin_uuid']) { return; }
+
+		$entity_nid = $parameters['entity_nid'];
+		$plugin_uuid = $parameters['plugin_uuid'];
+
+		// Log the start
+		$category = 'trust:edi:generate';
+		$type = 'complete';
+		$message = 'Generation complete.';
+		$summary = 'Generation complete.';
+		$notes = $plugin_uuid;
+		$handler_nids = array($entity_nid);
+		$attachments = array();
+		$json = array();
+		$json['result'] = $context;
 		$json['log'] = sirius_minilog_render_html();
 
 		sirius_log($category, $type, $message, $summary, $notes, $handler_nids, $attachments, $json);
