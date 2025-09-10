@@ -260,6 +260,8 @@ class Sirius_Trust_Provider_Edi extends Sirius_Plugin {
 		$json['log'] = sirius_minilog_render_html();
 
 		sirius_log($category, $type, $message, $summary, $notes, $handler_nids, $attachments, $json);
+
+		return $result;
 	}
 
 	public function entity_push_impl($entity_nid, $plugin_uuid, $report_id) {
