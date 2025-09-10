@@ -55,7 +55,7 @@ class Report_Cache_Report_Generator {
 			array(
 				'count' => 0, 
 				'tools' => l('Generate', "sirius/reports/$report_type/form", array('attributes' => array('class' => array('tool-button')))),
-				'details' => 'Report has never been run',
+				'details' => 'Report has never been run.',
 			)
 		);
 	}
@@ -73,16 +73,28 @@ class Report_Cache_Report_Generator {
 
   public function dashboard_render_link($prefs, $options, $report_id) {
   	$report_type = $this->type;
+
 		$parameters = $this->parameters($report_id);
+    // dpm($parameters);
+
 		$details = $parameters['meta']['dashboard']['details'];
 		$result = array();
-		$result['tools'] = l('View', "sirius/reports/$report_type", array('query' => array('report_id' => $report_id, 'action' => 'render', 'callback-name' => 'View'), 'attributes' => array('class' => array('tool-button'))));
+
+    $info = $this->info();
+    if ($info['render_callbacks']) {
+      $action = 'render';
+      $render_callback = array_keys($info['render_callbacks'])[0];
+    } else {
+      $action = 'preview';
+    }
+
+		$result['tools'] = l('View', "sirius/reports/$report_type", array('query' => array('report_id' => $report_id, 'action' => $action, 'callback-name' => $render_callback), 'attributes' => array('class' => array('tool-button'))));
 		$count = $parameters['meta']['dashboard']['count'];
 		$result['count'] = $count;
 		$ts = $parameters['meta']['ts']['completed'];
     if (!$ts) { $ts = $parameters['meta']['ts']['started']; }
     if (!$ts) {
-      $result['details'] = 'This report has never been run.';
+      $result['details'] = 'This report has never been run';
     } elseif (isset($count)) {
       $result['details'] = "<strong>$count records</strong> found " . format_interval(time() - $ts) . ' ago.';
     } else {
@@ -172,12 +184,13 @@ class Report_Cache_Report_Generator {
 
   public function row_encoding() {
     static $encoding;
-    if (!isset($encoding)) {
+    $type = $this->type;
+    if (!isset($encoding[$type])) {
       $info = $this->info();
-      $encoding = $info['row_encoding'];
-      if (!$encoding) { $encoding = 'serialize'; }
+      $encoding[$type] = $info['row_encoding'];
+      if (!$encoding[$type]) { $encoding[$type] = 'serialize'; }
     }
-    return $encoding;
+    return $encoding[$type];
   }
 
   public function preview_form_alter(&$form, &$form_state, $report_id, $info) {
@@ -225,6 +238,22 @@ class Report_Cache_Report_Generator {
     }
 
     return $stmt;
+  }
+
+  public function rowcount($report_id) {
+    $domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
+
+    $sql = "select count(*) as c from report_cache ";
+    $sql .= "where report_id = :report_id ";
+    $sql_args[':report_id'] = $report_id;
+    $sql .= "and report_type = :report_type ";
+    $sql_args[':report_type'] = $this->type;
+    $sql .= "and report_domain_nid = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid; 
+
+    $stmt = sirius_sql_query($sql, $sql_args);
+    $hr = $stmt->fetchAssoc();
+    return $hr['c'];
   }
 }
 

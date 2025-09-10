@@ -11,6 +11,8 @@ function sirius_cardcheck_node_tab_worker($worker_node) {
 
 	$action = sirius_node_tab_arg(0);
 
+	$bu_enabled = sirius_domain_component_enabled('employer:bu');
+
 	// Handle "create"
 	if ($action == 'create') {
 		$definition_nid = sirius_node_tab_arg(1);
@@ -48,7 +50,11 @@ function sirius_cardcheck_node_tab_worker($worker_node) {
   		$status = $instance->status($cardcheck_node);
   		$tools = array();
   		$tools[] = l('View', 'node/' . $cardcheck_node->nid . '/sirius_log_cardcheck', array('attributes' => array('class' => array('tool-button'))));
+
   		$row[] = $definition_node->title;
+  		if ($bu_enabled) {
+  			$row[] = sirius_node_title($cardcheck['bu']);
+  		}
   		$row[] = $status_options[$status];
   		$row[] = join('<br />', $notes);
   		$row[] = join('', $tools);
@@ -57,6 +63,9 @@ function sirius_cardcheck_node_tab_worker($worker_node) {
 
   	$header = array();
   	$header[] = t('Card Check');
+  	if ($bu_enabled) {
+  		$header[] = t('Bargaining Unit');
+  	}
   	$header[] = t('Status');
   	$header[] = t('Notes');
   	$header[] = t('Tools');

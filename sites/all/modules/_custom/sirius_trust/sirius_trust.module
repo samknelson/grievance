@@ -13,6 +13,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/s
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.cobra.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.qmsco.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.changequeue.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.providers.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.provider_edi.inc';
 
 /**
@@ -260,6 +261,15 @@ function sirius_sirius_log_buckets_alter(&$buckets) {
     'weight' => 7,
     'can_add' => TRUE,
   );
+
+  $buckets['trust_provider'] = array(
+    'title' => 'Log',
+    'content_type' => 'sirius_trust_provider',
+    'permissions' => array('sirius trust staff'),
+    'path' => 'sirius_trust_provider_log',
+    'weight' => 7,
+    'can_add' => TRUE,
+  );
 }
 
 
@@ -386,3 +396,13 @@ function sirius_trust_sirius_plugin_info($class) {
     return $items;
   }
 }
+
+/**
+ * Implements hook_report_cache_batch_finished_alter
+ */
+
+function sirius_trust_report_cache_batch_finished_alter($context) {
+  sirius_require('sirius_trust', 'sirius_trust.provider_edi.root.inc');
+  Sirius_Trust_Provider_Edi::getInstance()->handle_report_cache_callback($context);
+}
+

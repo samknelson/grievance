@@ -11,11 +11,24 @@ function sirius_trust_election_wizard_info() {
   return $items;
 }
 
+function sirius_trust_election_wizard_is_cobra($data, $wizard_node) {
+	$cobra = Sirius_Trust_Cobra::getInstance();
+	$employer_node = $cobra->cobra_employer();
+
+	if ($employer_node->nid == $data['employer']['employer_nid']) {
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
 function sirius_trust_election_wizard_steps($data, $wizard_node) {
 	$steps = &drupal_static(__FUNCTION__);
 	if (isset($steps)) { return $steps; }
 
   $steps = array();
+
+  $is_cobra = sirius_trust_election_wizard_is_cobra($data, $wizard_node);
 
 	// if (user_access('sirius trust staff')) {
   	$steps['policy'] = array(
@@ -163,24 +176,26 @@ function sirius_trust_election_wizard_steps($data, $wizard_node) {
 		}
 	}
 
-  $steps['dependent_new_count'] = array(
-  	'label' => 'New Dependents', 
-  	'callback' => 'sirius_trust_election_wizard_dependent_new_count_form',
-	  'file' => 'election_wizard/dependent_new_count.inc',
-		'module' => 'sirius_trust',
-  );
+	if (!$is_cobra) {
+	  $steps['dependent_new_count'] = array(
+	  	'label' => 'New Dependents', 
+	  	'callback' => 'sirius_trust_election_wizard_dependent_new_count_form',
+		  'file' => 'election_wizard/dependent_new_count.inc',
+			'module' => 'sirius_trust',
+	  );
 
-	// Need a page for each new relationship which you want to add.
-	if ($data['dependents']['general']['count_new'] > 0) {
-		for ($which=1; $which<=$data['dependents']['general']['count_new']; ++$which) {
-			$label = "New Dependent #$which";
-			$steps["dependent_new_$which"] = array(
-				'label' => $label, 
-				'callback' => 'sirius_trust_election_wizard_dependent_new_form',
-	  		'callback_render' => 'sirius_trust_election_wizard_dependent_new_render',
-			  'file' => 'election_wizard/dependent_new.inc',
-	  		'module' => 'sirius_trust',
-			);
+		// Need a page for each new relationship which you want to add.
+		if ($data['dependents']['general']['count_new'] > 0) {
+			for ($which=1; $which<=$data['dependents']['general']['count_new']; ++$which) {
+				$label = "New Dependent #$which";
+				$steps["dependent_new_$which"] = array(
+					'label' => $label, 
+					'callback' => 'sirius_trust_election_wizard_dependent_new_form',
+		  		'callback_render' => 'sirius_trust_election_wizard_dependent_new_render',
+				  'file' => 'election_wizard/dependent_new.inc',
+		  		'module' => 'sirius_trust',
+				);
+			}
 		}
 	}
 

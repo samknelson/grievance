@@ -21,6 +21,7 @@ class Sirius_Trust_Elgibility_Plugin_Relationship_Active extends Sirius_Trust_El
 
 		$ts = $params['ts'];
 		$start_ts = sirius_fieldval($relationship_node, 'field_sirius_date_start', 'ts');
+		if (!$start_ts) { $start_ts = strtotime('1980-01-01'); }
 		$end_ts = sirius_fieldval($relationship_node, 'field_sirius_date_end', 'ts');
 
 		if ($start_ts === NULL) {
