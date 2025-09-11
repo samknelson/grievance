@@ -125,7 +125,7 @@ class Sirius_Employer_Monthly_Upload extends Sirius_Singleton {
     $year_options = array();
     $y_now = date('Y');
     for ($i=0; $i<12; ++$i) {
-      $year_options[$y_now - $i] = $y_now - $i;
+      $year_options[$y_now + 1 - $i] = $y_now + 1 - $i;
     }
     $form['year'] = array(
       '#type' => 'select',
@@ -134,6 +134,13 @@ class Sirius_Employer_Monthly_Upload extends Sirius_Singleton {
       '#required' => TRUE,
       // '#default_value' => date('Y'),
     );
+
+    if ($form_state['need_future_confirm']) {
+      $form['future_confirm'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('I am uploading data for an incomplete month.'),
+      );
+    }
 
     $form['submit'] = array(
       '#type' => 'submit',
@@ -153,23 +160,27 @@ class Sirius_Employer_Monthly_Upload extends Sirius_Singleton {
 
   public function employer_landing_form_submit($form, &$form_state) {
     $employer_nid = $form_state['employer_nid'];
-    $year = $form_state['values']['year'];
-    $month = $form_state['values']['month'];
+    $year = $form_state['values']['year'] + 0;
+    $month = $form_state['values']['month'] + 0;
+
+    // This should be in "validate", but you can't fucking set "rebuild" in _validate, or
+    // send anything back to the form.
+    if (!$form_state['values']['future_confirm']) {
+      $year_now = date('Y') + 0;
+      $month_now = date('m') + 0;
+      if ($year > $year_now || ($year == $year_now && $month >= $month_now)) {
+        drupal_set_message("The month you are trying to report is not complete.", 'warning');
+        $form_state['rebuild'] = TRUE;
+        $form_state['need_future_confirm'] = TRUE;
+        return;
+      }
+    }
+
     $eup_node = $this->fetch($employer_nid, $year, $month, TRUE);
     drupal_goto("node/" . $eup_node->nid . '/sirius_smf_ehrs_wizard'); // @todo
   }
 
-  public function employer_landing_form_validate($form, &$form_state) {
-    $year = $form_state['values']['year'] + 0;
-    $month = $form_state['values']['month'] + 0;
-
-    $year_now = date('Y') + 0;
-    $month_now = date('m') + 0;
-
-    if ($year > $year_now || ($year == $year_now && $month >= $month_now)) {
-      form_set_error("year", "Please select a prior month.");
-      return;
-    }
+  public function employer_landing_form_validate(&$form, &$form_state) {
   }
 
   public function render_tools($eup_node) {
