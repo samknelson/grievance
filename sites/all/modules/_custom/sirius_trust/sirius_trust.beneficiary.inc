@@ -13,7 +13,7 @@ class Sirius_Trust_Beneficiary extends Sirius_Singleton {
 			);
 			*/
 
-			$form['beneficiaries'][$key]['intro'] = array('#markup' => '<table><tr><th>Name</th><th>SSN</th><th>Phone</th><th>Address</th><th>%</th></tr>');
+			$form['beneficiaries'][$key]['intro'] = array('#markup' => '<table><tr><th>Name</th><th>SSN</th><th>Phone</th><th>Address</th><th>Relationship</th><th>%</th></tr>');
 			for ($i=0; $i<8; ++$i) {
 				$form['beneficiaries'][$key][$i]['intro'] = array('#markup' => '<tr>');
 				$form['beneficiaries'][$key][$i]['name'] = array(
@@ -42,7 +42,14 @@ class Sirius_Trust_Beneficiary extends Sirius_Singleton {
 					'#field_prefix' => '<td>', 
 					'#field_suffix' => '</td>', 
 					'#default_value' => $data['beneficiaries'][$key][$i]['address'],
-					'#size' => 30
+					'#size' => 20
+				);
+				$form['beneficiaries'][$key][$i]['relationship'] = array(
+					'#type' => 'textfield', 
+					'#field_prefix' => '<td>', 
+					'#field_suffix' => '</td>', 
+					'#default_value' => $data['beneficiaries'][$key][$i]['relationship'],
+					'#size' => 20,
 				);
 				$form['beneficiaries'][$key][$i]['pct'] = array(
 					'#type' => 'textfield', 
@@ -123,6 +130,7 @@ class Sirius_Trust_Beneficiary extends Sirius_Singleton {
 		$header[] = t('SSN');
 		$header[] = t('Phone');
 		$header[] = t('Address');
+		$header[] = t('Relationship');
 		$header[] = t('%');
 
 		$rows = array();
@@ -134,6 +142,7 @@ class Sirius_Trust_Beneficiary extends Sirius_Singleton {
 				$row[] = $beneficiary['ssn'];
 				$row[] = $beneficiary['phone'];
 				$row[] = $beneficiary['address'];
+				$row[] = $beneficiary['relationship'];
 				$row[] = $beneficiary['pct'];
 				if (!array_filter($row)) { continue; }
 				$rows[] = $row;
