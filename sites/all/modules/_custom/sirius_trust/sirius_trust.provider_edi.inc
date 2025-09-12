@@ -559,6 +559,17 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
 	}
 
   public function context($worker, $asof_date, $parameters) {
+    $lookups = &drupal_static(__FUNCTION__);
+    if (!isset($lookups['reltypes'])) {
+      $lookups['reltypes'] = sirius_taxonomy_load('sirius_contact_relationship_types', 'tid', 'full');
+
+      $weight = 0;
+      foreach ($lookups['reltypes'] as $tid => $term) {
+        $lookups['reltype_weights'][$term->field_sirius_id['und'][0]['value']] = ++$count;
+      }
+    }
+
+
     $wb_nid = $worker['wb_nid'];
 
     $wb_node = node_load($wb_nid);
@@ -584,11 +595,10 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     }
 
     // Spouses before kids; @todo this needs to deal with relationship weights etc.
-    if ($this->relationship_type($relationship_node) == 'SP') {
-      $pk_parts[] = '1';
-    } else {
-      $pk_parts[] = '0';
-    }
+    $reltype_id = $this->relationship_type($relationship_node);
+    $weight = $lookups['reltype_weights'][$reltype_id];
+    if (!$weight) { $weight = 0; }
+    $pk_parts[] = sprintf($format, $weight);
 
     // Next worker NID (for uniqueness)
     $pk_parts[] = sprintf($format, $worker_node->nid);
