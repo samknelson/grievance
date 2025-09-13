@@ -175,13 +175,23 @@ function sirius_smf_node_tabs() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 12,
   );
-  */
 
   $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_dentwell_election_3'] = array(
     'title' => 'Oneoff Dentwell Election 3',
     'callback' => 'sirius_smf_node_tab_oneoff_dentwell_election_3',
     'permissions' => array('sirius trust staff'),
     'file' => 'sirius_smf.oneoff_dentwell_election_3.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+  */
+
+  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_election_add'] = array(
+    'title' => 'Oneoff Election AD+D',
+    'callback' => 'sirius_smf_node_tab_oneoff_election_add',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_election_add.inc',
     'component' => 'trust',
     'type' => MENU_LOCAL_TASK,
     'weight' => 12,
@@ -273,6 +283,50 @@ function sirius_smf_menu() {
     'access callback' => TRUE,
     'type'             => MENU_NORMAL_ITEM,
     'file' => 'sirius_smf.page_register.inc',
+  );
+
+  $items['smf/register/config'] = array(
+    'title'            => 'Registration Settings',
+    'page callback'    => 'sirius_smf_page_register_config',
+    'page arguments'   => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permissions' => array('sirius trust staff')
+      ),
+    ),
+    'type'             => MENU_NORMAL_ITEM,
+    'file' => 'sirius_smf.page_register_config.inc',
+  );
+
+  $items['smf/register/config/main'] = array(
+    'title'            => 'Settings',
+    'page callback'    => 'sirius_smf_page_register_config',
+    'page arguments'   => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permissions' => array('sirius trust staff')
+      ),
+    ),
+    'type'            => MENU_DEFAULT_LOCAL_TASK,
+    'weight'          => 1,
+    'file' => 'sirius_smf.page_register_config.inc',
+  );
+
+  $items['smf/register/config/test'] = array(
+    'title'            => 'Test',
+    'page callback'    => 'sirius_smf_page_register_test',
+    'page arguments'   => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permissions' => array('sirius trust staff')
+      ),
+    ),
+    'type'            => MENU_LOCAL_TASK,
+    'weight'          => 2,
+    'file' => 'sirius_smf.page_register_test.inc',
   );
 
   $items['sirius/smf/ehrs'] = array(
