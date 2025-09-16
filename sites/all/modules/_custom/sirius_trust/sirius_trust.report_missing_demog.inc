@@ -42,6 +42,7 @@ class Sirius_Trust_Report_Missing_Demog extends Report_Cache_Report_Generator {
         'gender' => 'Gender',
         'email' => 'Email',
         'phone' => 'Phone',
+        'dob' => 'DoB',
         'address' => 'Address',
       ),
       '#checkall' => TRUE,
@@ -75,6 +76,7 @@ class Sirius_Trust_Report_Missing_Demog extends Report_Cache_Report_Generator {
     $fields['gender'] = 'Gender';
     $fields['phone'] = 'Phone';
     $fields['email'] = 'Email';
+    $fields['dob'] = 'DoB';
     $fields['address'] = 'Address';
 
     return $fields;
@@ -144,6 +146,7 @@ class Sirius_Trust_Report_Missing_Demog extends Report_Cache_Report_Generator {
       $probe['phone'] = $worker_node->field_sirius_phone['und'][0]['value'];
       $probe['email'] = $worker_node->field_sirius_email['und'][0]['value'];
       $probe['address'] = $worker_node->field_sirius_address['und'][0]['thoroughfare'];
+      $probe['dob'] = $worker_node->field_sirius_dob['und'][0]['value'];
 
       $ok = TRUE;
       foreach ($scan as $key) { 
@@ -182,6 +185,13 @@ class Sirius_Trust_Report_Missing_Demog extends Report_Cache_Report_Generator {
       $row['email'] = $probe['email'];
       $row['phone'] = $probe['phone'];
       $row['address'] = sirius_addr_format_oneline($worker_node->field_sirius_address['und'][0]);
+
+      if ($probe['dob']) {
+        $row['dob'] = date('Y-m-d', strtotime($probe['dob']));
+      } else {
+        $row['dob'] = '';
+      }
+      
       $row['role'] = $role;
 
       $rows[$worker_nid] = $row;
