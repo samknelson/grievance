@@ -43,6 +43,7 @@ function sirius_ledger_page_monthly_test_form($form, &$form_state) {
 		'#type' => 'date_popup',
 		'#title' => t('As Of'),
     '#attributes' => array('autocomplete' => 'off'),
+    '#date_format' => 'Y-m-d',
     '#description' => t('Leave blank to make charges "as of" today. If running in batch mode, selecting a date will clear the batch progress for today.'),
 	);
 
@@ -54,6 +55,7 @@ function sirius_ledger_page_monthly_test_form($form, &$form_state) {
 				":input[name=\"action\"]" => array('value' => 'worker')
 			),
 		),
+		'#size' => 10,
 	);
 
 	$form['submit'] = array(
