@@ -59,7 +59,7 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 		return $participant_nid . '-' . $interval['id'];
 	}
 
-	public function invoice_render($invoice) {
+	public function invoice_render($invoice, $render_options = array()) {
 		drupal_add_css('sites/all/modules/_custom/sirius_ledger/css/invoice.css');
 
 		$currency = sirius_ledger_currency_info_from_account_nid($invoice['account_nid'])['instance'];
@@ -103,18 +103,20 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 		$html .= sirius_fakerender_field('Total Due:', '<strong>' . $currency->render_amt($invoice['balances']['balance_out']) . '</strong>');
 
 		// Render pending payments
-		$params = array();
-		$params['account_nid'] = $account_nid;
-		$params['payer_nid'] = $participant_nid;
-		$params['payment_status'] = 'Pending';
-		$payments = sirius_ledger_payments_search($params);
-		if ($payments) {
-			$options = array();
-			$options['hide_account'] = TRUE;
-			$options['hide_tools'] = TRUE;
-			$options['hide_allocated'] = TRUE;
-			$html .= '<p>' . t('The following payments are pending and have not yet cleared.') . '</p>';
-			$html .= sirius_ledger_payments_render($payments, $options);
+		if (!$render_options['hide_pending_payments']) {
+			$params = array();
+			$params['account_nid'] = $account_nid;
+			$params['payer_nid'] = $participant_nid;
+			$params['payment_status'] = 'Pending';
+			$payments = sirius_ledger_payments_search($params);
+			if ($payments) {
+				$options = array();
+				$options['hide_account'] = TRUE;
+				$options['hide_tools'] = TRUE;
+				$options['hide_allocated'] = TRUE;
+				$html .= '<p>' . t('The following payments are pending and have not yet cleared.') . '</p>';
+				$html .= sirius_ledger_payments_render($payments, $options);
+			}
 		}
 
 		$html .= '</div>';
