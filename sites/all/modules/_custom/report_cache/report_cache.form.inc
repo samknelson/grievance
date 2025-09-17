@@ -319,11 +319,17 @@ function report_cache_batch($pk, $count, $total, $values, $info, &$context) {
 function report_cache_batch_finished($success, $results, $operations) {
 	$report_type = $results['report_type'];
 	$report_id = $results['report_id'];
+	$info = report_cache_info($report_type);
+
 	if ($report_id) {
 		$parameters = report_cache_parameters($report_type, $report_id);
 		$parameters['meta']['ts']['completed'] = time();
 		$parameters['meta']['ts']['duration'] = $parameters['meta']['ts']['completed'] - $parameters['meta']['ts']['started'];
 		$parameters['meta']['dashboard'] = $results['dashboard'];
+
+		if ($info['generator']) {
+			$parameters['meta']['dashboard']['count'] = $info['generator']->rowcount($report_id);
+		}
 		report_cache_parameters($report_type, $report_id, $parameters);
 	}
 
@@ -343,6 +349,9 @@ function report_cache_batch_finished($success, $results, $operations) {
 			drupal_set_message(t('No records found.'));
 		}
 	}
+
+	$alter_context = array('success' => $success, 'results' => $results, 'operations' => $operations);
+	drupal_alter('report_cache_batch_finished', $alter_context);
 
 	if ($results['values']['redirect']) {
 		drupal_goto($results['values']['redirect']['path'], array('query' => $results['values']['redirect']['query']));
