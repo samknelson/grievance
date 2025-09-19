@@ -229,6 +229,7 @@ function sirius_smf_report_cache_info() {
   $items = array();
 
   sirius_require('sirius_smf', 'reports/empstatus.inc');
+  sirius_require('sirius_smf', 'reports/emptier.inc');
   sirius_require('sirius_smf', 'reports/emppop.inc');
   sirius_require('sirius_smf', 'reports/emprates.inc');
   sirius_require('sirius_smf', 'reports/actuarialhours.inc');
@@ -250,6 +251,7 @@ function sirius_smf_report_cache_info() {
 
   Sirius_Smf_Report_Empstatus::getInstance()->setInfo($items);
   Sirius_Smf_Report_Emppop::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Emptier::getInstance()->setInfo($items);
   Sirius_Smf_Report_Emprates::getInstance()->setInfo($items);
   Sirius_Smf_Report_Actuarial_Hours::getInstance()->setInfo($items);
   Sirius_Smf_Report_Autotag_Interval::getInstance()->setInfo($items);
@@ -337,24 +339,8 @@ function sirius_smf_oneoff_queue_all_autotag_year($year) {
  */
 
 function sirius_smf_tokens($type, $tokens, array $data = array(), array $options = array()) {
-  $replacements = array();
-
-  if ($type == 'smf') {
-    foreach ($tokens as $name => $original) {
-      if ($name == 'cobra:rate') {
-        $cobra = Sirius_Smf_Cobra::getInstance();
-        $result = $cobra->rate_from_worker($data['worker_node']);
-        if ($result['success']) {
-          $replacements[$original] = '$' . number_format($result['rate'], 2);
-        } else {
-          sirius_token_failures_set($original, $result['msg']);
-        }
-      }
-    }
-  }
-
-
-  return $replacements;
+  $cobra = Sirius_Smf_Cobra::getInstance();
+  return $cobra->tokens($type, $tokens, $data, $options);
 }
 
 /**
