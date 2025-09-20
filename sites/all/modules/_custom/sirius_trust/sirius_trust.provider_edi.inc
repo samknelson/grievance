@@ -704,7 +704,7 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
 
   public function dob($context, $which) {
   	$date = $context[$which]->field_sirius_dob['und'][0]['value'];
-  	if (!$date) { return ''; }
+  	if (!$date) { return '19750101'; }
   	return date('Ymd', strtotime($date));
   }
 
