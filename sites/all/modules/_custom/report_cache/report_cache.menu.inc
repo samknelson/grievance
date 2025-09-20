@@ -86,6 +86,7 @@ function report_cache_menu() {
 		'weight' => 2,
 	);
 
+	/*
 	$items['sirius/reports/%/auto'] = array(
 		'title' => 'Auto',
 		'description' => '',
@@ -97,6 +98,7 @@ function report_cache_menu() {
 		'weight' => 3,
 		'file' => 'report_cache.page_report_auto.inc',
 	);
+	*/
 
 	$items['sirius/reports/%/instances'] = array(
 		'title' => 'Instances',
