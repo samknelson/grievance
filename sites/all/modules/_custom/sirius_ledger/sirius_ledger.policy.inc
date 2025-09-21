@@ -122,9 +122,15 @@ function sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule
 	$lookups = &drupal_static(__FUNCTION__);
 	if (!isset($lookups)) { 
 		$lookups['ms'] = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
-		$lookups['level'] = sirius_training_levels_fetch_all();
+		if (function_exists('sirius_training_levels_fetch_all')) {
+			$lookups['level'] = sirius_training_levels_fetch_all();
+		}
 	}
-	$levels = sirius_training_levels_fetch_worker($worker_node);
+	if (function_exists('sirius_training_levels_fetch_worker')) {
+		$levels = sirius_training_levels_fetch_worker($worker_node);
+	} else {
+		$levels = array();
+	}
 	if ($ms_tid) { 
 		$ms_tids = array($ms_tid);
 	} else {
