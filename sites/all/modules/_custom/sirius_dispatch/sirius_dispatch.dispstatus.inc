@@ -51,6 +51,9 @@ function sirius_dispatch_worker_dispstatus_set_possible($worker_node, $dispstatu
 }
 
 function sirius_dispatch_worker_dispstatus_set(&$worker_node, $dispstatus_tid = NULL, $account = NULL, $reason = NULL, $attachments = NULL, $availdate = NULL) {
+	// Disable if we're not using live dispatch
+	if (!sirius_domain_component_enabled('dispatch:live')) { return; }
+
 	global $user;
 	if (!$account) { $account = $user; }
 	if (is_numeric($account)) { $account = user_load($account); }
