@@ -645,6 +645,7 @@ function sirius_worker_address_canonicalize($value) {
 }
 
 function sirius_worker_name_canonicalize_part($string) {
+  $string = trim($string);
   $word_splitters = array(' ', '-', "O'", "L'", "D'", 'St.', 'Mc', 'Mac');
   $lowercase_exceptions = array('the', 'van', 'den', 'von', 'und', 'der', 'de', 'di', 'da', 'of', 'and', "l'", "d'");
   $uppercase_exceptions = array('III', 'IV', 'VI', 'VII', 'VIII', 'IX');
