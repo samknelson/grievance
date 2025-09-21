@@ -4,6 +4,10 @@ function sirius_dispatch_payrate_set($dispatch_node, $force_recompute = FALSE, $
 }
 
 function sirius_dispatch_payrate_compute(&$dispatch_node, $force_recompute = FALSE) {
+  if (!sirius_domain_component_enabled('dispatch:live')) {
+    return array('success' => TRUE, 'msg' => "Live dispatch not enabled.");
+  }
+
   // The pay rate should only be computed once.
   if (!$force_recompute) {
   	if (isset($dispatch_node->field_sirius_payrate['und'][0]['value'])) { return array('success' => TRUE, 'msg' => 'Payrate already set.'); }
