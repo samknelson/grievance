@@ -58,6 +58,12 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
         */
         'preview_links' => TRUE,
       ),
+      'render_callbacks' => array(
+        'By Employer' => array(
+          'method' => 'render_by_employer',
+          'csv' => TRUE,
+        ),
+      ),
       'dashboard' => TRUE,
       'module' => 'sirius_smf',
       'file' => 'reports/emptier.inc',
@@ -324,4 +330,89 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
 
      return array('is_multiple' => TRUE, 'rows' => $rows);
   }
-}
+
+  public function render_by_employer($report_id, $output = 'page') {
+    $info = $this->info();
+    $parameters = $this->parameters($report_id);
+    $report_type = $this->type;
+
+
+    $summary_fields = array();
+    // $summary_fields[] = 'WORK MONTH';
+    $summary_fields[] = 'HN';
+    $summary_fields[] = 'HN T1';
+    $summary_fields[] = 'HN T2';
+    $summary_fields[] = 'HN T3';
+    $summary_fields[] = 'KP';
+    $summary_fields[] = 'KP T1';
+    $summary_fields[] = 'KP T2';
+    $summary_fields[] = 'KP T3';
+    $summary_fields[] = 'MLK';
+    $summary_fields[] = 'MLK T1';
+    $summary_fields[] = 'MLK T2';
+    $summary_fields[] = 'MLK T3';
+    $summary_fields[] = 'VSP';
+    $summary_fields[] = 'VSP T1';
+    $summary_fields[] = 'VSP T2';
+    $summary_fields[] = 'VSP T3';
+    $summary_fields[] = 'DD';
+    $summary_fields[] = 'UC-Liberty';
+    $summary_fields[] = 'LADC';
+    $summary_fields[] = 'NON ENROLLED';
+    $summary_fields[] = 'HOURS';
+    $summary_fields[] = 'NON ELIG';
+    $summary_fields[] = 'NON ELIG HRS';
+    $summary_fields[] = 'EL HRS';
+    $summary_fields[] = 'NON ENR NO DDS';
+    $summary_fields[] = 'MEDICAL';
+    $summary_fields[] = 'DENTAL';
+    $summary_fields[] = 'LIFE';
+
+    $query = db_select('report_cache');
+    $query->fields('report_cache');
+    $query->condition('report_id', $report_id);
+    $query->condition('report_type', $report_type);
+    $stmt = $query->execute();
+    $data = array();
+
+    while ($hr = $stmt->fetchAssoc()) {
+      $row = $this->row_decode($hr['report_data']);
+      $multiplier = $row['MULTIPLIER'];
+      if (!$multiplier) { continue; }
+      $employer_name = $row['employer_name'];
+      if (!$employer_name) { continue; }
+
+      if (!$data[$employer_name]) { $data[$employer_name] = array(); }
+
+      foreach ($summary_fields as $field_name) {
+        $val = $row[$field_name];
+        if (!$val) { $val = 0; }
+        $data[$employer_name][$field_name] += $multiplier * $row[$field_name];
+      }
+
+      // One month at a time
+      $month = $row['WORK MONTH'];
+    }
+
+    ksort($data);
+
+    $rows = array();
+    foreach ($data as $employer_name => $employer_data) {
+      $row = array();
+      $row[] = $employer_name;
+      $row[] = $month;
+      foreach ($summary_fields as $field_name) {
+        $val = $employer_data[$field_name];
+        if (!$val) { $val = 0; }
+        $row[] = round($val, 2);
+      }
+      $rows[] = $row;
+    }
+
+    $header = array();
+    $header[] = 'Employer';
+    $header[] = 'WORK MONTH';
+    foreach ($summary_fields as $field_name) { $header[] = $field_name; }
+
+    return array('header' => $header, 'rows' => $rows);
+  }}
