@@ -387,7 +387,11 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
       foreach ($summary_fields as $field_name) {
         $val = $row[$field_name];
         if (!$val) { $val = 0; }
-        $data[$employer_name][$field_name] += $multiplier * $row[$field_name];
+
+        if (!in_array($field_name, array('HOURS', 'NON ELIG HRS', 'EL HRS'))) {
+          $val = $multiplier * $val;
+        }
+        $data[$employer_name][$field_name] += $val;
       }
 
       // One month at a time
