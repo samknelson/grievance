@@ -54,7 +54,7 @@ function sirius_trust_election_wizard_steps($data, $wizard_node) {
 	  }
 
   	$steps['name'] = array(
-  		'label' => 'Name', 
+  		'label' => 'Personal', 
   		'callback' => 'sirius_trust_election_wizard_name_form',
   		'callback_render' => 'sirius_trust_election_wizard_name_render',
   		'callback_post' => 'sirius_trust_election_wizard_name_post',
