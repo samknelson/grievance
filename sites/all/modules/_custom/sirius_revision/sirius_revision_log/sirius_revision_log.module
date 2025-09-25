@@ -1,0 +1,15 @@
+<?php
+
+function sirius_revision_log_node_update($node) {
+  sirius_require('sirius_revision_log', 'sirius_revision_log.logger.inc');
+  $logger = Sirius_Revision_Log::getInstance();
+  $logger->handle_update($node);
+}
+
+function sirius_revision_log_sirius_denorm($denorm_item, $args = array()) {
+  if ($denorm_item['denorm_trigger'] == 'sirius_revision_log_denorm') {
+    sirius_require('sirius_revision_log', 'sirius_revision_log.logger.inc');
+    $logger = Sirius_Revision_Log::getInstance();
+    $logger->denorm($denorm_item);
+  }
+}
