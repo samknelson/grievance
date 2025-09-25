@@ -195,6 +195,17 @@ function sirius_worker_node_tabs() {
     'component' => 'lang',
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_contact/bu'] = array(
+    'title' => 'Bargaining Unit',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_contact_bu',
+    'file' => 'sirius_worker.page_contact_bu.inc',
+    'permissions' => array('sirius worker admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 4,
+    'component' => 'employer:bu',
+  );
+
   $node_tabs['sirius_worker']['sirius_worker_contact/user'] = array(
     'title' => 'User',
     'description' => '',

@@ -2825,7 +2825,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Contact',
-    'weight' => '3',
+    'weight' => '2',
     'children' => array(
       0 => 'field_sirius_phone',
       1 => 'field_sirius_address',
@@ -2920,7 +2920,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_sirius_worker_preferences';
   $field_group->data = array(
     'label' => 'Holds',
-    'weight' => '47',
+    'weight' => '46',
     'children' => array(
       0 => 'field_sirius_dispatch_hfe',
       1 => 'field_sirius_dispatch_hfe_until',
@@ -2986,7 +2986,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Identity',
-    'weight' => '2',
+    'weight' => '1',
     'children' => array(
       0 => 'field_sirius_id',
       1 => 'field_sirius_name',
@@ -3093,7 +3093,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Dispatch Preferences',
-    'weight' => '5',
+    'weight' => '4',
     'children' => array(
       0 => 'field_sirius_skills_avail',
       1 => 'field_sirius_dispatch_dncs2',
@@ -3199,7 +3199,8 @@ function grievance_content_types_field_group_info() {
       5 => 'field_sirius_dispatch_availdate',
       6 => 'field_sirius_industry',
       7 => 'field_sirius_denorm_level',
-      8 => 'field_sirius_denorm_benefits',
+      8 => 'field_sirius_bu',
+      9 => 'field_sirius_title',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -3225,7 +3226,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Status',
-    'weight' => '4',
+    'weight' => '3',
     'children' => array(
       0 => 'field_sirius_skill',
       1 => 'field_grievance_shop',
@@ -3236,6 +3237,8 @@ function grievance_content_types_field_group_info() {
       6 => 'field_sirius_dispatch_availdate',
       7 => 'field_sirius_industry',
       8 => 'field_sirius_skill_expire',
+      9 => 'field_sirius_bu',
+      10 => 'field_sirius_title',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
