@@ -393,7 +393,7 @@ function sirius_trust_wb_find_election_nid($wb_node) {
 	return $hr['nid'];
 }
 
-function sirius_trust_benefit_get_by_id($id) {
+function sirius_trust_benefit_get_by_id($id, $nid_only = FALSE) {
   if (!$id) { return NULL; }
 
   $query = new EntityFieldQuery;
@@ -406,7 +406,9 @@ function sirius_trust_benefit_get_by_id($id) {
   $stmt = $query->execute();
   if (!$stmt['node']) { return NULL; }
 
-  return node_load(array_keys($stmt['node'])[0]);
+  $nid = array_keys($stmt['node'])[0];
+  if ($nid_only) { return $nid; }
+  return node_load($nid);
 }
 
 /**

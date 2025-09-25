@@ -64,7 +64,7 @@ class Report_Cache_Report_Generator {
 		$report_id = $this->most_recent($prefs['instance']);
 		if (!$report_id) { return $this->dashboard_render_never_run($prefs, $options); }
 
-    if ($prefs['link_only'] != 'Yes') {
+    if ($prefs['link_only'] == 'Yes') {
       return $this->dashboard_render_link($prefs, $options, $report_id);
     }
 
@@ -171,6 +171,7 @@ class Report_Cache_Report_Generator {
   }
 
   public function row_encode($hr) { 
+    if (!$hr) { $hr = array(); }
     $encoding = $this->row_encoding();
     if ($encoding == 'json') { return json_encode($hr); }
     else { return serialize($hr); }

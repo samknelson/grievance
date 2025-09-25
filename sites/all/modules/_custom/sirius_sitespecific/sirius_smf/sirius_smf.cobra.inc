@@ -17,6 +17,31 @@ class Sirius_Smf_Cobra extends Sirius_Singleton {
 		return $this->rate_from_election($election_node);
 	}
 
+	public function dependents_from_worker($worker_node) {
+		if (!$worker_node) {
+			$msg = "No worker.";
+			sirius_minilog($msg, 'error'); return array('success' => FALSE, 'msg' => $msg);
+		}
+
+		sirius_minilog("Computing COBRA dependents for " . $worker_node->title . ' (' . $worker_node->nid . ')');
+		$election_node = sirius_trust_worker_election($worker_node);
+		if (!$election_node) {
+			$msg = "No election found.";
+			sirius_minilog($msg, 'error'); return array('success' => FALSE, 'msg' => $msg);
+		}
+
+		$dependents = array();
+		$relationship_nids = sirius_fieldvals($election_node, 'field_sirius_contact_relations', 'target_id');
+		foreach ($relationship_nids as $relationship_nid) {
+			$relationship_node = node_load($relationship_nid);
+			$dependent_contact_nid = $relationship_node->field_sirius_contact_alt['und'][0]['target_id'];
+			$dependent_worker_nid = sirius_worker_get_by_contact_nid($dependent_contact_nid, TRUE);
+			$dependents[$dependent_worker_nid] = sirius_node_title($dependent_worker_nid);
+		}
+
+		return array('success' => TRUE, 'dependents' => $dependents);
+	}
+
 	public function rate_from_election($election_node) {
 		sirius_minilog("Computing cobra rate for " . $election_node->title . ' (' . $election_node->nid . ')');
 
@@ -125,6 +150,36 @@ class Sirius_Smf_Cobra extends Sirius_Singleton {
 
 		sirius_minilog("Found rate for medical = $medical, dental = $dental, tier = $tier, rate = \$" . number_format($rate, 2));
 		return array('success' => TRUE, 'rate' => $rate);
+	}
+
+	public function tokens($type, $tokens, array $data = array(), array $options = array()) {
+		// Only type smf
+	  if ($type != 'smf') { return array(); }
+
+	  $replacements = array();
+    foreach ($tokens as $name => $original) {
+    	if (!preg_match('/^cobra\:/', $name)) { continue; }
+
+      if ($name == 'cobra:rate') {
+        $result = $this->rate_from_worker($data['worker_node']);
+        if ($result['success']) {
+          $replacements[$original] = '$' . number_format($result['rate'], 2);
+        } else {
+          sirius_token_failures_set($original, $result['msg']);
+        }
+      }
+
+			if ($name == 'cobra:dependents') {
+      	$result = $this->dependents_from_worker($data['worker_node']);
+      	if ($result['success']) {
+      		$replacements[$original] = join(', ', $result['dependents']);
+      	} else {
+          sirius_token_failures_set($original, $result['msg']);
+      	}
+      }
+    }
+
+	  return $replacements;
 	}
 }
 

@@ -38,13 +38,22 @@ class Sirius_Smf_Eligibility_Plugin_Linked extends Sirius_Trust_Elgibility_Plugi
 		$ts = strtotime(date('Y-m-15', $params['ts']));
 
 		foreach ($linked_benefit_nids as $linked_benefit_nid) {
-			$search_params = array();
-			$search_params['worker_nid'] = $subscriber_worker_node->nid;
-			$search_params['benefit_nid'] = $linked_benefit_nid;
-			$search_params['nids_only'] = TRUE;
-			$search_params['ts'] = $ts;
-			$wb_nids = sirius_trust_worker_benefits_search($search_params);
-			if ($wb_nids) { return array('success' => TRUE, 'msg' => 'The subscriber had the benefit ' . sirius_node_title($linked_benefit_nid) . ' in ' . date('m/Y', $ts)); }
+			if ($params['from_benefit_nids']) {
+				// We might be passed in a "hardcoded" set of source benefit nids, i.e. if we are checking linked benefits for an election where the
+				// prior benefits don't exist yet.
+				if (in_array($linked_benefit_nid, $params['from_benefit_nids'])) {
+					return array('success' => TRUE, 'msg' => 'We assume the benefit ' . sirius_node_title($linked_benefit_nid) . ' in ' . date('m/Y', $ts));
+				}
+			} else {
+				// Otherwise, we seach for the benefit.
+				$search_params = array();
+				$search_params['worker_nid'] = $subscriber_worker_node->nid;
+				$search_params['benefit_nid'] = $linked_benefit_nid;
+				$search_params['nids_only'] = TRUE;
+				$search_params['ts'] = $ts;
+				$wb_nids = sirius_trust_worker_benefits_search($search_params);
+				if ($wb_nids) { return array('success' => TRUE, 'msg' => 'The subscriber had the benefit ' . sirius_node_title($linked_benefit_nid) . ' in ' . date('m/Y', $ts)); }
+			}
 		}
 
 		return array('success' => FALSE, 'msg' => 'The subscriber did not have any of the linked benefits in ' . date('m/Y', $ts));

@@ -106,6 +106,7 @@ function report_cache_access($report_type) {
 function report_cache_parameters($report_type, $report_id, $parameters = array()) {
  	$cache = &drupal_static(__FUNCTION__);
 	$info = report_cache_info($report_type);
+	if (!$info['generator']) { return array(); }
 
  	// Set?
  	if ($parameters) {
@@ -145,7 +146,11 @@ function report_cache_parameters($report_type, $report_id, $parameters = array()
   $query->condition('report_type', $report_type . ' :: PARAMETERS');
   $stmt = $query->execute();
   $hr = $stmt->fetchAssoc();
-	$parameters = $info['generator']->row_decode($hr['report_data']);
+  if ($hr['report_data']) {
+		$parameters = $info['generator']->row_decode($hr['report_data']);
+	} else {
+		$parameters = array(); 
+	}
 
 	// Quick sloppy caching. 
 	// - Since we're doing a database query, we want to store the results in memory

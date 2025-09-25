@@ -78,19 +78,40 @@ function sirius_ledger_policy($entity, $options = array(), $ts = NULL) {
 	return node_load($nid);
 }
 
-function sirius_ledger_policy_lookup($worker_node, $employer_node = NULL) {
+function sirius_ledger_policy_lookup($worker_node, $employer_node = NULL, $asof_ts = NULL) {
+	if (!$asof_ts) { $asof_ts = time(); }
+	if ($worker_node) { $worker_title = $worker_node->title; } else { $worker_title = '[no name]'; }
+	if ($employer_node) { $employer_title = $employer_node->title; } else { $employer_title = '[no employer]'; }
+	sirius_minilog("Determining policy for $worker_title at $employer_title as of " . date('c', $asof_ts));
+
+	// Get the election (if any)
+	if ($worker_node && !$employer_node && sirius_domain_component_enabled('trust')) {
+		sirius_minilog("Since we don't have an employer, checking for an election");
+		$election_node = sirius_trust_worker_election($worker_node, $asof_ts);
+
+		if ($election_node && $election_node->field_sirius_trust_policy['und'][0]['target_id']) {
+			$policy_node = node_load($election_node->field_sirius_trust_policy['und'][0]['target_id']);
+		}
+
+		if ($policy_node) {
+			sirius_minilog("Found election policy " . $policy_node->title);
+			return $policy_node;
+		} else {
+			sirius_minilog("No election found or the election did not have a policy, continuing to search for policy based on primary employer.");
+		}
+	}
+
 	// Get the employer
 	if (!$employer_node) {
 		$employer_node = node_load($worker_node->field_grievance_shop['und'][0]['target_id']);
+		if ($employer_node) { $employer_title = $employer_node->title; } else { $employer_title = '[no employer]'; }
+		sirius_minilog("Looked up primary employer, found $employer_title");
 	}
-	$worker_name = $worker_node->title;
-	if ($employer_node) { $employer_title = $employer_node->title; } else { $employer_title = '[no employer]'; }
-	sirius_minilog("Policy lookup: Looking for policy for $worker_name at $employer_title");
 
 	if ($employer_node) {
 		$policy_node = sirius_ledger_policy($employer_node);
 		if ($policy_node) { 
-			sirius_minilog("Using employer policy: " . $policy_node->title);
+			sirius_minilog("Found employer policy: " . $policy_node->title);
 			return $policy_node;
 		}
 
@@ -98,7 +119,7 @@ function sirius_ledger_policy_lookup($worker_node, $employer_node = NULL) {
 		if ($contract_tplt_node) {
 			$policy_node = sirius_ledger_policy($employer_node);
 			if ($policy_node) {
-				sirius_minilog("Using contract template policy: " . $policy_node->title);
+				sirius_minilog("Found contract template policy: " . $policy_node->title);
 				return $policy_node;
 			}
 		}
@@ -106,11 +127,11 @@ function sirius_ledger_policy_lookup($worker_node, $employer_node = NULL) {
 
 	$policy_node = node_load(sirius_domain_variable_get('sirius_ledger_default_policy'));
 	if ($policy_node) {
-		sirius_minilog("Using global policy: " . $policy_node->title);
+		sirius_minilog("Found global policy: " . $policy_node->title);
 		return $policy_node;
 	}
 
-	sirius_minilog("No policy found in employer, contract template, or global.", 'warning');
+	sirius_minilog("No policy found in election, employer, contract template, or global.", 'warning');
 	return NULL;
 }
 

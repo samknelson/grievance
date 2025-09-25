@@ -197,7 +197,7 @@ class Sirius_Smf_Report_Edi_Healthnet extends Sirius_Trust_Provider_Edi_Report_G
     $id = $this->gender_id($context['worker_node']);
     if ($id == 'F') { return 'F'; }
     if ($id == 'M') { return 'M'; }
-    return '';
+    return 'F';
   }
 
   public function phone($context, $which) {

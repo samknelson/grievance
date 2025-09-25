@@ -6,7 +6,11 @@ function sirius_trust_election_wizard_name_form($form, &$form_state, $info, $dat
 	$worker_node = sirius_trust_election_wizard_get_worker($wizard_node);
 	$policy_node = sirius_trust_election_wizard_get_policy($data);
 
-	$html = sirius_fakerender_field('Current Name:', $worker_node->title);
+	$html = sirius_fakerender_field('Name:', $worker_node->title);
+	if ($worker_node->field_sirius_dob['und'][0]['value']) {
+		$html .= sirius_fakerender_field('Date of Birth:', date('m/d/Y', strtotime($worker_node->field_sirius_dob['und'][0]['value'])));
+	}
+	$html .= sirius_fakerender_field('Gender:', $worker_node->field_sirius_gender_nota_calc['und'][0]['value']);
 	$html .= '<br />';
 	$form['name']['intro'] = array('#markup' => $html);
 
@@ -16,8 +20,8 @@ function sirius_trust_election_wizard_name_form($form, &$form_state, $info, $dat
 	$form['name']['change'] = array(
 		'#type' => 'radios',
 		'#options' => array(
-			'No' => t('Keep my current name'),
-			'Yes' => t('Enter a new name'),
+			'No' => t('The values above are correct'),
+			'Yes' => t('The values above are not correct'),
 		),
 		'#default_value' => $def,
 		'#required' => TRUE,
@@ -25,6 +29,16 @@ function sirius_trust_election_wizard_name_form($form, &$form_state, $info, $dat
 	);
 
 	$fieldset_title = t('New Name');
+
+	if (!$data['name']['new']['given']) {
+		$data['name']['new']['given'] = $worker_node->field_sirius_name['und'][0]['given'];
+		$data['name']['new']['family'] = $worker_node->field_sirius_name['und'][0]['family'];
+		$data['name']['new']['middle'] = $worker_node->field_sirius_name['und'][0]['middle'];
+		$data['name']['new']['dob'] = $worker_node->field_sirius_dob['und'][0]['value'];
+		$data['name']['new']['gender'] = $worker_node->field_sirius_gender['und'][0]['tid'];
+		$data['name']['new']['gender_nota_val'] = $worker_node->field_sirius_gender_nota_val['und'][0]['value'];
+	}
+
 
 	$form['name']['new'] = array(
 		'#type' => 'fieldset',
@@ -51,6 +65,40 @@ function sirius_trust_election_wizard_name_form($form, &$form_state, $info, $dat
 		'#default_value' => $data['name']['new']['family'],
 	);
 
+	$form['name']['new']['dob'] = array(
+		'#type' => 'date_popup',
+		'#title' => t('Date of Birth'),
+		'#attributes' => array(
+			'autocomplete' => 'off',
+		),
+		'#date_format' => 'Y-m-d',
+		'#default_value' => $data['name']['new']['dob'],
+	);
+
+	$gender_options = sirius_taxonomy_load('sirius_gender', 'tid', 'name');
+	$form['name']['new']['gender'] = array(
+		'#type' => 'select',
+		'#title' => t('Gender'),
+		'#default_value' => $data['name']['new']['gender'],
+		'#options' => array(NULL => t('-- Select --')) + $gender_options,
+		'#id' => 'sirius_gender_dropdown',
+	);
+
+	// Figure out which tids are "none of the above"
+	$nota_tids = sirius_nota_tids('sirius_gender');
+	if ($nota_tids) {
+		$tmp = array();
+		foreach ($nota_tids as $nota_tid) {
+			$tmp[] = array(":input[id=\"sirius_gender_dropdown\"]" => array('value' => $nota_tid));
+		}
+		$form['name']['new']['gender_nota_val'] = array(
+			'#type' => 'textfield',
+			'#title' => t('I Identify As'),
+			'#default_value' => $data['name']['new']['gender_nota_val'],
+			'#states' => array('visible' => $tmp),
+		);
+	}
+
 	return sirius_trust_election_wizard_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
 }
 
@@ -59,17 +107,24 @@ function sirius_trust_election_wizard_name_form_validate($form, &$form_state) {
 
 		$required = array(
 			'given' => 'First Name', 
-			'family' => 'Last Name'
+			'family' => 'Last Name',
+			'dob' => 'Date of Birth',
+			'gender' => 'Gender',
 		);
 
 		$ok = TRUE;
 		foreach ($required as $key => $value) {
 			if (!$form_state['values']['name']['new'][$key]) {
 				form_set_error("name][new][$key", "$value field is required.");
-				$ok = FALSE;
 			}
 		}
-		if (!$ok) { return; }
+
+		$nota_tids = sirius_nota_tids('sirius_gender');
+		if (in_array($form_state['values']['name']['new']['gender'], $nota_tids)) {
+			if (!$form_state['values']['name']['new']['gender_nota_val']) {
+				form_set_error("name][new][gender_nota_val", "I Identify As field is required.");
+			}
+		}
 	}
 }
 
@@ -102,7 +157,12 @@ function sirius_trust_election_wizard_name_post($info, &$data, $wizard_node, $cu
 	if ($change != 'Yes') { return array('success' => TRUE); }
 
 	$worker_node = sirius_trust_election_wizard_get_worker($wizard_node);
-	$worker_node->field_sirius_name['und'][0] = $data['name']['new'];
+	$worker_node->field_sirius_name['und'][0]['given'] = $data['name']['new']['given'];
+	$worker_node->field_sirius_name['und'][0]['middle'] = $data['name']['new']['middle'];
+	$worker_node->field_sirius_name['und'][0]['family'] = $data['name']['new']['family'];
+	$worker_node->field_sirius_dob['und'][0]['value'] = date('Y-m-d', strtotime($data['name']['new']['dob'])) . ' 00:00:00';
+	$worker_node->field_sirius_gender['und'][0]['tid'] = $data['name']['new']['gender'];
+	$worker_node->field_sirius_gender_nota_val['und'][0]['value'] = $data['name']['new']['gender_nota_val'];
 	node_save($worker_node);
 	return array('success' => TRUE);
 

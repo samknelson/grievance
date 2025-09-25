@@ -13,6 +13,13 @@ function sirius_smf_emphist_from_hours($worker_nid) {
   $worker_node = node_load($worker_nid);
   sirius_domain($worker_node->field_sirius_domain['und'][0]['target_id']);
 
+  // Generate a stub election
+  sirius_minilog("Generating a stub election");
+  sirius_minilog_indent();
+  $result = sirius_smf_emphist_stub_election($worker_node);
+  sirius_minilog($result['msg']);
+  sirius_minilog_outdent();
+
   // Get the list of all employers ever
   $sql = "select distinct employer_nid ";
   $sql .= "from sirius_hours_cache ";
@@ -330,4 +337,66 @@ function sirius_smf_emphist_from_hours_employer($worker_nid, $employer_nid) {
 function sirius_smf_emphist_from_hours_calc_ym($y, $m) {
   if (strlen($m) < 2) { $m = "0$m"; }
   return "$y-$m";
+}
+
+
+function sirius_smf_emphist_stub_election($worker_node) {
+  // Make sure we don't already have an election
+  $election_node = sirius_trust_worker_election($worker_node);
+  if ($election_node) { return array('success' => TRUE, 'msg' => 'The worker already has an active election.'); }
+
+  // Get the first hours
+  $sql = "select * from sirius_hours_cache ";
+  $sql .= "where worker_nid = :worker_nid ";
+  $sql .= "and employer_nid is not null ";
+  $sql .= "order by year, month, day ";
+  $stmt = sirius_sql_query($sql, array(':worker_nid' => $worker_node->nid));
+  $hr = $stmt->fetchAssoc();
+  if (!$hr) {
+    return array('success' => TRUE, 'msg' => 'The worker has never had any hours entries.');
+  }
+
+  // Get the policy
+  $employer_nid = $hr['employer_nid'];
+  $employer_node = node_load($employer_nid);
+  if (!$employer_node) {
+    return array('success' => FALSE, 'msg' => "First hours were at employer $employer_nid, which does not have a record in the system.");
+  }
+  sirius_minilog("Generating an election at employer " . $employer_node->title);
+
+  // Get the policy
+  $policy_node = sirius_ledger_policy_lookup($worker_node, $employer_node);
+  if (!$policy_node) {
+    return array('success' => FALSE, 'msg' => "No policy found for " . $employer_node->title);
+  }
+  sirius_minilog("Using policy " . $policy_node->title);
+
+  // Create a new election
+  global $user;
+  $election_node = new stdClass();
+  $election_node->type = 'sirius_trust_worker_election';
+  $election_node->language = LANGUAGE_NONE;
+  $election_node->uid = $user->uid;
+  $election_node->status = 1;
+  $election_node->promote = 0;
+  $election_node->comment = 0;
+  $election_node->field_sirius_domain['und'][0]['target_id'] = sirius_domain_nid();
+  $election_node->field_sirius_worker['und'][0]['target_id'] = $worker_node->nid;
+  $election_node->field_sirius_trust_policy['und'][0]['target_id'] = $policy_node->nid;
+  $election_node->field_sirius_date_start['und'][0]['value'] = date('Y-m-1 00:00:00');
+  $election_node->field_grievance_shop['und'][0]['target_id'] = $employer_node->nid;
+
+  // Get the automatic benefits
+  $benefits = node_load_multiple(array_keys(sirius_trust_policy_benefits_offered($policy_node, array('electable' => FALSE, 'worker_node' => $worker_node))));
+
+  sirius_minilog_indent();
+  foreach ($benefits as $benefit_nid => $benefit_node) {
+    $election_node->field_sirius_trust_benefits['und'][] = array('target_id' => $benefit_nid);
+    sirius_minilog("Adding benefit " . $benefit_node->title);
+  }
+
+  sirius_minilog("Saving election");
+  node_save($election_node);
+
+  return array('success' => TRUE, 'msg' => 'Stub election created.');;
 }

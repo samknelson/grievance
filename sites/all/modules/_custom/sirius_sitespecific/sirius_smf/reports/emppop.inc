@@ -9,7 +9,22 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
       'description' => '',
       'access' => 'sirius trust staff',
       'preview' => array(
-        // 'default_display_fields' => array(),
+        'default_display_fields' => array(
+          'first_name',
+          'last_name',
+          'election',
+          'employer',
+          'life',
+          'medical',
+          'subscriber',
+          'covered_lives',
+          'tier',
+          'hours_0',
+          'hours_1',
+          'hours_2',
+          'hours_3',
+          'hours_4',
+        ),
         'preview_links' => TRUE,
       ),
       'dashboard' => TRUE,
@@ -27,15 +42,22 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
     $fields['first_name'] = 'Frst Name';
     $fields['last_name'] = 'Last Name';
     $fields['election'] = 'Election';
+    $fields['employer'] = 'Employer';
     $fields['life'] = 'Life';
+    $fields['subscriber'] = 'Subscriber?';
     $fields['medical'] = 'Medical';
     $fields['covered_lives'] = 'Covered Lives';
     $fields['tier'] = 'Tier';
     $fields['hours_0'] = 'Hours This Month';
+    $fields['hours_type_0'] = 'Hours Type This Month';
     $fields['hours_1'] = 'Hours Prev 1';
+    $fields['hours_type_1'] = 'Hours Type Prev 1';
     $fields['hours_2'] = 'Hours Prev 2';
+    $fields['hours_type_2'] = 'Hours Type Prev 2';
     $fields['hours_3'] = 'Hours Prev 3';
+    $fields['hours_type_3'] = 'Hours Type Prev 3';
     $fields['hours_4'] = 'Hours Prev 4';
+    $fields['hours_type_4'] = 'Hours Type Prev 4';
     return $fields;
   }
 
@@ -184,7 +206,7 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
       $wb_node = reset($probe);
       if ($wb_node) {
         $row['life'] = 'Y';
-      } else {
+     } else {
         $row['life'] = 'N';
       }
 
@@ -198,6 +220,12 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
       if ($wb_node) {
         $benefit_node = node_load($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
         $row['medical'] = $benefit_node->field_sirius_id['und'][0]['value'];
+
+        if ($wb_node->field_sirius_worker['und'][0]['target_id'] == $wb_node->field_sirius_trust_subscriber['und'][0]['target_id']) {
+          $row['subscriber'] = 'Y';
+        } else {
+          $row['subscriber'] = 'N';
+        }
       }
 
       $params = array();
@@ -226,19 +254,25 @@ class Sirius_Smf_Report_Emppop extends Report_Cache_Report_Generator {
       $y = $parameters['year']+0;
       $m = $parameters['month']+0;
       for ($i=0; $i<5; ++$i) {
-        $sql = "select sum(hours) as c from sirius_hours_cache ";
+        $sql = "select sum(hours) as c, min(hours_type_tid) as type_tid from sirius_hours_cache ";
         $sql .= "where worker_nid = :worker_nid ";
         $sql .= "and year = :y ";
         $sql .= "and month = :m ";
         $stmt = sirius_sql_query($sql, array(':worker_nid' => $worker_nid, ':y' => $y, ':m' => $m));
         $hr = $stmt->fetchAssoc();
         $row['hours_' . $i] = round($hr['c'], 2);
+        $row['hours_type_' . $i] = sirius_term_title($hr['type_tid']);
         --$m;
         if ($m < 1) { $m = 12; --$y; }
       }
 
       $election_node = sirius_trust_worker_election($worker_node, $ts);
-      if ($election_node) { $row['election'] = 'Y'; } else { $row['election'] = 'N'; }
+      if ($election_node) {
+        $row['employer'] = sirius_node_title($election_node->field_grievance_shop['und'][0]['target_id']);
+        $row['election'] = 'Y';
+      } else {
+        $row['election'] = 'N';
+      }
 
       $rows[$worker_nid] = $row;
     }

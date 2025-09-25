@@ -84,8 +84,8 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
       $row['DEP REL'] = $this->deprel($context);
       $row['BD'] = $this->dob($context, 'worker_node');
       $row['SEX'] = $this->gender($context);
-      $row['SSN'] = ''; // $this->ssn($context, 'subscriber_node');
-      $row['DEP SSN'] = ''; // $this->ssn($context, 'worker_node');
+      $row['SSN'] = $this->ssn($context, 'subscriber_node');
+      $row['DEP SSN'] = $this->ssn($context, 'worker_node');
       $row['PHONE'] = $this->mlk_column($context, 'phone');
       $row['ADDR1'] = $this->mlk_column($context, 'thoroughfare');
       $row['ADDR2'] = $this->mlk_column($context, 'premise'); 
