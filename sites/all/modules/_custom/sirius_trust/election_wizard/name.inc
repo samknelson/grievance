@@ -14,6 +14,10 @@ function sirius_trust_election_wizard_name_form($form, &$form_state, $info, $dat
 	$html .= '<br />';
 	$form['name']['intro'] = array('#markup' => $html);
 
+	$must_change = FALSE;
+	if (!$worker_node->field_sirius_dob['und'][0]['value']) { $must_change = TRUE; }
+	if (!$worker_node->field_sirius_gender_nota_calc['und'][0]['value']) { $must_change = TRUE; }
+
 	$def = $data['name']['change'];
 	if (!$def) { $def = 'No'; }
 
@@ -28,7 +32,13 @@ function sirius_trust_election_wizard_name_form($form, &$form_state, $info, $dat
 		'#id' => 'change_name',
 	);
 
-	$fieldset_title = t('New Name');
+	if ($must_change) {
+		$form['name']['change']['#value'] = 'Yes';
+		$form['name']['change']['#default_value'] = 'Yes';
+		$form['name']['change']['#disabled'] = TRUE;
+	}
+
+	$fieldset_title = t('New Personal Info');
 
 	if (!$data['name']['new']['given']) {
 		$data['name']['new']['given'] = $worker_node->field_sirius_name['und'][0]['given'];
