@@ -10,13 +10,17 @@ class Sirius_Smf_Report_Benefit_Ending_Xtra extends Sirius_Trust_Report_Worker_B
     $result['name'] = "Coverage - Ending - With Cobra Rate";
     $result['module'] = 'sirius_smf';
     $result['file'] = 'reports/benefit_ending_xtra.inc';
+
     $result['preview']['default_display_fields'][] = 'cobra_rate';
+    $result['preview']['default_display_fields'][] = 'cobra_deps';
+
     return $result;
   }
 
   public function fields() {
     $fields = parent::fields();
     $fields['cobra_rate'] = 'COBRA Rate';
+    $fields['cobra_deps'] = 'COBRA Dependents';
     return $fields;
   }
 
@@ -28,8 +32,14 @@ class Sirius_Smf_Report_Benefit_Ending_Xtra extends Sirius_Trust_Report_Worker_B
     foreach ($result['rows'] as $pk => $row) {
       $worker_node = node_load($row['worker_nid']);
       $cobra_result = $cobra->rate_from_worker($worker_node);
-      if (!$cobra_result['success']) { continue; }
-      $result['rows'][$pk]['cobra_rate'] = $cobra_result['rate'];
+      if ($cobra_result['success']) { 
+        $result['rows'][$pk]['cobra_rate'] = $cobra_result['rate'];
+      }
+
+      $cobra_result = $cobra->dependents_from_worker($worker_node);
+      if ($cobra_result['success']) {
+        $result['rows'][$pk]['cobra_deps'] = join(', ', $cobra_result['dependents']);
+      }
     }
     return $result;
   }
