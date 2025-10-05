@@ -63,7 +63,7 @@ function sirius_cron_sirius_cron_scan_info() {
 	$items['check_active_expired_nodes'] = array(
 		'title' => 'Active but Expired Nodes',
 		'description' => 'Check for active nodes whose expiration date has passed',
-		'schedule' => 'daily',
+		'schedule' => 'hourly',
 		'callback' => 'sirius_cron_scan_expired_active_nodes',
 	);
 
