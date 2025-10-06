@@ -85,12 +85,20 @@ function sirius_cron_sirius_cron_scan_info() {
 
 function sirius_cron_scan_all($force = FALSE, $mode = 'live') {
 	$info_all = sirius_cron_scan_info_all();
+	$ts_global = time();
+	$limit = ini_get('memory_limit');
 	foreach ($info_all as $key => $info) {
+		$ts_scan = time();
+
+		watchdog('sirius_cron', "Starting scan: $key");
 		$result = sirius_cron_scan($key, $force, $mode);
 		if (!$result['success']) { 
 			// return $result;
 		}
+		$usage = memory_get_usage();
+		watchdog('sirius_cron', "Finished scan: $key " . format_interval(time()-$ts_scan, 2) . ") usage $usage / $limit");
 	}
+	watchdog('sirius_cron', "Finished all scan (" . format_interval(time()-$ts_global, 2) . ") usage $usage / $limit");
 	return array('success' => TRUE);
 }
 
