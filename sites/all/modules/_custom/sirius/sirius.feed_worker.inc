@@ -59,6 +59,8 @@ function sirius_feed_worker_fields($info, $data, $feed_node, $current_step) {
     'dob' => array('title' => 'Date of Birth'),
     'sirius_gender' => array('title' => 'Gender', 'type' => 'term_reference', 'taxonomy' => 'sirius_gender'),
     'sirius_gender_nota_val' => array('title' => 'Gender (Other)', 'type' => 'text'),
+    'sirius_title' => array('title' => 'Title', 'type' => 'text'),
+    'sirius_bu' => array('title' => 'Bargaining Unit', 'type' => 'entity_reference', 'entity_type' => 'node', 'bundle' => 'sirius_bu'),
   );
 
   // Json fields
@@ -245,6 +247,16 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
     if ($precompute) { $row['level_ms_tid'] = $level_ms_tid; }
   }
 
+  // This is the new way and we should have been using it everywhere...
+  $fields = sirius_feed_wizard_fields($info, $data, $feed_node, $current_step);
+  foreach ($fields as $field_name => $field_info) {
+    if (!in_array($field_name, array('sirius_title', 'sirius_bu'))) { continue; }
+
+    if (!$row[$field_name]) { continue; }
+    $result = sirius_feed_handle_field($field_name, $field_info, $row[$field_name], $precompute);
+    if (!$result['success']) { return $result; }
+  }
+
   if ($precompute) {
     if ($row['worker_nid']) {
       return array('success' => TRUE, 'msg' => 'An existing worker will be updated.');
@@ -303,7 +315,7 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
 
   $fields = sirius_feed_worker_fields($info, $data, $feed_node, $current_step);
   foreach ($fields as $field_name => $field_info) {
-    if (!in_array($field_name, array('sirius_gender', 'sirius_gender_nota_val'))) { continue; }
+    if (!in_array($field_name, array('sirius_gender', 'sirius_gender_nota_val', 'sirius_title', 'sirius_bu'))) { continue; }
     
     if ($row[$field_name]) {
       if (in_array($field_info['type'], array('integer', 'list', 'text', 'long', 'date', 'phone', 'ssn'))) {
@@ -317,11 +329,6 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
       }
     }
   }
-
-
-
-
-
 
   foreach (array('thoroughfare', 'premise', 'locality', 'administrative_area', 'postal_code') as $col) {
     $has_address = FALSE;

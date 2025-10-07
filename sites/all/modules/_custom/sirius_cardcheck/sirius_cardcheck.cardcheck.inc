@@ -315,6 +315,10 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 		node_save($cardcheck_node);
 	}
 
+	public function worker($cardcheck_node) {
+		return sirius_log_handler($cardcheck_node, 'sirius_worker');
+	}
+
 	public function create($definition_node, $options = array()) {
 		$title = '';
 		$handlers = array($definition_node->nid);
@@ -345,13 +349,6 @@ class Sirius_Cardcheck extends Sirius_Singleton {
     node_save($cardcheck_node);
     return $cardcheck_node;
 	}
-
-
-
-
-
-
-
 
 	public function cardcheck_offline_form($form, &$form_state, $cardcheck_node, $options = array()) {
 		drupal_add_css(drupal_get_path('module', 'sirius') . '/css/ux.css');
