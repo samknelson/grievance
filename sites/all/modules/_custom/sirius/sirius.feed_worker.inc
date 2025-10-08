@@ -55,10 +55,9 @@ function sirius_feed_worker_fields($info, $data, $feed_node, $current_step) {
     'shop_name' => array('title' => 'Current Employer Name'),
     'member_status' => array('title' => 'Member Status'),
     'dispatch_job_nid' => array('title' => 'Dispatch to Job (NID)'),
+    'dispatch_employer_id' => array('title' => 'Dispatch to Employer (ID)'),
     'level' => array('title' => 'Training Center Level Code'),
     'dob' => array('title' => 'Date of Birth'),
-    'sirius_gender' => array('title' => 'Gender', 'type' => 'term_reference', 'taxonomy' => 'sirius_gender'),
-    'sirius_gender_nota_val' => array('title' => 'Gender (Other)', 'type' => 'text'),
   );
 
   // Json fields
@@ -97,34 +96,15 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
    if (!preg_match('/^[0-9]+$/', $row['nid'])) { return array('success' => FALSE, 'msg' => 'Invalid NID'); }
   }
 
-  if ($row['phone']) {
-    if (!sirius_phone_validate($row['phone'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone'); } else { $row['phone'] = sirius_phone_format($row['phone']); }
-  }
-
-  if ($row['phone_alt']) {
-    if (!sirius_phone_validate($row['phone_alt'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone (Alt)'); } else { $row['phone_alt'] = sirius_phone_format($row['phone_alt']); }
-  }
-
-  if ($row['phone_mobile']) {
-    if ($row['phone_mobile'] && !sirius_phone_validate($row['phone_mobile'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone (Mobile)'); } else { $row['phone_mobile'] = sirius_phone_format($row['phone_mobile']); }
-  }
+  if ($row['phone'] && !sirius_phone_validate($row['phone'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone'); } else { $row['phone'] = sirius_phone_format($row['phone']); }
+  if ($row['phone_alt'] && !sirius_phone_validate($row['phone_alt'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone (Alt)'); } else { $row['phone_alt'] = sirius_phone_format($row['phone_alt']); }
+  if ($row['phone_mobile'] && !sirius_phone_validate($row['phone_mobile'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone (Mobile)'); } else { $row['phone_mobile'] = sirius_phone_format($row['phone_mobile']); }
 
   if ($row['email'] && !sirius_email_validate($row['email'])) { return array('success' => FALSE, 'msg' => 'Invalid Email'); }
 
   if ($row['dob']) {
     $dob_ts = strtotime($row['dob']);
     if ($dob_ts === FALSE) { return array('success' => FALSE, 'msg' => 'Invalid date of birth'); }
-  }
-
-  // @todo: We should be doing this for all fields. But legacy code and "feed_handle_field" didn't exist.
-  //        So I'm only doing it for new fields :(
-  $fields = sirius_feed_worker_fields($info, $data, $feed_node, $current_step);
-  foreach ($fields as $field_name => $field_info) {
-    if (!in_array($field_name, array('sirius_gender', 'sirius_gender_nota_val'))) { continue; }
-    if (!$row[$field_name]) { continue; }
-
-    $result = sirius_feed_handle_field($field_name, $field_info, $row[$field_name], $precompute);
-    if (!$result['success']) { return $result; }
   }
 
   $domain_nid = $feed_node->field_sirius_domain['und'][0]['target_id'];
@@ -215,6 +195,33 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
     }
   }
 
+  // Find a stub job
+  if ($row['dispatch_employer_id']) {
+    // Get the employer
+    $result = sirius_feed_lookup_by_field(
+      'grievance_shop', 
+      'field_data_field_sirius_id', 
+      'field_sirius_id_value', 
+      $row['dispatch_employer_id']
+    );
+    if (!$result['success']) {
+      $result['msg'] = "Employer lookup failed: " . $result['msg']; 
+      return $result;
+    }
+    $employer_nid = $result['nid'];
+
+    // Get the stub job nid. We assume one industry, which probably isn't a safe assumption in the long term.
+    $stub_nids = sirius_dispatch_job_stub_fetch_all($employer_nid, TRUE);
+    if (!$stub_nids) {
+      return array('success' => FALSE, 'msg' => "Stub job not found for " . sirius_node_title($employer_nid));
+    }
+    $job_nid = $stub_nids[0];
+
+    if ($precompute && !$row['dispatch_job_nid']) {
+      $row['dispatch_job_nid'] = $job_nid;
+    }
+  }
+
   // Job NID
   if ($row['dispatch_job_nid']) {
     $sql = "select type from node where nid = :dispatch_job_nid";
@@ -299,28 +306,6 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
   if ($row['email']) { $worker_node->field_sirius_email['und'][0]['value'] = $row['email']; }
 
   if ($row['shop_nid']) { $worker_node->field_grievance_shop['und'][0]['target_id'] = $row['shop_nid']; }
-
-
-  $fields = sirius_feed_worker_fields($info, $data, $feed_node, $current_step);
-  foreach ($fields as $field_name => $field_info) {
-    if (!in_array($field_name, array('sirius_gender', 'sirius_gender_nota_val'))) { continue; }
-    
-    if ($row[$field_name]) {
-      if (in_array($field_info['type'], array('integer', 'list', 'text', 'long', 'date', 'phone', 'ssn'))) {
-        $worker_node->{"field_$field_name"}['und'][0]['value'] = $row[$field_name];
-      }
-      if ($field_info['type'] == 'term_reference') {
-        $worker_node->{"field_$field_name"}['und'][0]['tid'] = $row[$field_name];
-      }
-      if ($field_info['type'] == 'entity_reference') {
-        $worker_node->{"field_$field_name"}['und'][0]['target_id'] = $row[$field_name];
-      }
-    }
-  }
-
-
-
-
 
 
   foreach (array('thoroughfare', 'premise', 'locality', 'administrative_area', 'postal_code') as $col) {
