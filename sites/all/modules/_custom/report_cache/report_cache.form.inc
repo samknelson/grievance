@@ -196,6 +196,7 @@ function report_cache_form_submit($form, &$form_state) {
 
 		$context = array();
 		$context['results']['report_id'] = $report_id;
+		$context['results']['report_type'] = $report_type;
 		foreach ($pks as $pk) {
 			++$count;
 			report_cache_batch($pk, $count, $total, $form_state['values'], $info, $context);
