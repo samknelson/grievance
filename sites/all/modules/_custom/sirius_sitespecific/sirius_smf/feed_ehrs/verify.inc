@@ -199,9 +199,9 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
 	}
 	*/
 
-	/*
 	// FMLA and disability workers have the number of hours automatically set to their threshold
-	if (in_array($row['hour_type_id'], array('fmla', 'disability'))) {
+	// if (in_array($row['hour_type_id'], array('fmla', 'disability'))) {
+	if (in_array($row['hour_type_id'], array('fmla'))) {
 		//
 		// @todo: The threshold logic is really ugly. Technically, we ought to:
 		// 		1. Find their election.
@@ -215,7 +215,6 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
 		$threshold = $plugin_info['instance']->threshold_from_worker_and_employer($worker_node, $employer_node);
 		if ($threshold > $row['hrs']) { $row['hrs'] = $threshold; }
 	}
-	*/
 
   // For disability, we need to look back in time and find out when they started.
   if ($row['hour_type_id'] == 'disability') {

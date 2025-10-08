@@ -81,12 +81,18 @@ class Report_Cache_Report_Generator {
 		$result = array();
 
     $info = $this->info();
-    if ($info['render_callbacks']) {
-      $action = 'render';
-      $render_callback = array_keys($info['render_callbacks'])[0];
-    } else {
+
+    // Commenting this out for now.
+    // - We used to link to the "first" render callback. But that's not the right thing to do.
+    // - There should be something like $info['dashboard']['link_action'].
+    // But not bothering for now.
+
+    // if ($info['render_callbacks']) {
+    //  $action = 'render';
+    //  $render_callback = array_keys($info['render_callbacks'])[0];
+    // } else {
       $action = 'preview';
-    }
+    // }
 
 		$result['tools'] = l('View', "sirius/reports/$report_type", array('query' => array('report_id' => $report_id, 'action' => $action, 'callback-name' => $render_callback), 'attributes' => array('class' => array('tool-button'))));
 		$count = $parameters['meta']['dashboard']['count'];
