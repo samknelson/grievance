@@ -64,19 +64,33 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 		// The BU
 		if (sirius_domain_component_enabled('employer:bu')) {
 			$bu_options = sirius_employer_bu_list();
+			if ($status == 'unsigned') {
+				$worker_node = $this->worker_node($cardcheck_node);
+				if ($worker_node) {
+					$form['title'] = array(
+						'#type' => 'textfield',
+						'#title' => 'Title',
+						'#default_value' => $worker_node->field_sirius_title['und'][0]['value'],
+						'#value' => $worker_node->field_sirius_title['und'][0]['value'],
+						'#disabled' => TRUE,
+					);
 
-			if ($bu_options) {
-				$form['bu'] = array(
-					'#type' => 'select',
-					'#title' => 'Bargaining Unit',
-					'#options' => array(NULL => t('-- Select --')) + $bu_options,
-					'#default_value' => $cardcheck['bu'],
-				);
-				if ($status == 'unsigned') {
-					$form['bu']['#required'] = TRUE;
-				} else {
-					$form['bu']['#disabled'] = TRUE;
+					$form['bu'] = array(
+						'#type' => 'select',
+						'#title' => 'Bargaining Unit',
+						'#default_value' => $worker_node->field_sirius_bu['und'][0]['target_id'],
+						'#value' => $worker_node->field_sirius_bu['und'][0]['target_id'],
+						'#disabled' => TRUE,
+						'#options' => array(NULL => t('-- Select --')) + $bu_options,
+					);
 				}
+			} else {
+
+				$html = '<div class="sirius-form sirius_callout_basic">';
+				$html .= sirius_fakerender_field('Bargaining Unit:', $bu_options[$cardcheck_json['cardcheck']['bu']]);
+				$html .= sirius_fakerender_field('Title:', $cardcheck_json['cardcheck']['title']);
+				$html .= '</div>';
+				$form['bu'] = array('#markup' => $html);
 			}
 		}
 
@@ -236,6 +250,7 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 
 	  // Save the BU
 	  $cardcheck['bu'] = $form_state['values']['bu'];
+	  $cardcheck['title'] = $form_state['values']['title'];
 
 		// Save the acceptance
 		$cardcheck['acceptance'] = array();
@@ -371,6 +386,12 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 				);
 				$form['bu']['#required'] = TRUE;
 			}
+
+			$form['title'] = array(
+				'#type' => 'textfield',
+				'#title' => 'Title',
+				'#required' => TRUE,
+			);
 		}
 
 		$form['signature_date'] = array(
@@ -442,6 +463,7 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 
 	  // Save the BU
 	  $cardcheck['bu'] = $values['bu'];
+	  $cardcheck['title'] = $values['title'];
 
 	  global $user;
 		// Save the acceptance
@@ -517,5 +539,9 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 	  	$cardcheck_nodes = node_load_multiple(array_keys($stmt['node']));
 	  }
 	  return $cardcheck_nodes;
+	}
+
+	public function worker_node($cardcheck_node) {
+		return sirius_log_handler($cardcheck_node, 'sirius_worker');
 	}
 }
