@@ -116,8 +116,11 @@ function sirius_ledger_sirius_access_info() {
  */
 
 function sirius_ledger_report_cache_info() {
+  sirius_require('sirius_ledger', 'reports/fourmonth.inc');
+
   $items = array();
   $items += sirius_ledger_report_discrepancy_info();
+  Sirius_Ledger_Report_Fourmonth::getInstance()->setInfo($items);
   return $items;
 }
 
