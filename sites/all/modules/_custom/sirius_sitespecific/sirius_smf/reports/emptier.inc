@@ -206,6 +206,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
     $stmt = sirius_sql_query($sql, array(':y' => $y, ':m' => $m));
 
     $format = '%010d';
+    $pks = array();
     while ($hr = $stmt->fetchAssoc()) {
       $pks[] = sprintf($format, $hr['employer_nid']) . ':' . sprintf($format, $hr['worker_nid']);
     }
