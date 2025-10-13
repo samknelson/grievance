@@ -170,6 +170,7 @@ class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
 
       $row['cardcheck_acceptance_date'] = date('Y-m-d H:i', $ts);
 
+      $pk = $cardcheck_nid;
       $rows[$pk] = $row;
     }
 
