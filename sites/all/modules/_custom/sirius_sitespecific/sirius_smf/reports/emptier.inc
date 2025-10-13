@@ -217,7 +217,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
     $date = $parameters['year'] . '-' . $parameters['month'] . '-15';
 
     $ts = strtotime($date);
-    $work_ts = strtotime('-4 months', $ts);
+    $work_ts = strtotime('-3 months', $ts);
     $work_display = date('Y-m', $work_ts);
     $work_year = date('Y', $work_ts);
     $work_month = date('n', $work_ts);
