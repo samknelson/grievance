@@ -198,15 +198,26 @@ function report_cache_form_submit($form, &$form_state) {
 		$context['results']['report_id'] = $report_id;
 		$context['results']['report_type'] = $report_type;
 
-		sirius_minilog("Starting batch generation");
+		$start_ts = time();
+		sirius_minilog("BATCH STARTING");
+		sirius_minilog("Type:       " . $report_type);
+		sirius_minilog("Started:    " . date('c', $start_ts));
+
 		sirius_minilog_indent();
 		$total = count($pks);
 		foreach ($pks as $pk) {
+			$elapsed_ts = time() - $start_ts;
+			if ($count) { $batch_ts = $elapsed_ts / $count; }
+			$remaining_ts = ($total - $count) * $batch_ts;
+
 			++$count;
-			sirius_minilog("Starting batch $count / $total");
+
+			sirius_minilog("Starting batch $count / $total: Elapsed " . format_interval($elapsed_ts) . " remaining " . format_interval($remaining_ts));
+
 			report_cache_batch($pk, $count, $total, $form_state['values'], $info, $context);
 			entity_get_controller('node')->resetCache();
 		}
+
 		sirius_minilog_outdent();
 		sirius_minilog("Batch generation complete.");
 		report_cache_batch_finished(TRUE, $context['results'], array());
