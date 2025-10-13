@@ -200,9 +200,10 @@ function report_cache_form_submit($form, &$form_state) {
 
 		sirius_minilog("Starting batch generation");
 		sirius_minilog_indent();
+		$total = count($pks);
 		foreach ($pks as $pk) {
 			++$count;
-			sirius_minilog("Starting batch $count");
+			sirius_minilog("Starting batch $count / $total");
 			report_cache_batch($pk, $count, $total, $form_state['values'], $info, $context);
 			entity_get_controller('node')->resetCache();
 		}
