@@ -58,6 +58,10 @@ function sirius_feed_worker_fields($info, $data, $feed_node, $current_step) {
     'dispatch_employer_id' => array('title' => 'Dispatch to Employer (ID)'),
     'level' => array('title' => 'Training Center Level Code'),
     'dob' => array('title' => 'Date of Birth'),
+    'sirius_gender' => array('title' => 'Gender', 'type' => 'term_reference', 'taxonomy' => 'sirius_gender'),
+    'sirius_gender_nota_val' => array('title' => 'Gender (Other)', 'type' => 'text'),
+    'sirius_title' => array('title' => 'Title', 'type' => 'text'),
+    'sirius_bu' => array('title' => 'Bargaining Unit', 'type' => 'entity_reference', 'entity_type' => 'node', 'bundle' => 'sirius_bu'),
   );
 
   // Json fields
@@ -252,6 +256,18 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
     if ($precompute) { $row['level_ms_tid'] = $level_ms_tid; }
   }
 
+  // @todo: We should be doing this for all fields. But legacy code and "feed_handle_field" didn't exist.
+  //        So I'm only doing it for new fields :(
+  $fields = sirius_feed_worker_fields($info, $data, $feed_node, $current_step);
+  foreach ($fields as $field_name => $field_info) {
+    if (!in_array($field_name, array('sirius_gender', 'sirius_gender_nota_val', 'sirius_title', 'sirius_bu'))) { continue; }
+    if (!$row[$field_name]) { continue; }
+
+    $result = sirius_feed_handle_field($field_name, $field_info, $row[$field_name], $precompute);
+    if (!$result['success']) { return $result; }
+  }
+
+
   if ($precompute) {
     if ($row['worker_nid']) {
       return array('success' => TRUE, 'msg' => 'An existing worker will be updated.');
@@ -347,9 +363,28 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
     }
   }
 
+  $fields = sirius_feed_worker_fields($info, $data, $feed_node, $current_step);
+  foreach ($fields as $field_name => $field_info) {
+    if (!in_array($field_name, array('sirius_gender', 'sirius_gender_nota_val', 'sirius_bu', 'sirius_title'))) { continue; }
+
+    if ($row[$field_name]) {
+      if (in_array($field_info['type'], array('integer', 'list', 'text', 'long', 'date', 'phone', 'ssn'))) {
+        $worker_node->{"field_$field_name"}['und'][0]['value'] = $row[$field_name];
+      }
+      if ($field_info['type'] == 'term_reference') {
+        $worker_node->{"field_$field_name"}['und'][0]['tid'] = $row[$field_name];
+      }
+      if ($field_info['type'] == 'entity_reference') {
+        $worker_node->{"field_$field_name"}['und'][0]['target_id'] = $row[$field_name];
+      }
+    }
+  }
+  // dpm($worker_node);
+
   try {
     node_save($worker_node);
   } catch (exception $e) {
+    dpm($e);
     return array('success' => FALSE, 'msg' => 'node_save() failed.');
   }
 
