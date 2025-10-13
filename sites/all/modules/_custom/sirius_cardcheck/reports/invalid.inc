@@ -1,11 +1,11 @@
 <?php
 
-class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
-  public $type = 'sirius-cardcheck-acceptance';
+class Sirius_Cardcheck_Report_Invalid extends Report_Cache_Report_Generator {
+  public $type = 'sirius-cardcheck-invalid';
 
   public function info($result = array()) {
     $result = array(
-      'name' => t('Acceptance'),
+      'name' => t('Invalid'),
       'description' => '',
       'access' => 'sirius cardcheck admin',
       'preview' => array(
@@ -13,7 +13,7 @@ class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
       ),
       'dashboard' => TRUE,
       'module' => 'sirius_cardcheck',
-      'file' => 'reports/acceptance.inc',
+      'file' => 'reports/invalid.inc',
       'row_encoding' => 'json',
     );
 
@@ -26,9 +26,10 @@ class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
     $fields['worker_id'] = 'Worker ID';
     $fields['worker_title'] = 'Worker Title';
     $fields['worker_employer_name'] = 'Employer';
+    $fields['worker_bu_name'] = 'BU Name';
+    $fields['worker_bu_id'] = 'BU ID';
     $fields['cardcheck_bu_name'] = 'BU Name';
     $fields['cardcheck_bu_id'] = 'BU ID';
-    $fields['cardcheck_acceptance_date'] = 'Acceptance Date';
 
     return $fields;
   }
@@ -40,6 +41,8 @@ class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
   }
 
   public function form() {
+    return array();
+    /*
     $form['start_date'] = array(
       '#type' => 'date_popup',
       '#title' => t('Start Date'),
@@ -61,6 +64,7 @@ class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
     );
 
     return $form;
+    */
   }
 
   public function render_parameters($parameters) {
@@ -91,8 +95,9 @@ class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
 
     $sql_args = array();
 
-    $sql = "select nid from node ";
+    $sql = "select distinct nid from node ";
     $sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
     $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
     $sql .= "where ";
 
@@ -104,14 +109,8 @@ class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
     }
 
     $sql .= "and field_sirius_category_value = 'cardcheck' ";
+    $sql .= "and field_sirius_type_value = 'signed' ";
 
-    $sql .= "and changed >= :start_ts ";
-    $sql_args[':start_ts'] = $start_ts;
-
-    if ($end_ts) {
-      $sql .= "and changed <= :end_ts ";
-      $sql_args[':end_ts'] = $end_ts;
-    }
     $sql .= "order by nid ";
 
 
@@ -147,11 +146,28 @@ class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
 
       $worker_node = $cardcheck_instance->worker($cardcheck_node);
 
+      $cardcheck_bu_nid = $cardcheck['bu'];
+      $worker_bu_nid = $worker_node->field_sirius_bu['und'][0]['target_id'];
+
+      if ($cardcheck_bu_nid == $worker_bu_nid) { continue; }
+
       $row = array();
       $row['worker_nid'] = $worker_node->nid;
       $row['worker_name'] = $worker_node->title;
       $row['worker_id'] = $worker_node->field_sirius_id['und'][0]['value'];
       $row['worker_title'] = $worker_node->field_sirius_title['und'][0]['value'];
+
+      $cardcheck_bu_node = node_load($cardcheck_bu_nid);
+      if ($cardcheck_bu_node) {
+        $row['cardcheck_bu_name'] = $cardcheck_bu_node->title;
+        $row['cardcheck_bu_id'] = $cardcheck_bu_node->field_sirius_id['und'][0]['value'];
+      }
+
+      $worker_bu_node = node_load($worker_bu_nid);
+      if ($worker_bu_node) {
+        $row['worker_bu_name'] = $worker_bu_node->title;
+        $row['worker_bu_id'] = $worker_bu_node->field_sirius_id['und'][0]['value'];
+      }
 
       $dispatch_nodes = sirius_dispatch_emphist_search($worker_node->nid);
       $dispatch_node = reset($dispatch_nodes);
@@ -161,15 +177,8 @@ class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
           $row['worker_employer_name'] = sirius_node_title($job_node->field_grievance_shop['und'][0]['target_id']);
         }
       }
-      $bu_node = node_load($cardcheck['bu']);
 
-      if ($bu_node) {
-        $row['cardcheck_bu_name'] = $bu_node->title;
-        $row['cardcheck_bu_id'] = $bu_node->field_sirius_id['und'][0]['value'];
-      }
-
-      $row['cardcheck_acceptance_date'] = date('Y-m-d H:i', $ts);
-
+      $pk = $cardcheck_nid;
       $rows[$pk] = $row;
     }
 
