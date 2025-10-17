@@ -5,6 +5,11 @@ class Sirius_Trust_Elgibility_Plugin_Ageout extends Sirius_Trust_Elgibility_Plug
 	public $name = 'Age Out';
 	public $description = 'Deny eligibility to selected relationship types if they affected dependent has reached a specified age.';
 
+	// If this is NOT a subscriber-only test, then this function must be overridden
+	public function subscriber_only() {
+		return FALSE;
+	}
+
 	public function form($json) {
 		$form['reltypes'] = array(
 			'#type' => 'checkboxes',
@@ -93,7 +98,7 @@ class Sirius_Trust_Elgibility_Plugin_Ageout extends Sirius_Trust_Elgibility_Plug
 		$diff = $from->diff($to);
 		// drupal_set_message("Difference is " . $diff->y . " years " . $diff->m . " months " . $diff->d . " days ");
 
-		$age_in_months = (12*$diff->y) + $diff->m + 1;
+		$age_in_months = (12*$diff->y) + $diff->m;
 		$age = round(($age_in_months / 12), 2);
 
 		if ($age < $min_age) {

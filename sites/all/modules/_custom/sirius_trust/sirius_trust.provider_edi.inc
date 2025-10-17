@@ -98,6 +98,9 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
   }
 
   public function pks(&$form_state) {
+    global $user;
+    $debug = ($user->uid == 1);
+
     $benefit_nid = $this->benefit_nid();
     if (!$benefit_nid) { return array(); }
 
@@ -109,7 +112,8 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     $sql .= "field_sirius_trust_subscriber_target_id as subscriber_nid, ";
     $sql .= "field_sirius_worker_target_id as worker_nid, ";
     $sql .= "field_sirius_date_end_value as end_date, ";
-    $sql .= "field_sirius_contact_relation_target_id as relationship_nid ";
+    $sql .= "field_sirius_contact_relation_target_id as relationship_nid, ";
+    $sql .= "field_sirius_contact_reltype_tid as relationship_type_tid ";
     $sql .= "from node ";
     $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
     $sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
@@ -118,6 +122,8 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     $sql .= "left join field_data_field_sirius_trust_subscriber on field_data_field_sirius_trust_subscriber.entity_type = 'node' and field_data_field_sirius_trust_subscriber.entity_id = node.nid ";
     $sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
     $sql .= "left join field_data_field_sirius_contact_relation on field_data_field_sirius_contact_relation.entity_type = 'node' and field_data_field_sirius_contact_relation.entity_id = node.nid ";
+    $sql .= "left join node relationship_node on relationship_node.nid = field_sirius_contact_relation_target_id ";
+    $sql .= "left join field_data_field_sirius_contact_reltype on field_data_field_sirius_contact_reltype.entity_type = 'node' and field_data_field_sirius_contact_reltype.entity_id = relationship_node.nid ";
 
     $sql .= "where node.type = 'sirius_trust_worker_benefit' ";
 
@@ -137,6 +143,15 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
 
     $sql .= "and (field_sirius_date_end_value >= :start_date or field_sirius_date_end_value is null) ";
     $sql_args[':start_date'] = $start_date;
+
+    if ($_REQUEST['worker_nid']) {
+      $sql .= "and field_sirius_worker_target_id = :input_worker_nid ";
+      $sql_args[':input_worker_nid'] = $_REQUEST['worker_nid'];
+    }
+
+    if ($debug) {
+      // $sql .= "and field_sirius_worker_target_id in (2528940, 3123041, 3123037, 2520114) ";
+    }
 
     $sql .= "order by field_sirius_trust_subscriber_target_id, field_sirius_worker_target_id ";
 
@@ -190,6 +205,33 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
       if ($worker['is_subscriber']) { continue; }
       $workers[$worker['subscriber_nid']]['dependent_relationship_nids'][] = $worker['relationship_nid']; 
     }
+
+    /*
+    // Load the relationship terms
+    $relationship_type_lookup = sirius_taxonomy_load('sirius_contact_relationship_types', 'tid', 'full');
+
+    // Sort the workers
+    uksort($workers, function($a, $b) use ($workers, $relationship_type_lookup) {
+      // First sort by nid
+      $tmp = ($workers[$a]['subscriber_nid'] <=> $workers[$b]['subscriber_nid']);
+      if ($tmp) { return $tmp; }
+
+      // Next, subscribers are first
+      if ($workers[$a]['is_subscriber'] && !$workers[$b]['is_subscriber']) { return -1; }
+      if (!$workers[$a]['is_subscriber'] && $workers[$b]['is_subscriber']) { return 1; }
+
+      // Next, spouses.
+      // @todo: hardcoding this because we haven't set up relationship type weights.
+      $reltype_a = $workers[$a]['relationship_type_tid'];
+      $reltype_b = $workers[$a]['relationship_type_tid'];
+      if ($relationship_type_lookup[$reltype_a]->field_sirius_id['und'][0]['value'] == 'SP') { return -1; }
+      if ($relationship_type_lookup[$reltype_b]->field_sirius_id['und'][0]['value'] == 'SP') { return 1; }
+
+      return 0;
+    });
+    */
+
+    // if ($debug) { drupal_set_message('<pre>' . print_r($workers, 1) . '</pre>'); }
 
     return array_chunk($workers, 100);
   }
@@ -328,19 +370,20 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
       $row['edi_ssn'] = $hr['edi_ssn'];
       $row['edi_firstname'] = strtoupper($hr['edi_firstname']);
       $row['edi_lastname'] = strtoupper($hr['edi_lastname']);
-      $row['edi_premium_amt'] = $hr['edi_premium_amt'];
+      $row['edi_premium_amt'] = '$' . number_format(round($hr['edi_premium_amt'], 2), 2);
       $row['edi_payment_month'] = $edi_payment_month;
       $rows[] = $row;
 
-      if ($total) { $total += $hr['edi_premium_amt']; }
+      if ($hr['edi_premium_amt']) { $total += $hr['edi_premium_amt']; }
     }
+    $total = round($total, 2);
 
     $row = array();
     $row['edi_carrier_name'] = '';
     $row['edi_group_number'] = '';
     $row['edi_asof_month'] = '';
     $row['edi_premium_tier'] = 'TOTAL';
-    $row['edi_premium_amt'] = $total;
+    $row['edi_premium_amt'] = '$' . number_format($total, 2);
     $row['edi_ssn'] = '';
     $row['edi_firstname'] = '';
     $row['edi_lastname'] = '';
@@ -483,7 +526,11 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
       }
 
       $fields = $info['preview']['default_display_fields'];
-      fputcsv($fp, $fields);
+
+      if (!$info['edi_csv_hide_header']) {
+        fputcsv($fp, $fields);
+      }
+
   		while ($hr = $stmt->fetchAssoc()) {
   			$hr = $info['generator']->row_decode($hr['report_data']);
   			$row = array();
@@ -512,6 +559,17 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
 	}
 
   public function context($worker, $asof_date, $parameters) {
+    $lookups = &drupal_static(__FUNCTION__);
+    if (!isset($lookups['reltypes'])) {
+      $lookups['reltypes'] = sirius_taxonomy_load('sirius_contact_relationship_types', 'tid', 'full');
+
+      $weight = 0;
+      foreach ($lookups['reltypes'] as $tid => $term) {
+        $lookups['reltype_weights'][$term->field_sirius_id['und'][0]['value']] = ++$count;
+      }
+    }
+
+
     $wb_nid = $worker['wb_nid'];
 
     $wb_node = node_load($wb_nid);
@@ -523,7 +581,32 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     $employer_node = node_load($wb_node->field_grievance_shop['und'][0]['target_id']);
 
     $format = '%010d';
-    $pk = sprintf($format, $subscriber_node->nid) . '|' . sprintf($format, $worker_node->nid) . '|' . sprintf($format, $wb_node->nid);
+
+    $pk_parts = array();
+
+    // Sort first by subscriber NID
+    $pk_parts[] = sprintf($format, $subscriber_node->nid);
+
+    // Subscribers before depedants
+    if ($relationship_node) {
+      $pk_parts[] = '1';
+    } else {
+      $pk_parts[] = '0';
+    }
+
+    // Spouses before kids; @todo this needs to deal with relationship weights etc.
+    $reltype_id = $this->relationship_type($relationship_node);
+    $weight = $lookups['reltype_weights'][$reltype_id];
+    if (!$weight) { $weight = 0; }
+    $pk_parts[] = sprintf($format, $weight);
+
+    // Next worker NID (for uniqueness)
+    $pk_parts[] = sprintf($format, $worker_node->nid);
+
+    // Next WB NID (just in case)
+    $pk_parts[] = sprintf($format, $wb_node->nid);
+
+    $pk = join('|', $pk_parts);
 
     $context = array();
     $context['parameters'] = $parameters;
@@ -605,7 +688,10 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     $asof_ts = strtotime($context['asof_date']);
     if ($end_ts > $asof_ts) { return ''; }
 
-    return date('Ymd', $end_ts);
+    // Always the last day of the month. Round down.
+    if (date('d', $end_ts) < 5) { $end_ts = strtotime('-1 month', $end_ts); }
+
+    return date('Ymt', $end_ts);
   }
 
   public function phone($context, $which) {
@@ -618,7 +704,7 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
 
   public function dob($context, $which) {
   	$date = $context[$which]->field_sirius_dob['und'][0]['value'];
-  	if (!$date) { return ''; }
+  	if (!$date) { return '19750101'; }
   	return date('Ymd', strtotime($date));
   }
 
@@ -652,7 +738,7 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
     $search_params['benefit_type'] = $benefit_type;
     $wb_nodes = sirius_trust_worker_benefits_search($search_params);
     if (!$wb_nodes) { return ''; }
-    $wb_nodes =  sirius_trust_worker_benefits_sort_by_date($wb_nodes);
+    $wb_nodes =  sirius_trust_worker_benefits_sort_by_date_only($wb_nodes);
 
     $wb_node = reset($wb_nodes);
     $benefit_node = node_load($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);

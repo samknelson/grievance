@@ -17,6 +17,7 @@ class Sirius_Smf_Report_Edi_Local11 extends Report_Cache_Report_Generator {
           'hours_year',
           'hours_month',
           'hours_amt',
+          'hours_type',
         ),
         'preview_links' => TRUE,
       ),
@@ -40,6 +41,7 @@ class Sirius_Smf_Report_Edi_Local11 extends Report_Cache_Report_Generator {
     $fields['hours_year'] = 'Year';
     $fields['hours_month'] = 'Month';
     $fields['hours_amt'] = 'Hours';
+    $fields['hours_type'] = 'Hours Type';
     return $fields;
   }
 
@@ -160,6 +162,7 @@ class Sirius_Smf_Report_Edi_Local11 extends Report_Cache_Report_Generator {
         $row['worker_nid'] = $hr['worker_nid'];
         $row['payperiod_nid'] = $hr['payperiod_nid'];
         $row['employer_nid'] = $hr['employer_nid'];
+        $row['hours_type'] = sirius_term_title($hr['hours_type_tid']);
 
         // Why didn't I put an ID on the hours table?!?!
         $pk = join('|', array(

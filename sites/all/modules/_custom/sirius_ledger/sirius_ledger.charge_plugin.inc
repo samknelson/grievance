@@ -49,6 +49,13 @@ function sirius_ledger_charge_plugin_charge_all(&$context, $mode = 'test') {
 		$context['contact_node'] = node_load($context['worker_node']->field_sirius_contact['und'][0]['target_id']);
 	}
 
+	// Attempt to guess the employer from the election
+	if ($context['worker_node'] && !$context['employer_node'] && sirius_domain_component_enabled('trust')) {
+		$election_node = sirius_trust_worker_election($context['worker_node'], $context['ts']);
+		$context['employer_node'] = node_load($election_node->field_grievance_shop['und'][0]['target_id']);
+	}
+
+	// Attempt to guess the employer from the employment history
 	if ($context['worker_node'] && !$context['employer_node']) {
 		$context['employer_node'] = node_load(sirius_dispatch_emphist_employer_nid_asof($context['worker_node']->nid, $context['ts']));
 	}

@@ -76,7 +76,9 @@ function unite_node_presave($node) {
 
 function unite_calc_distances($property_node) {
 	$calc_fields = array(
-		'field_convention_center' => 'field_calc_convention_dist'
+		'field_convention_center' => 'field_calc_convention_dist',
+		'field_airport' => 'field_calc_airport_dist', 
+		'field_airport_alt' => 'field_calc_airport_dist_alt',
 	);
 
 	foreach ($calc_fields as $source_field => $target_field) {

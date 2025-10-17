@@ -61,47 +61,6 @@ function sirius_smf_node_tabs() {
     'weight' => 12,
   );
 
-  /*
-  $node_tabs['sirius_worker']['sirius_worker_hours/smf_hour_threshold'] = array(
-    'title' => 'Hours Threshold',
-    'callback' => 'sirius_smf_node_tab_worker_hour_threshold',
-    'permissions' => array('sirius trust staff'),
-    'file' => 'sirius_smf.page_worker_hour_threshold.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-  );
-  */
-
-  $node_tabs['sirius_worker']['sirius_trust_worker_benefits/oneoff_benefit_cleanup'] = array(
-    'title' => 'Oneoff Benefit Cleanup',
-    'callback' => 'sirius_smf_node_tab_worker_oneoff_benefit_cleanup',
-    'permissions' => array('sirius trust staff'),
-    'file' => 'sirius_smf.oneoff_benefit_cleanup.inc',
-    'component' => 'trust',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 12,
-  );
-
-  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_dentwell_election'] = array(
-    'title' => 'Oneoff Dentwell Election',
-    'callback' => 'sirius_smf_node_tab_worker_oneoff_dentwell_election',
-    'permissions' => array('sirius trust staff'),
-    'file' => 'sirius_smf.oneoff_dentwell_election.inc',
-    'component' => 'trust',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 12,
-  );
-
-  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_election_relationships'] = array(
-    'title' => 'Oneoff Election Relationships',
-    'callback' => 'sirius_smf_node_tab_worker_oneoff_election_relationships',
-    'permissions' => array('sirius trust staff'),
-    'file' => 'sirius_smf.oneoff_election_relationships.inc',
-    'component' => 'trust',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 12,
-  );
-
   $node_tabs['sirius_worker']['sirius_worker_contact/smf_autotag'] = array(
     'title' => 'Autotag',
     'callback' => 'sirius_smf_node_tab_worker_autotag',
@@ -182,6 +141,76 @@ function sirius_smf_node_tabs() {
     'skip_node_view_check' => TRUE,
   );
 
+  //
+  // Oneoffs
+  //
+
+  /*
+  $node_tabs['sirius_worker']['sirius_trust_worker_benefits/oneoff_benefit_cleanup'] = array(
+    'title' => 'Oneoff Benefit Cleanup',
+    'callback' => 'sirius_smf_node_tab_worker_oneoff_benefit_cleanup',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_benefit_cleanup.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+
+  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_dentwell_election'] = array(
+    'title' => 'Oneoff Dentwell Election',
+    'callback' => 'sirius_smf_node_tab_worker_oneoff_dentwell_election',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_dentwell_election.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+
+  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_election_relationships'] = array(
+    'title' => 'Oneoff Election Relationships',
+    'callback' => 'sirius_smf_node_tab_worker_oneoff_election_relationships',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_election_relationships.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+
+  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_dentwell_election_3'] = array(
+    'title' => 'Oneoff Dentwell Election 3',
+    'callback' => 'sirius_smf_node_tab_oneoff_dentwell_election_3',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_dentwell_election_3.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+  */
+
+  $node_tabs['sirius_worker']['sirius_trust_worker_election/oneoff_election_add'] = array(
+    'title' => 'Oneoff Election AD+D',
+    'callback' => 'sirius_smf_node_tab_oneoff_election_add',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_election_add.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+
+  $node_tabs['sirius_trust_worker_election']['oneoff_linked_benefit'] = array(
+    'title' => 'Oneoff Linked Benefits',
+    'callback' => 'sirius_smf_node_tab_election_oneoff_linked_benefit',
+    'permissions' => array('sirius trust staff'),
+    'file' => 'sirius_smf.oneoff_linked_election.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
+
+
+
+
+
   sirius_node_tab_set_module('sirius_smf', $node_tabs);
 	return $node_tabs;
 }
@@ -254,6 +283,50 @@ function sirius_smf_menu() {
     'access callback' => TRUE,
     'type'             => MENU_NORMAL_ITEM,
     'file' => 'sirius_smf.page_register.inc',
+  );
+
+  $items['smf/register/config'] = array(
+    'title'            => 'Registration Settings',
+    'page callback'    => 'sirius_smf_page_register_config',
+    'page arguments'   => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permissions' => array('sirius trust staff')
+      ),
+    ),
+    'type'             => MENU_NORMAL_ITEM,
+    'file' => 'sirius_smf.page_register_config.inc',
+  );
+
+  $items['smf/register/config/main'] = array(
+    'title'            => 'Settings',
+    'page callback'    => 'sirius_smf_page_register_config',
+    'page arguments'   => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permissions' => array('sirius trust staff')
+      ),
+    ),
+    'type'            => MENU_DEFAULT_LOCAL_TASK,
+    'weight'          => 1,
+    'file' => 'sirius_smf.page_register_config.inc',
+  );
+
+  $items['smf/register/config/test'] = array(
+    'title'            => 'Test',
+    'page callback'    => 'sirius_smf_page_register_test',
+    'page arguments'   => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permissions' => array('sirius trust staff')
+      ),
+    ),
+    'type'            => MENU_LOCAL_TASK,
+    'weight'          => 2,
+    'file' => 'sirius_smf.page_register_test.inc',
   );
 
   $items['sirius/smf/ehrs'] = array(

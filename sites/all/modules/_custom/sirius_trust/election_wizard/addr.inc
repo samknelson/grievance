@@ -140,8 +140,14 @@ function sirius_trust_election_wizard_addr_post($info, &$data, $wizard_node, $cu
 	$change = $data['addr']['change'];
 	if ($change != 'Yes') { return array('success' => TRUE); }
 
+	$data['addr']['new']['country'] = 'US';
 	$worker_node = sirius_trust_election_wizard_get_worker($wizard_node);
 	$worker_node->field_sirius_address['und'][0] = $data['addr']['new'];
+
+	node_object_prepare($worker_node);
+	$worker_node = node_submit($worker_node);
 	node_save($worker_node);
+	
+	// return array('success' => FALSE, 'msg' => 'Debug');
 	return array('success' => TRUE);
 }

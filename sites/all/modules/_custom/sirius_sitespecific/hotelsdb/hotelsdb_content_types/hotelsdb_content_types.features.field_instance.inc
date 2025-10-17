@@ -61,7 +61,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 36,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -72,7 +72,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_actors',
-    'label' => 'Actors',
+    'label' => 'Parent Actor(s)',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -86,7 +86,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -107,7 +107,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'use_widget_handlers' => 1,
         ),
         'type' => 'addressfield_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -150,7 +150,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         ),
       ),
       'type' => 'addressfield_standard',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -164,7 +164,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -204,7 +204,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         ),
       ),
       'type' => 'geocoder',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -220,7 +220,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'file',
         'settings' => array(),
         'type' => 'file_default',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -247,7 +247,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_mfw',
-      'weight' => 10,
+      'weight' => 11,
     ),
   );
 
@@ -263,7 +263,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'inline',
@@ -288,7 +288,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -304,7 +304,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 6,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -329,7 +329,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'rows' => 3,
       ),
       'type' => 'text_textarea',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
@@ -345,7 +345,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'inline',
@@ -370,7 +370,46 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 5,
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance: 'node-actor-field_public'.
+  $field_instances['node-actor-field_public'] = array(
+    'bundle' => 'actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_public',
+    'label' => 'Public?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 3,
     ),
   );
 
@@ -426,7 +465,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'link',
         'settings' => array(),
         'type' => 'link_default',
-        'weight' => 5,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -467,7 +506,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'link',
       'settings' => array(),
       'type' => 'link_field',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -1296,6 +1335,90 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-property-field_airport'.
+  $field_instances['node-property-field_airport'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 67,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_airport',
+    'label' => 'Primary Airport',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 43,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_airport_alt'.
+  $field_instances['node-property-field_airport_alt'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 69,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_airport_alt',
+    'label' => 'Secondary Airport',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 44,
+    ),
+  );
+
   // Exported field_instance: 'node-property-field_attachments'.
   $field_instances['node-property-field_attachments'] = array(
     'bundle' => 'property',
@@ -1433,6 +1556,98 @@ function hotelsdb_content_types_field_default_field_instances() {
       ),
       'type' => 'options_select',
       'weight' => 23,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_calc_airport_dist'.
+  $field_instances['node-property-field_calc_airport_dist'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 68,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_calc_airport_dist',
+    'label' => 'Primary Airport Distance',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => ' Miles',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 45,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_calc_airport_dist_alt'.
+  $field_instances['node-property-field_calc_airport_dist_alt'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 70,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_calc_airport_dist_alt',
+    'label' => 'Secondary Airport Distance',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => ' Miles',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 46,
     ),
   );
 
@@ -2861,6 +3076,84 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-property-field_fs_concession_type'.
+  $field_instances['node-property-field_fs_concession_type'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 66,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fs_concession_type',
+    'label' => 'Concession Type',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 42,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_fs_dbe'.
+  $field_instances['node-property-field_fs_dbe'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 10,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fs_dbe',
+    'label' => 'DBE',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 20,
+    ),
+  );
+
   // Exported field_instance: 'node-property-field_fs_segment'.
   $field_instances['node-property-field_fs_segment'] = array(
     'bundle' => 'property',
@@ -3825,11 +4118,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   // Exported field_instance: 'node-property-field_rooms'.
   $field_instances['node-property-field_rooms'] = array(
     'bundle' => 'property',
-    'default_value' => array(
-      0 => array(
-        'value' => 0,
-      ),
-    ),
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -5731,7 +6020,6 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Abbreviation');
   t('Actor');
   t('Actor Type');
-  t('Actors');
   t('Address');
   t('Address Accuracy');
   t('Address Geofield');
@@ -5751,10 +6039,12 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Casino Type');
   t('Casino?');
   t('Common Name');
+  t('Concession Type');
   t('Convention Center');
   t('Convention Center Attached?');
   t('Convention Center Distance');
   t('County');
+  t('DBE');
   t('Development Status');
   t('Employees Claimed');
   t('Employer ID');
@@ -5804,6 +6094,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Outdoor Event Space?');
   t('Owner Last Updated');
   t('Owner of Record');
+  t('Parent Actor(s)');
   t('Parking Available?');
   t('Parking Capacity');
   t('Part of Multi-Party Loan?');
@@ -5811,8 +6102,11 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Percent owned');
   t('Phone');
   t('Portfolio');
+  t('Primary Airport');
+  t('Primary Airport Distance');
   t('Property');
   t('Property ID  / Assessor’s Parcel');
+  t('Public?');
   t('Raw Address');
   t('Regulator');
   t('Relationship type');
@@ -5822,6 +6116,8 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Rooms');
   t('Sales price');
   t('Search Body');
+  t('Secondary Airport');
+  t('Secondary Airport Distance');
   t('Segment');
   t('Servicer Commentary');
   t('Servicer Commentary As Of');

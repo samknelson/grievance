@@ -17,16 +17,18 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 			return array('success' => FALSE, 'msg' => 'No policy or employer specified, so we don\'t know the hours threshold.');
 		}
 
-		// "as of" means a two-month lag
+		// "As of" is passed in
 		$asof_ts = $params['ts'];
 		$asof_year = date('Y', $asof_ts);
 		$asof_month = date('n', $asof_ts);
 		$asof_ym = "$asof_year-$asof_month";
 
-		// Benefit month is three months before current
+		// Benefit month is three months before current, unless this is an election, in which case we look at the month now.
 		$threemonthsprev_month = $asof_month;
 		$threemonthsprev_year = $asof_year;
-		$threemonthsprev_month -= 3;
+		if (!$params['is_election']) {
+			$threemonthsprev_month -= 3;
+		}
 		if ($threemonthsprev_month < 1) { $threemonthsprev_year--; $threemonthsprev_month += 12; }
 		$threemonthsprev_ym = "$threemonthsprev_year-$threemonthsprev_month";
 
@@ -100,6 +102,7 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 
 		$result = array();
 
+		$msg_details = array();
 		foreach ($data as $ym => $record) {
 			list ($y, $m) = explode('-', $ym);
 
@@ -115,6 +118,7 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 			$hr = $stmt->fetchAssoc();
 			$hrs = $hr['c'];
 			if (!$hrs) { $hrs = 0; }
+			$msg_details[] = '[' . round($hrs) . " hrs $m/$y]";
 
 			// Eligibility month
 			if ($m == $threemonthsprev_month && $y == $threemonthsprev_year) {
@@ -207,6 +211,8 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 			$result['warning'] = TRUE;
 		}
 
+		$result['msg'] .= ' ' . join(' ', $msg_details);
+
 		return $result;
 	}
 
@@ -230,6 +236,7 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 			$ms_term = taxonomy_term_load($ms_tid);
 			$ms_json = sirius_json_get($ms_term);
 			$val = $ms_json['smf']['threshold'];
+			if (is_array($val)) { $val = $val['hrs']; }
 			if (!($val > 0)) { $val = 100; }
 			$cache[$ms_tid] = $val;
 		}

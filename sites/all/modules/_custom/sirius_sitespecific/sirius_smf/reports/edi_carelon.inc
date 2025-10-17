@@ -15,6 +15,7 @@ class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Gen
       'row_encoding' => 'json',
       'edi_tiers' => array('mlk', 'other'),
       'edi_output_format' => 'csv',
+      'edi_csv_hide_header' => TRUE,
     );
 
     return parent::info($result);
@@ -73,11 +74,21 @@ class Sirius_Smf_Report_Edi_Carelon extends Sirius_Trust_Provider_Edi_Report_Gen
       $row['LSTNAM'] = $context['worker_node']->field_sirius_name['und'][0]['family'];
       $row['FSTNAM'] = $context['worker_node']->field_sirius_name['und'][0]['given'];
       $row['MIDNAM'] = substr($context['worker_node']->field_sirius_name['und'][0]['middle'], 0, 1);
+
       $row['ADRLN1'] = preg_replace('/\'\"/', '', $context['worker_node']->field_sirius_address['und'][0]['thoroughfare']);
       $row['ADRLN2'] = preg_replace('/\'\"/', '', $context['worker_node']->field_sirius_address['und'][0]['premise']);
       $row['CITYCD'] = preg_replace('/\'\"/', '', $context['worker_node']->field_sirius_address['und'][0]['locality']);
       $row['STACOD'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
       $row['ZIPCOD'] = $this->zip($context, 'worker_node');
+
+      if (!$row['ADRLN1']) {
+        $row['ADRLN1'] = preg_replace('/\'\"/', '', $context['subscriber_node']->field_sirius_address['und'][0]['thoroughfare']);
+        $row['ADRLN2'] = preg_replace('/\'\"/', '', $context['subscriber_node']->field_sirius_address['und'][0]['premise']);
+        $row['CITYCD'] = preg_replace('/\'\"/', '', $context['subscriber_node']->field_sirius_address['und'][0]['locality']);
+        $row['STACOD'] = $context['subscriber_node']->field_sirius_address['und'][0]['administrative_area'];
+        $row['ZIPCOD'] = $this->zip($context, 'subscriber_node');
+      }
+
       $row['HOMPHN'] = $this->phone($context, 'worker_node');
       $row['WRKPHN'] = '';
       $row['BTHDAT'] = $this->dob($context, 'worker_node');

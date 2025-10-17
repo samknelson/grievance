@@ -297,7 +297,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_work_status']['display'] = 'block_8';
     $settings['sirius_work_status']['multidomain'] = 'Yes';
     $settings['sirius_ledger_type']['view'] = 'sirius_taxonomy';
-    $settings['sirius_ledger_type']['display'] = 'block';
+    $settings['sirius_ledger_type']['display'] = 'block_22';
     $settings['sirius_ledger_type']['multidomain'] = 'Yes';
     $settings['sirius_payment_type']['view'] = 'sirius_taxonomy';
     $settings['sirius_payment_type']['display'] = 'block_10';
@@ -306,7 +306,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_worker_tor_type']['display'] = 'block_11';
     $settings['sirius_worker_tor_type']['multidomain'] = 'Yes';
     $settings['sirius_trust_benefit_type']['view'] = 'sirius_taxonomy';
-    $settings['sirius_trust_benefit_type']['display'] = 'block';
+    $settings['sirius_trust_benefit_type']['display'] = 'block_21';
     $settings['sirius_trust_benefit_type']['multidomain'] = 'Yes';
     $settings['sirius_trust_election_type']['view'] = 'sirius_taxonomy';
     $settings['sirius_trust_election_type']['display'] = 'block_15';
@@ -322,6 +322,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_trust_service_type']['display'] = 'block_17';
     $settings['sirius_trust_service_type']['multidomain'] = 'Yes';
     $settings['sirius_trust_service_type']['component'] = 'trust';
+
 
 
     $settings['grievance_alert_types']['config_category'] = 'grievance';

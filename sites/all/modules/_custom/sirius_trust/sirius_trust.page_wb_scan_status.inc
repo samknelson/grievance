@@ -24,6 +24,7 @@ function sirius_trust_page_wb_scan_status_form($form, &$form_state) {
  	}
 
 
+	$html .= sirius_fakerender_field('Which Month:', $status['month']);
 	$html .= sirius_fakerender_field('Month:', $status['ym']);
 	$html .= sirius_fakerender_field('Pending:', number_format($status['pending'], 0));
 	$html .= sirius_fakerender_field('Complete:', number_format($status['complete']));
@@ -74,6 +75,16 @@ function sirius_trust_page_wb_scan_status_form($form, &$form_state) {
 		),
 	);
 
+	$form['settings']['month'] = array(
+		'#type' => 'select',
+		'#title' => t('Mode'),
+		'#default_value' => $status['month'],
+		'#options' => array(
+			'this_month' => date('F Y'),
+			'next_month' => date('F Y', strtotime('+1 month')),
+		),
+	);
+
 	$form['settings']['reset'] = array(
 		'#type' => 'select',
 		'#title' => t('Reset?'),
@@ -112,6 +123,8 @@ function sirius_trust_page_wb_scan_status_form_submit($form, &$form_state) {
 	$status = sirius_domain_variable_get('sirius_trust_wb_scan_status', array());
 	$status['limit'] = $form_state['values']['settings']['limit'];
 	$status['mode'] = $form_state['values']['settings']['mode'];
+	$status['month'] = $form_state['values']['settings']['month'];
+
 	if ($form_state['values']['settings']['reset'] == 'Yes') {
 		unset($status['ym']);
 		unset($status['last_worker_nid']);

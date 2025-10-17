@@ -22,10 +22,6 @@ function sirius_trust_denormalize_queue($node) {
  */
 
 function sirius_trust_sirius_denorm($item) {
-  if ($item['denorm_trigger'] == 'sirius_trust_worker_benefits') {
-    sirius_trust_denorm_worker_benefits($item['denorm_target_nid']);
-  }
-
   if ($item['denorm_trigger'] == 'sirius_trust_worker_memdep_tag') {
     sirius_trust_denorm_worker_memdep_tag($item['denorm_source_nid'], $item['denorm_target_nid']);
   }
@@ -101,32 +97,6 @@ function sirius_trust_denorm_worker_memdep_tag($wb_nid, $worker_nid) {
   // All done.
   sirius_domain($old_domain_nid);
   return $result;
-}
-
-/**
- * Make sure that there is a simple field in the Worker record that shows all active
- * worker benefits
- */
-
-function sirius_trust_denorm_worker_benefits($worker_nid) {
-  $worker_node = node_load($worker_nid);
-
-  $benefits = sirius_trust_worker_benefits_search(array('worker_nid' => $worker_nid, 'active' => 'Yes'));
-
-  $new_benefit_nids = array();
-  foreach ($benefits as $worker_benefit) {
-    $new_benefit_nids[] = $worker_benefit->field_sirius_trust_benefit['und'][0]['target_id'];
-  }
-  $new_benefit_nids = array_unique($new_benefit_nids);
-  $old_benefit_nids = sirius_fieldvals($worker_node, 'field_sirius_denorm_benefits', 'target_id');
-
-  if (array_diff($new_benefit_nids, $old_benefit_nids) || array_diff($old_benefit_nids, $new_benefit_nids)) {
-    $worker_node->field_sirius_denorm_benefits = array();
-    foreach ($new_benefit_nids as $new_benefit_nid) {
-      $worker_node->field_sirius_denorm_benefits['und'][] = array('target_id' => $new_benefit_nid);
-    }
-    node_save($worker_node);
-  }
 }
 
 /**

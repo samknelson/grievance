@@ -123,6 +123,8 @@ class Sirius_Trust_Wb_Scan_Changelog extends Sirius_Singleton {
 		while ($hr = $stmt->fetchAssoc()) {
 			$hr['ts'] = date('Y-m-d H:i:s', $hr['ts']);
 			fputcsv($fp, array_values($hr));
+			fflush($fp);
+			ob_flush();
 		}
 	}
 }

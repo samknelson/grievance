@@ -17,5 +17,7 @@ function unite_amenities_fields() {
 		'field_fh_outdoor_area',
 		'field_fh_parking',
 		'field_fh_parking_capacity',
+		'field_airport',
+		'field_airport_alt',
 	);
 }

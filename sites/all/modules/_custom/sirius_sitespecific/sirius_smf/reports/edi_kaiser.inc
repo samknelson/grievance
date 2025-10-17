@@ -13,15 +13,31 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       'module' => 'sirius_smf',
       'file' => 'reports/edi_kaiser.inc',
       'row_encoding' => 'json',
-      'edi_tiers' => array('single', 'single+1', 'family'),
+      'edi_tiers' => array('single', 'single+1', 'family', 'no_coverage'),
       'edi_output_format' => 'fixed',
     );
 
     return parent::info($result);
   }
 
+  public function form() {
+    $form = parent::form();
+    $form['activity_date'] = array(
+      '#type' => 'select',
+      '#title' => t('Activity Date'),
+      '#options' => array(
+        'today' => 'File Creation Date',
+        'first_of_month' => 'First Day of the Month',
+      ),
+      '#description' => t('This will appear in the header row as "production / test indicator"'),
+    );
+
+    return $form;
+  }
+
   public function edi_premium_tier($context) {
     if (!($this->is_subscriber($context))) { return NULL; }
+    if ($this->coverage_end_date($context)) { return 'no_coverage'; }
 
     $count = count($context['dependent_relationship_nodes']);
     if ($count == 0) { return 'single'; }
@@ -116,7 +132,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       $row['Record Type'] = '1';
       $row['Customer ID'] = '000226111';
       $row['Enrollment Unit'] = $this->enrollment_unit($context);
-      $row['Activity Date'] = date('Ymd');
+      $row['Activity Date'] = $this->activity_date($context);
       $row['Transaction Type'] = '';
       $row['Record Code'] = $this->record_code($context);
       $row['Last Name'] = $context['worker_node']->field_sirius_name['und'][0]['family'];
@@ -129,7 +145,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       $row['Subscriber SSN'] = $this->ssn($context, 'subscriber_node');
       $row['Member SSN'] = $this->ssn($context, 'worker_node');
       $row['Employee ID'] = '';
-      $row['Supplemental ID'] = '';
+      $row['Supplemental ID'] = $this->supplemental_id($context);
       $row['Employer ID'] = '';
       $row['Employment Status'] = '';
       $row['Hire Date'] = '';
@@ -162,6 +178,32 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
     }
 
     return array('is_multiple' => TRUE, 'rows' => $rows);
+  }
+
+  public function activity_date($context) {
+    if ($context['parameters']['activity_date'] == 'first_of_month') {
+      return date('Ym') . '01';
+    } else {
+      return date('Ymd');
+    }
+  }
+
+  public function coverage_start_date($context) {
+    $date = parent::coverage_start_date($context);
+    if (!$date) { return $date; }
+    if ($date < '20250801') { $date = '20250801'; }
+    return $date;
+  }
+
+  public function ssn($context, $which) {
+    $str = parent::ssn($context, $which);
+    while (strlen($str) < 9) { $str = "0$str"; }
+    return $str;
+  }
+
+  public function supplemental_id($context) {
+    if ($this->is_qmsco($context)) { return '08'; }
+    return '';
   }
 
   public function enrollment_unit($context) {

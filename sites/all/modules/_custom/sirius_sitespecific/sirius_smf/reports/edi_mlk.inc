@@ -75,8 +75,8 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
       $row['PLAN'] = '1';
       $row['GROUP'] = 'SMC';
       $row['FILE DT'] = date('Ymd');
-      $row['MEM ACCT'] = $this->mlk_acct($context['subscriber_node']);
-      $row['DEP ACCT'] = $this->mlk_acct($context['worker_node']);
+      $row['MEM ACCT'] = $this->mlk_acct($context, 'subscriber_node');
+      $row['DEP ACCT'] = $this->mlk_acct($context, 'worker_node');
       $row['MEM/DEP'] = $this->memdep($context);
       $row['LN'] = $context['worker_node']->field_sirius_name['und'][0]['family'];
       $row['FN'] = $context['worker_node']->field_sirius_name['und'][0]['given'];
@@ -84,14 +84,14 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
       $row['DEP REL'] = $this->deprel($context);
       $row['BD'] = $this->dob($context, 'worker_node');
       $row['SEX'] = $this->gender($context);
-      $row['SSN'] = ''; // $this->ssn($context, 'subscriber_node');
-      $row['DEP SSN'] = ''; // $this->ssn($context, 'worker_node');
-      $row['PHONE'] = $this->phone($context, 'worker_node');
-      $row['ADDR1'] = $context['worker_node']->field_sirius_address['und'][0]['thoroughfare'];
-      $row['ADDR2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
-      $row['CITY'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
-      $row['ST'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['ZIP'] = $this->zip($context, 'worker_node');
+      $row['SSN'] = $this->ssn($context, 'subscriber_node');
+      $row['DEP SSN'] = $this->ssn($context, 'worker_node');
+      $row['PHONE'] = $this->mlk_column($context, 'phone');
+      $row['ADDR1'] = $this->mlk_column($context, 'thoroughfare');
+      $row['ADDR2'] = $this->mlk_column($context, 'premise'); 
+      $row['CITY'] = $this->mlk_column($context, 'locality');
+      $row['ST'] = $this->mlk_column($context, 'administrative_area');
+      $row['ZIP'] = $this->mlk_column($context, 'zip');
       $row['EFF DT'] = $this->coverage_start_date($context);
       $row['TERM DT'] =  $this->coverage_end_date($context);
       $row['PCP'] = '';
@@ -108,10 +108,40 @@ class Sirius_Smf_Report_Edi_MLK extends Sirius_Trust_Provider_Edi_Report_Generat
     return array('is_multiple' => TRUE, 'rows' => $rows);
   }
 
-  public function mlk_acct($worker_node) {
-    $id = $worker_node->field_sirius_id3['und'][0]['value'];
+  public function mlk_column($context, $column) {
+    // First try to fetch the data directly from the worker.
+    if ($column == 'zip')       { $result = $this->zip($context, 'worker_node'); }
+    elseif ($column == 'phone') { $result = $this->phone($context, 'worker_node'); }
+    else                        { $result = $context['worker_node']->field_sirius_address['und'][0][$column]; }
+    if ($result) { return $result; }
+
+    // If the worker is QMSCO, we're done now.
+    if ($this->is_qmsco($context)) { return ''; }
+
+    // Otherwise, copy the data from the subscriber.
+    if ($column == 'zip')       { $result = $this->zip($context, 'subscriber_node'); }
+    elseif ($column == 'phone') { $result = $this->phone($context, 'subscriber_node'); }
+    else                        { $result = $context['subscriber_node']->field_sirius_address['und'][0][$column]; }
+    return $result;
+  }
+
+  public function mlk_acct($context, $which) {
+    // For subscribers, we use this algorithm
+    if ($this->is_subscriber($context) || ($which == 'subscriber_node')) {
+      $id = $context['subscriber_node']->field_sirius_id3['und'][0]['value'];
+      if (preg_match('/^U/', $id)) { return $id; }
+
+      return $context['subscriber_node']->field_sirius_id['und'][0]['value'];
+    }
+
+    // For dependents, it's slightly different
+    $id = $context['worker_node']->field_sirius_id2['und'][0]['value'];
     if (preg_match('/^U/', $id)) { return $id; }
-    return $worker_node->field_sirius_id['und'][0]['value'];
+
+    $id = $context['worker_node']->field_sirius_id3['und'][0]['value'];
+    if (preg_match('/^U/', $id)) { return $id; }
+
+    return $context['worker_node']->field_sirius_id['und'][0]['value'];
   }
 
   public function cobrastatus($context) {

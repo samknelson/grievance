@@ -45,7 +45,7 @@ class Sirius_Cardcheck_Access extends Sirius_Access {
 
     // Admins can do pretty much anything.
     if ($is_admin) { 
-      if ($action != 'create worker cardcheck') { return TRUE; }
+      if (!in_array($action, array('create worker cardcheck', 'create offline cardcheck'))) { return TRUE; }
     }
 
     // If we are passed in a worker node, we must have access to it.
@@ -97,6 +97,18 @@ class Sirius_Cardcheck_Access extends Sirius_Access {
     if ($action == "view cardcheck") {
       if (!$context['cardcheck_node']) { return FALSE; }
       if ($is_worker) { return TRUE; }
+    }
+
+    // Staff can handle offline cardchcks
+    if ($action == "create offline cardcheck") {
+      // Must have a cardcheck node
+      if (!$context['cardcheck_node']) { return FALSE; }
+
+      // Must be unsigned
+      if ($instance->status($context['cardcheck_node']) != 'unsigned') { return FALSE; }
+
+      // Must be staff
+      if ($is_staff) { return TRUE; }
     }
 
     // Workers can create their own cardchecks, if they don't have a signed or unsigned 

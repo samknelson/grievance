@@ -95,3 +95,19 @@ function sirius_nota_node_presave_field($node, $field) {
 
 	$node->{$field_calc}['und'][0]['value'] = $calc;
 }
+
+function sirius_nota_tids($taxonomy_name) {
+	$data = &drupal_static(__FUNCTION__);
+
+	if (!isset($data[$taxonomy_name])) {
+		$data[$taxonomy_name] = array();
+		$terms = sirius_taxonomy_load($taxonomy_name, 'tid', 'full');
+		foreach ($terms as $tid => $term) { 
+			if ($term->field_sirius_nota['und'][0]['value'] == 'Yes') {
+				$data[$taxonomy_name][] = $tid;
+			}
+		}
+	}
+
+	return $data[$taxonomy_name];
+}

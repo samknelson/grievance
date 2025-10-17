@@ -11,9 +11,6 @@ function report_cache_page_report_instances_access($report_type) {
 	if (!$access) { $access = 'access site reports'; }
 	if (!user_access($access)) { return FALSE; }
 
-	// Must have a parameteres callback; otherwise, there's no need for instances
-	if (! ($info['generator']->form()) ) { return FALSE; }
-
 	return TRUE;
 }
 

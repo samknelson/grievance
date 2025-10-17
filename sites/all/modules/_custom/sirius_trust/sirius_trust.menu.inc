@@ -435,6 +435,53 @@ function sirius_trust_menu() {
     'file' => 'sirius_trust.page_changequeue.inc',
   );
 
+  $items['sirius/trust/providers'] = array(
+    'title' => 'Providers',
+    'page callback' => 'sirius_trust_page_providers',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius trust staff',
+        'component' => 'trust:provider',
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_trust.page_providers.inc',
+  );
+
+  $items['sirius/trust/providers/list'] = array(
+    'title' => 'List',
+    'page callback' => 'sirius_trust_page_providers',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius trust staff',
+        'component' => 'trust:provider',
+      ),
+    ),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'sirius_trust.page_providers.inc',
+    'weight' => 1,
+  );
+
+  $items['sirius/trust/providers/edi'] = array(
+    'title' => 'EDI',
+    'page callback' => 'sirius_trust_page_providers_edi',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius trust staff',
+        'component' => 'trust:provider:edi',
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'sirius_trust.page_providers_edi.inc',
+    'weight' => 2,
+  );
+
   $items['sirius/trust/geog/tester'] = array(
     'title' => 'Geography tester',
     'page callback' => 'sirius_trust_page_geog_tester',

@@ -95,6 +95,7 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_universal.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_election.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_reltype.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_relationship_active.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_ws.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_ms.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_geog.inc');
@@ -102,11 +103,13 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_balance.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_arrears.inc');
 	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_cardcheck.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_test_bymonth.inc');
 
   $items = array();
   Sirius_Trust_Elgibility_Plugin_Universal::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_Election::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_Reltype::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_Relationship_Active::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_WS::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_MS::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_Geog::getInstance()->setInfo($items);
@@ -114,6 +117,7 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
   Sirius_Trust_Elgibility_Plugin_Balance::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_Arrears::getInstance()->setInfo($items);
   Sirius_Trust_Elgibility_Plugin_Cardcheck::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_Test_Bymonth::getInstance()->setInfo($items);
   return $items;
 }
 
