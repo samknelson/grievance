@@ -323,6 +323,11 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_trust_service_type']['multidomain'] = 'Yes';
     $settings['sirius_trust_service_type']['component'] = 'trust';
 
+    $settings['sirius_worker_rating_type']['view'] = 'sirius_taxonomy';
+    $settings['sirius_worker_rating_type']['display'] = 'block_23';
+    $settings['sirius_worker_rating_type']['multidomain'] = 'Yes';
+    $settings['sirius_worker_rating_type']['component'] = 'worker:rating';
+
 
 
     $settings['grievance_alert_types']['config_category'] = 'grievance';
