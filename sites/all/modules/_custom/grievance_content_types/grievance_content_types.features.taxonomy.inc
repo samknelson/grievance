@@ -1022,6 +1022,29 @@ function grievance_content_types_taxonomy_default_vocabularies() {
         ),
       ),
     ),
+    'sirius_worker_rating_type' => array(
+      'name' => 'Sirius Worker Rating Type',
+      'machine_name' => 'sirius_worker_rating_type',
+      'description' => '',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
     'sirius_worker_tor_type' => array(
       'name' => 'Sirius Worker TOR Type',
       'machine_name' => 'sirius_worker_tor_type',
