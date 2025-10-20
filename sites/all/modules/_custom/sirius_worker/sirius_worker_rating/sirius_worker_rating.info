@@ -1,0 +1,4 @@
+name = Sirius Worker Rating
+description = Implements functionality for worker ratings and rankings
+package = sirius
+core = 7.x

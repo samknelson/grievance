@@ -1,0 +1,52 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_worker_rating') . '/sirius_worker_rating.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_worker_rating') . '/sirius_worker_rating.permission.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_worker_rating') . '/sirius_worker_rating.access.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_worker_rating') . '/sirius_worker_rating.rating.inc';
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_worker_rating_sirius_domain_component_info() {
+  return array(
+    'worker:rating' => array(
+      'title' => 'Worker - Rating',
+      'description' => 'Support for worker ratings',
+    ),
+  );
+}
+
+/** 
+ * Implements hook_sirius_access_info
+ */
+
+function sirius_worker_rating_sirius_access_info() {
+  $infos = array();
+  Sirius_Worker_Rating_Access::getInstance()->setInfo($infos);
+  return $infos;
+}
+
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+function sirius_worker_rating_sirius_config_links_alter(&$links) {
+  $links['worker']['links']['sirius/worker/rating'] = array('title' => 'Ratings', 'description' => 'Configure settings for the worker ratings tools.');
+}
+
+/**
+ * Implements hook_sirius_backlinks_from_node_alter
+ */
+
+function sirius_worker_rating_sirius_backlinks_from_node_alter(&$links, $rating_node) {
+  if ($rating_node->type != 'sirius_log') { return; }
+  if ($rating_node->field_sirius_category['und'][0]['value'] != 'rating') { return; }
+
+  $rating = Sirius_Worker_Rating::getInstance();
+  $worker_node = $rating->worker($rating_node);
+  $worker_nid = $worker_node->nid;
+  unset($links["node/$worker_nid/sirius_worker_log"]);
+  $links["node/$worker_nid/sirius_worker_rating"] = array('name' => "Worker");
+}
