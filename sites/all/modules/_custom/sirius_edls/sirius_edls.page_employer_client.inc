@@ -34,7 +34,8 @@ function sirius_edls_node_tab_employer_client_form($form, &$form_state, $employe
   	'#default_value' => $employer_json['edls']['client']['access_code']
   );
 
-  $ms_list = sirius_edls_outsource_ms_list($employer_node);
+  $ms_list = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
+
   if ($ms_list) {
 	  $form['client']['active_ms_list'] = array(
 	  	'#type' => 'checkboxes',
