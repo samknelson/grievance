@@ -106,7 +106,7 @@ class Sirius_Edls_Access extends Sirius_Access {
       // You can accept or decline if status = 'sent'
       if (
           (in_array($action, array('notification_accept', 'notification_decline'))) && 
-          (in_array($context['notification']['notification_status'], array('sent', 'error')))
+          (in_array($context['notification']['notification_status'], array('queue', 'sent', 'error')))
         ) {
         return TRUE;
       }
