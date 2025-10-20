@@ -327,6 +327,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_worker_rating_type']['display'] = 'block_23';
     $settings['sirius_worker_rating_type']['multidomain'] = 'Yes';
     $settings['sirius_worker_rating_type']['component'] = 'worker:rating';
+    $settings['sirius_worker_rating_type']['config_category'] = 'worker';
 
 
 

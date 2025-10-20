@@ -28,6 +28,10 @@
 	font-weight: bold;
 }
 
+.sirius_form_inline_longlabel label {
+	width: 200px;
+}
+
 .sirius_form_inline .form-item {
 	clear: left;
 }
