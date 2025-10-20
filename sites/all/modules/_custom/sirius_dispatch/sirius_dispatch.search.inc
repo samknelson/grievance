@@ -109,10 +109,6 @@ function sirius_dispatch_search($params) {
     if (!$offset) { $offset = 0; }
     $sql .= "offset $offset";
   }
-  $sql .= " DEBUG";
-  print $sql;
-  print_r($sql_args);
-  exit();
 
   $stmt = sirius_sql_query($sql, $sql_args);
 
