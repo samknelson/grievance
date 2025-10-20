@@ -1,10 +1,15 @@
 <?php
 
 function sirius_edls_employer_switch() {
+  // Admin might have an employer
+  $probe = sirius_employer_get();
+  if ($probe) { return array('markup' => '', 'employer_node' => $probe); }
+
   $access = sirius_access_instance('edls');
   if (!$access->access('staff')) {
-    return array('markup' => '', 'employer_node' => sirius_employer_get());
+    return array('markup' => '', 'employer_node' => NULL);
   }
+
 
   drupal_add_css(drupal_get_path('module', 'sirius') . '/css/ux.css');
   drupal_add_css(drupal_get_path('module', 'sirius_edls') . '/css/employer.css');
