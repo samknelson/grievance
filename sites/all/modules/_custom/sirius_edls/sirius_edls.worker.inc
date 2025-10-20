@@ -338,7 +338,7 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
 
   $sql .= "group by node.nid ";
 
-  $sql .= "order by field_sirius_name_family, field_sirius_name_given ";
+  $sql .= "order by field_sirius_name_family, field_sirius_name_given x";
 
   $ms_name_lookup = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
 
