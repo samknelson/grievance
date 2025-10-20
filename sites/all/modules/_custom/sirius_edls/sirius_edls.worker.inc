@@ -231,6 +231,8 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
   $sql_args = array();
 
   $sql = "select ";
+
+  /*
   if (!$filters['skip_assignment']) {
     $sql .= "( ";
     $sql .= "  select sheet_nid from sirius_edls_assignments ";
@@ -255,6 +257,7 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
 
     $sql_args[':date'] = $date;
   }
+  */
 
   if ($filters['include_ein']) {
     $sql .= "( ";
@@ -361,8 +364,60 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
     unset($hr['worker_phone_alt']);
     unset($hr['worker_dispatch_medium']);
 
-    $workers[] = $hr;
+    $workers[$hr['worker_id']] = $hr;
   }
+
+
+
+  if (!$filters['skip_assignment']) {
+    $all_ids = array();
+    foreach ($workers as $worker) {
+      $all_ids[] = $worker['worker_id'];
+    }
+
+    if ($all_ids) {
+      $sqls = array();
+
+      $sql = "select worker_id, min(sheet_nid) as sheet_nid from sirius_edls_assignments ";
+      $sql .= "where sirius_edls_assignments.worker_id in (:all_ids) ";
+      $sql .= "and sirius_edls_assignments.employer_nid = :employer_nid ";
+      $sql .= "and sirius_edls_assignments.assignment_date = :date ";
+      $sql .= "group by worker_id ";
+      $sqls['curr_sheet_nid'] = $sql;
+
+      $sql = "select worker_id, max(sheet_nid) as sheet_nid from sirius_edls_assignments ";
+      $sql .= "where sirius_edls_assignments.worker_id in (:all_ids) ";
+      $sql .= "and sirius_edls_assignments.employer_nid = :employer_nid ";
+      $sql .= "and sirius_edls_assignments.assignment_date < :date ";
+      $sql .= "group by worker_id ";
+      $sqls['prev_sheet_nid'] = $sql;
+
+      $sql = "select worker_id, min(sheet_nid) as sheet_nid from sirius_edls_assignments ";
+      $sql .= "where sirius_edls_assignments.worker_id in (:all_ids) ";
+      $sql .= "and sirius_edls_assignments.employer_nid = :employer_nid ";
+      $sql .= "and sirius_edls_assignments.assignment_date > :date ";
+      $sql .= "group by worker_id ";
+      $sqls['next_sheet_nid'] = $sql;
+
+      foreach ($sqls as $field => $sql) {
+        $sql_args = array();
+        $sql_args[':all_ids'] = $all_ids;
+        $sql_args[':employer_nid'] = $employer_nid;
+        $sql_args[':date'] = $date;
+        $stmt = sirius_sql_query($sql, $sql_args);
+
+        $result = array();
+        while ($hr = $stmt->fetchAssoc()) {
+          $workers[$hr['worker_id']][$field] = $hr['sheet_nid'];
+        }
+      }
+    }
+  }
+
+
+
+
+
   return $workers;
 }
 
