@@ -199,7 +199,7 @@ function sirius_edls_client_worker_fetch_employer($employer_nid, $mode = 'test',
 			if ($need_save) {
 				node_save($worker_node);
 				sirius_minilog("Saved worker record: " . $worker_node->title);
-				++$xyz; if ($xyz > 20) { break; }
+				++$xyz; if ($xyz > 50) { break; }
 			}
 
 			// Create or update a dispatch. Do we have an existing accepted?
@@ -210,6 +210,7 @@ function sirius_edls_client_worker_fetch_employer($employer_nid, $mode = 'test',
 			$params['ts'] = time();
 			$params['count_only'] = TRUE;
 			$count = sirius_dispatch_search($params);
+			sirius_minilog("Here with $count");
 			if ($count) { continue; }
 
 			// If not, do we have any dispatch at all? We're just going to update the most recrent to re-accept.
