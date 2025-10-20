@@ -26,10 +26,10 @@ class Sirius_Cardcheck_Report_Invalid extends Report_Cache_Report_Generator {
     $fields['worker_id'] = 'Worker ID';
     $fields['worker_title'] = 'Worker Title';
     $fields['worker_employer_name'] = 'Employer';
-    $fields['worker_bu_name'] = 'BU Name';
-    $fields['worker_bu_id'] = 'BU ID';
-    $fields['cardcheck_bu_name'] = 'BU Name';
-    $fields['cardcheck_bu_id'] = 'BU ID';
+    $fields['worker_bu_name'] = 'Worker BU Name';
+    $fields['worker_bu_id'] = 'Worker BU ID';
+    $fields['cardcheck_bu_name'] = 'Cardcheck BU Name';
+    $fields['cardcheck_bu_id'] = 'Cardcheck BU ID';
 
     return $fields;
   }
@@ -156,6 +156,7 @@ class Sirius_Cardcheck_Report_Invalid extends Report_Cache_Report_Generator {
       $row['worker_name'] = $worker_node->title;
       $row['worker_id'] = $worker_node->field_sirius_id['und'][0]['value'];
       $row['worker_title'] = $worker_node->field_sirius_title['und'][0]['value'];
+      $row['worker_employer_name'] = sirius_node_title($worker_node->field_grievance_shop['und'][0]['target_id']);
 
       $cardcheck_bu_node = node_load($cardcheck_bu_nid);
       if ($cardcheck_bu_node) {
@@ -169,14 +170,6 @@ class Sirius_Cardcheck_Report_Invalid extends Report_Cache_Report_Generator {
         $row['worker_bu_id'] = $worker_bu_node->field_sirius_id['und'][0]['value'];
       }
 
-      $dispatch_nodes = sirius_dispatch_emphist_search($worker_node->nid);
-      $dispatch_node = reset($dispatch_nodes);
-      if ($dispatch_node) {
-        $job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
-        if ($job_node) {
-          $row['worker_employer_name'] = sirius_node_title($job_node->field_grievance_shop['und'][0]['target_id']);
-        }
-      }
 
       $pk = $cardcheck_nid;
       $rows[$pk] = $row;
