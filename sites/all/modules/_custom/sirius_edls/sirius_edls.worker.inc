@@ -414,9 +414,7 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
     }
   }
 
-
-
-
+  $workers = array_values($workers);
 
   return $workers;
 }
