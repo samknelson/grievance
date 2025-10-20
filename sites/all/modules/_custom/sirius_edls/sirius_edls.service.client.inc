@@ -210,7 +210,6 @@ function sirius_edls_client_worker_fetch_employer($employer_nid, $mode = 'test',
 			$params['ts'] = time();
 			$params['count_only'] = TRUE;
 			$count = sirius_dispatch_search($params);
-			sirius_minilog("Here with $count");
 			if ($count) { continue; }
 
 			// If not, do we have any dispatch at all? We're just going to update the most recrent to re-accept.
