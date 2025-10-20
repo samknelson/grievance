@@ -295,7 +295,7 @@ function sirius_edls_notify_deliver($mode, $notification_id) {
 		} else {
 			$date = date('l, F j', strtotime($sheet_node->field_sirius_date_start['und'][0]['value']));
 			global $base_url;
-			$url = $base_url . '/edls/' . $notification['notification_uuid'];
+			$url = $base_url . '/edls-sched/' . $notification['notification_uuid'];
 			$subject = $worker_node->title . ": Crew assignment";
 			$body = "Your crew assignment has been posted or updated. Please follow the link below and accept:<br><br><a href=\"$url\">$url</a>";
 			$sms = $worker_node->title . ": your crew assignment has been posted or updated. Please follow the link below and accept:\n\n$url";
