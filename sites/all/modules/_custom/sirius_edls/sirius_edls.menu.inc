@@ -51,6 +51,17 @@ function sirius_edls_node_tabs() {
     'weight' => 4,
   );
 
+  $node_tabs['sirius_edls_sheet']['sirius_edls_sheet_sts'] = array(
+    'title' => 'Next Shifts',
+    'description' => '',
+    'callback' => 'sirius_edls_node_tab_sheet_sts',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_edls.page_sheet_sts.inc',
+    'skip_node_view_check' => TRUE,
+    'component' => 'edls',
+    'weight' => 4,
+  );
+
   $node_tabs['sirius_edls_sheet']['sirius_edls_sheet_revisions'] = array(
     'title' => 'Sheet Change History',
     'description' => '',
