@@ -223,6 +223,7 @@ function sirius_edls_client_worker_fetch_employer($employer_nid, $mode = 'test',
 				sirius_minilog("Rehired worker record: " . $worker_node->title);
 				$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = 'accepted';
 				unset($dispatch_node->field_sirius_date_end['und']);
+				$dispatch_node->field_sirius_date_start['und'][0]['value'] = '2000-01-01';
 				node_save($dispatch_node);
 				continue;
 			}
