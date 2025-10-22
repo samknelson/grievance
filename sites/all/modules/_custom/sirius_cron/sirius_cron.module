@@ -56,7 +56,7 @@ function sirius_cron_scan_expired_active_nodes($mode) {
     $sql .= "where node.type = :content_type ";
     $sql .= "and field_sirius_active_value = 'Yes' ";
     $sql .= "and (field_sirius_date_end_value is not null and field_sirius_date_end_value < :current_date) ";
-    $sql .= "order by nid ";
+    $sql .= "order by nid limit 1000 ";
     $stmt = db_query($sql, $sql_args);
 
     $count = 0;
@@ -86,7 +86,7 @@ function sirius_cron_scan_expired_active_nodes($mode) {
     $sql .= "and field_sirius_active_value = 'No' ";
     $sql .= "and (field_sirius_date_start_value is not null and field_sirius_date_start_value <= :current_date) ";
     $sql .= "and (field_sirius_date_end_value is null or field_sirius_date_end_value >= :current_date) ";
-    $sql .= "order by nid ";
+    $sql .= "order by nid limit 1000 ";
     $stmt = db_query($sql, $sql_args);
 
     $count = 0;
