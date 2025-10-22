@@ -33,6 +33,8 @@ function sirius_cron_scan_test($mode) {
 }
 
 function sirius_cron_scan_expired_active_nodes($mode) {
+  sirius_denorm_realtime(FALSE);
+
   $content_types = array(
     'sirius_contact_relationship',
     'sirius_trust_worker_benefit',
