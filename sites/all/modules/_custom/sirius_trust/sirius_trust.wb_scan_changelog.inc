@@ -33,7 +33,7 @@ class Sirius_Trust_Wb_Scan_Changelog extends Sirius_Singleton {
 				':dependent_worker_nid' => $change_data['dependent_worker_nid'],
 				':relationship_nid' => $change_data['relationship_nid'],
 				':benefit_nid' => $change_data['benefit_nid'],
-				':msg' => $change_data['msg'],
+				':msg' => substr($change_data['msg'], 0, 250),
 				':action' => $change_data['action'],
 			)
 		);
