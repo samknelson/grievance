@@ -60,6 +60,7 @@ function sirius_trust_election_wizard_signature_form_submit($form, &$form_state)
 		sirius_jsonfield_util_esignature_set($wizard_json, $which, NULL);
 		sirius_json_set($wizard_node, $wizard_json);
 		sirius_trust_election_set_title($wizard_node);
+		$wizard_node->field_sirius_type['und'][0]['value'] = 'draft';
 		sirius_wizard_submit($info, $data, $wizard_node, $current_step, "Signature revoked.", array('incomplete' => TRUE, 'nonsequential' => FALSE));
 	} else {
 		$signature = sirius_esignature_form_get_json($form, $form_state, $which);

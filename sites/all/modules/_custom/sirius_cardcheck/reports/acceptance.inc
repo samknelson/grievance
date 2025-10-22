@@ -146,6 +146,7 @@ class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
       if ($end_ts && ($end_ts < $ts)) { continue; }
 
       $worker_node = $cardcheck_instance->worker($cardcheck_node);
+      $row['worker_employer_name'] = sirius_node_title($worker_node->field_grievance_shop['und'][0]['target_id']);
 
       $row = array();
       $row['worker_nid'] = $worker_node->nid;
@@ -153,14 +154,6 @@ class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
       $row['worker_id'] = $worker_node->field_sirius_id['und'][0]['value'];
       $row['worker_title'] = $worker_node->field_sirius_title['und'][0]['value'];
 
-      $dispatch_nodes = sirius_dispatch_emphist_search($worker_node->nid);
-      $dispatch_node = reset($dispatch_nodes);
-      if ($dispatch_node) {
-        $job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
-        if ($job_node) {
-          $row['worker_employer_name'] = sirius_node_title($job_node->field_grievance_shop['und'][0]['target_id']);
-        }
-      }
       $bu_node = node_load($cardcheck['bu']);
 
       if ($bu_node) {
@@ -170,6 +163,7 @@ class Sirius_Cardcheck_Report_Acceptance extends Report_Cache_Report_Generator {
 
       $row['cardcheck_acceptance_date'] = date('Y-m-d H:i', $ts);
 
+      $pk = $cardcheck_nid;
       $rows[$pk] = $row;
     }
 
