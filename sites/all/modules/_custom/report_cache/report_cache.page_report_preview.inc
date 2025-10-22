@@ -98,7 +98,7 @@ function report_cache_preview_form($form, &$form_state, $report_type, $report_id
 		}
 
 		if ($info['preview']['preview_links']) {
-			$links = $info['generator']->preview_links($hr);
+			$links = $info['generator']->preview_links($hr, array('values' => $parameters));
 			$links_html = '';
 			foreach ($links as $path => $link) {
 				// Legacy supoprt
