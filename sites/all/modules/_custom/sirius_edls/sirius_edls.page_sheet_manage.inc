@@ -57,6 +57,17 @@ function sirius_edls_node_tab_sheet_manage_form($form, &$form_state, $sheet_node
 		'#required' => TRUE,
 	);
 
+	$form['sheet_status_trash'] = array(
+		'#type' => 'fieldset',
+		'#states' => array('visible' => array(":input[name=\"action\"]" => array('value' => 'sheet_status_trash'))),
+	);
+
+	$form['sheet_status_trash']['confirm'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Are you sure that you want to discard this sheet? All contents will be lost and workers made available.'),
+	);
+
+
 	$form['sheet_notify_enable'] = array(
 		'#type' => 'fieldset',
 		'#title' => 'Notifications',
@@ -161,8 +172,12 @@ function sirius_edls_node_tab_sheet_manage_form_submit($form, &$form_state) {
 	}
 
 	if ($action == 'sheet_status_trash') {
-		$result = sirius_edls_sheet_status_set($sheet_node, 'trash');
-		$msg = "Sheet status set to " . $status_options['trash'];
+		if (!$form_state['values']['sheet_status_trash']['confirm']) {
+			$result = array('success' => FALSE, 'msg' => 'Please check the confirmation box.');
+		} else {
+			$result = sirius_edls_sheet_status_set($sheet_node, 'trash');
+			$msg = "Sheet status set to " . $status_options['trash'];
+		}
 	}
 
 	if ($action == 'sheet_status_reserved') {
