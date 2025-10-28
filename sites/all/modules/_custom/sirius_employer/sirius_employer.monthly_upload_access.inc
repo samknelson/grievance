@@ -7,7 +7,7 @@ class Sirius_Employer_Monthly_Upload_Access extends Sirius_Access {
    * Should be overridden
    */
 
-  public function is_staff() { return NULL; }
+  public function is_staff() { return user_access('sirius employer admin');; }
 
   /**
    * Should be overridden
