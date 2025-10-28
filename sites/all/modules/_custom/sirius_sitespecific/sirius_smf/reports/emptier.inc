@@ -78,6 +78,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
     $fields[] = 'employer_nid';
     $fields[] = 'worker_name';
     $fields[] = 'employer_name';
+    $fields[] = 'employer_id';
     $fields[] = 'WORK MONTH';
     $fields[] = 'HN';
     $fields[] = 'HN T1';
@@ -244,6 +245,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
       }
     }
 
+    $employer_lookup = array();
 
     $rows = array();
     foreach ($pks as $pk) {
@@ -253,12 +255,17 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
 
       $worker_node = node_load($worker_nid);
 
+      if (!$employer_lookup[$employer_nid]) {
+        $employer_lookup[$employer_nid] = node_load($employer_nid);
+      }
+
       $row = array();
 
       $row['worker_nid'] = $worker_nid;
       $row['employer_nid'] = $employer_nid;
       $row['worker_name'] = $worker_node->title;
-      $row['employer_name'] = sirius_node_title($employer_nid);
+      $row['employer_name'] = $employer_lookup[$employer_nid]->title;
+      $row['employer_id'] = $employer_lookup[$employer_nid]->field_sirius_id['und'][0]['value'];
 
       $row['WORK MONTH'] = $work_display;
 
