@@ -194,8 +194,8 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
     $y = $parameters['year'] + 0;
     $m = $parameters['month'] + 0;
 
-    for ($i=0; $i<4; ++$i) {
-      --$m; if ($m < 0) { $m = 12; --$y; }
+    for ($i=0; $i<3; ++$i) {
+      --$m; if ($m < 1) { $m = 12; --$y; }
     }
 
     $worker_nids = array();
