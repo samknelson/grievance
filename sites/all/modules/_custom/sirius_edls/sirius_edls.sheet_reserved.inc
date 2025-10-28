@@ -52,7 +52,7 @@ function sirius_edls_sirius_edls_sheet_reserved_info() {
 			'start_time' => '23:30',
 			'end_time' => '23:45',
 		),
-		'tos' => array(
+		'off' => array(
 			'title' => 'Scheduled Time Off',
 			'job_number' => 'TIME_OFF',
 			'count' => 100,
