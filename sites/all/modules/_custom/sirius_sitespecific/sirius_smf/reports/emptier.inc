@@ -390,7 +390,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
       $employer_name = $row['employer_name'];
       if (!$employer_name) { continue; }
 
-      if (!$data[$employer_name]) { $data[$employer_name] = array(); }
+      if (!$data[$employer_name]) { $data[$employer_name] = array('employer_id' => $row['employer_id']); }
 
       foreach ($summary_fields as $field_name) {
         $val = $row[$field_name];
@@ -412,6 +412,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
     foreach ($data as $employer_name => $employer_data) {
       $row = array();
       $row[] = $employer_name;
+      $row[] = $employer_data['employer_id'];
       $row[] = $month;
       foreach ($summary_fields as $field_name) {
         $val = $employer_data[$field_name];
@@ -423,6 +424,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
 
     $header = array();
     $header[] = 'Employer';
+    $header[] = 'Employer ID';
     $header[] = 'WORK MONTH';
     foreach ($summary_fields as $field_name) { $header[] = $field_name; }
 
