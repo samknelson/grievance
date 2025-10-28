@@ -339,12 +339,12 @@ function sirius_edls_sheet_form_validate($form, &$form_state) {
 		$crews_input_by_uuid[$crew['uuid']]['delta'] = $delta;
 
 		if (!$is_reserved) {
-			if (!preg_match('/^\d\d\:\d\d$/', $crew['start_time'])) {
-				form_set_error("crews][$delta][start_time", "Please enter a valid start time.");
+			if (!preg_match('/^(?:[01]\d|2[0-3]):(?:00|15|30|45)$/', $crew['start_time'])) {
+				form_set_error("crews][$delta][start_time", "Please enter a valid start time in fifteen minute increments.");
 			}
 
-			if (!preg_match('/^\d\d\:\d\d$/', $crew['end_time'])) {
-				form_set_error("crews][$delta][end_time", "Please enter a valid end time.");
+			if (!preg_match('/^(?:[01]\d|2[0-3]):(?:00|15|30|45)$/', $crew['end_time'])) {
+				form_set_error("crews][$delta][end_time", "Please enter a valid end time in fifteen minute increments.");
 			}
 
 			if (strtotime("2024-01-01 $crew[start_time]") >= strtotime("2024-01-01 $crew[end_time]")) {
