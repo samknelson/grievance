@@ -61,7 +61,7 @@ function sirius_trust_node_tab_worker_benefits_form($form, &$form_state, $worker
 		$render_options['hide_name'] = TRUE;
 	}
 
-	$html .= '<h2>' . t('Benefits Received') . '</h2>';
+	$html .= '<h2>' . t('Member Benefits') . '</h2>';
 	if ($show_inactive) {
 		$html .= sirius_trust_render_worker_benefits($worker_node, 'direct', $all_benefits_received, $render_options);
 	} else {
