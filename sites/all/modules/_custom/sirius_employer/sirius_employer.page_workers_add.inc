@@ -110,7 +110,6 @@ function sirius_employer_node_tab_workers_add_form($form, &$form_state, $employe
 	$form['employee_fields']['field_sirius_id'] = array(
 	  '#type' => 'textfield',
 		'#title' => t('EIN'),
-		'#required' => TRUE,
 		'#size' => 12,
 	);
 
@@ -138,9 +137,11 @@ function sirius_employer_node_tab_workers_add_form_validate($form, &$form_state)
 			form_set_error('core_fields][field_sirius_ssn', 'Please enter a valid SSN.');
 		}
 		$val = $form_state['values']['core_fields']['field_sirius_ssn'] = sirius_ssn_format($val);
-		$probe = sirius_worker_get_by_ssn($val);
-		if ($probe) {
-			form_set_error('core_fields][field_sirius_ssn', 'There is already a worker with that SSN.');
+		if ($val) {
+			$probe = sirius_worker_get_by_ssn($val);
+			if ($probe) {
+				form_set_error('core_fields][field_sirius_ssn', 'There is already a worker with that SSN.');
+			}
 		}
 	}
 
@@ -180,7 +181,7 @@ function sirius_employer_node_tab_workers_add_form_validate($form, &$form_state)
 		$form_state['values']['employee_fields']['field_sirius_id'] = $val;
 		$probe = sirius_worker_ein_lookup($employer_nid, $val);
 		if ($probe) {
-			// form_set_error("employee_fields][field_sirius_id", "There is already a worker with the EIN: [" . $val . "]");
+			form_set_error("employee_fields][field_sirius_id", "There is already a worker with the EIN: [" . $val . "]");
 		}
 	}
 
