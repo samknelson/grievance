@@ -45,6 +45,7 @@ class Sirius_Smf_Eligibility_Plugin_Kaiser extends Sirius_Trust_Elgibility_Plugi
 		}
 
 		// Have we *ever* had Kaiser or Kaiser Enhanced
+		/*
 		$kaiser_benefit_ids = array('K', 'KE');
 		$kaiser_benefit_nids = array();
 		foreach ($kaiser_benefit_ids as $id) {
@@ -59,6 +60,7 @@ class Sirius_Smf_Eligibility_Plugin_Kaiser extends Sirius_Trust_Elgibility_Plugi
 		$search_params['nids_only'] = TRUE;
 		$probe = sirius_trust_worker_benefits_search($search_params);
 		if ($probe) { return array('success' => TRUE, 'msg' => 'The subscriber met the eligibility requirements for starting Kaiser (had a previous instance of Kaiser coverage).'); }
+		*/
 
 		// Start date. 15th of the month.
 		$ts = $params['ts'];
