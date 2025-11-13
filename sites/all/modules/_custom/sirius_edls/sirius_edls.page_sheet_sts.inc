@@ -64,7 +64,7 @@ function sirius_edls_node_tab_sheet_sts($sheet_node) {
       $rows[] = $row;
 		}
 
-		$html .= sirius_table_render($header, $rows, array('attributes' => array('class' => array('sirius_table_align', 'sirius_contact_relationships'))));
+		$html .= sirius_table_render($header, $rows, /* array('attributes' => array('class' => array('sirius_table_align', 'sirius_contact_relationships'))) */);
 	}
 
 	return $html;
