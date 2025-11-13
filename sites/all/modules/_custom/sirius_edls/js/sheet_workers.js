@@ -106,7 +106,6 @@
 						if (!result) { return; }
 
 						workers = result['data']['workers'];
-						console.log(workers);
 
 						// Clear all workers
 						$('#sirius_edls_workers .sirius_edls_workers_ms').html('');
