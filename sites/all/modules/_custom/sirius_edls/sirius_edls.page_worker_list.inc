@@ -40,7 +40,6 @@ function sirius_edls_page_worker_list_form($form, &$form_state, $employer_node) 
 
 	// js_settings for associative arrays don't preserve key order. Ick.
 	$ms_list = sirius_edls_ms_list($employer_node, 'name');
-	drupal_set_message("ms_list: " . print_r($ms_list, 1));
 	$js_settings['ms_name_lookup'] = $ms_list;
 	$js_settings['ms_keys'] = array_values($ms_list);
 
