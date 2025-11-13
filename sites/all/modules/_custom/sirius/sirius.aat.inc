@@ -31,9 +31,9 @@ function sirius_aat_set($node, $len = 6) {
   	$aat = '';
   	for ($i = 0; $i < $len; $i++) {
   		if ($i == 0) {
-    		$aat .= $characters_first[rand(0, strlen($characters_first))];
+    		$aat .= $characters_first[rand(0, strlen($characters_first)-1)];
     	} else {
-    		$aat .= $characters[rand(0, strlen($characters))];
+    		$aat .= $characters[rand(0, strlen($characters)-1)];
     	}
   	}
   	$node->field_sirius_aat['und'][0]['value'] = $aat;
