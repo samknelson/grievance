@@ -23,6 +23,7 @@ function sirius_edls_node_tab_sheet_sts($sheet_node) {
 
 	$html = '';
 	foreach ($crews as $crew_uuid => $crew) {
+		/*
 		$html .= '<h2>' . sirius_edls_crew_title($crew) . '</h2>';
 		$rows = array();
 		foreach ($assignments[$crew_uuid] as $assignment) {
@@ -63,6 +64,7 @@ function sirius_edls_node_tab_sheet_sts($sheet_node) {
       $row[] = $interval2_render;
       $rows[] = $row;
 		}
+		*/
 
 		$html .= sirius_table_render($header, $rows, array('attributes' => array('class' => array('sirius_table_align', 'sirius_contact_relationships'))));
 	}
