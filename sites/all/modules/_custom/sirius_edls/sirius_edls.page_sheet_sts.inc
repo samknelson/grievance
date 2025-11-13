@@ -8,9 +8,11 @@ function sirius_edls_node_tab_sheet_sts($sheet_node) {
 	sirius_require('sirius_edls', 'sirius_edls.report_sts.inc');
 	$instance = Sirius_Edls_Report_Sts::getInstance();
 
+	/*
 	$employer_nid = $sheet_node->field_grievance_shop['und'][0]['target_id'];
 	$date = date('Y-m-d', strtotime($sheet_node->field_sirius_date_start['und'][0]['value']));
 	$ts_now = time();
+	*/
 
 	$crews = sirius_edls_crews($sheet_node, 'uuid');
 	$assignments = sirius_edls_assignment_fetch_sheet($sheet_node);
