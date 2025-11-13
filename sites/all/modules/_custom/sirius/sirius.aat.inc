@@ -31,7 +31,7 @@ function sirius_aat_set($node, $len = 6) {
   	$aat = '';
   	for ($i = 0; $i < $len; $i++) {
   		if ($i == 0) {
-    		$aat .= $characters_first[rand(0, strlen($characters))];
+    		$aat .= $characters_first[rand(0, strlen($characters_first))];
     	} else {
     		$aat .= $characters[rand(0, strlen($characters))];
     	}
