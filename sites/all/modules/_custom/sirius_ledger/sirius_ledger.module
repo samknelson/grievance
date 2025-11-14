@@ -116,13 +116,17 @@ function sirius_ledger_sirius_access_info() {
  */
 
 function sirius_ledger_report_cache_info() {
+  sirius_require('sirius_ledger', 'reports/aged.inc');
   sirius_require('sirius_ledger', 'reports/fourmonth.inc');
   sirius_require('sirius_ledger', 'reports/ratehistory.inc');
 
   $items = array();
   $items += sirius_ledger_report_discrepancy_info();
+
+  Sirius_Ledger_Report_Aged::getInstance()->setInfo($items);
   Sirius_Ledger_Report_Fourmonth::getInstance()->setInfo($items);
   Sirius_Ledger_Report_Ratehistory::getInstance()->setInfo($items);
+
   return $items;
 }
 
