@@ -48,7 +48,7 @@ function sirius_letter_wizard_review($info, $data, $letter_node, $current_step) 
 
 	if (strlen($data['body']) > 20) {
 		$html .= '<hr><h2>Body</h2><div style="padding: 20px; margin: 20px; border: 1px solid #cccccc;">';
-		$html .= $data['body'];
+		$html .= nl2br(drupal_html_to_text($data['body']));
 		$html .= '</div>';
 	}
 

@@ -236,7 +236,11 @@ class Sirius_Postal_Client_Lob extends Sirius_Postal_Client {
 				$letterhead_node = node_load($letterhead_nid);
 				$body = $letterhead_node->body['und'][0]['value'];
 			} else {
-				$body = $this->default_template();
+				if (preg_match('/\<html/', $params['body'])) {
+					$body = '[sirius:letterhead:body]';
+				} else {
+					$body = $this->default_template();
+				}
 			}
 
 			$tokens = array();
