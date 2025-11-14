@@ -20,6 +20,11 @@ class Sirius_Postal_Client_Lob extends Sirius_Postal_Client {
 
 	public function cache_set($uuid, $body) {
 		if (!$uuid) { return; }
+
+		// We have character set problems.
+ 		$body = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $body);
+    $body = preg_replace('/[^\x20-\x7E]/', '', $body);		
+
 		$sql = "insert into sirius_postal_lob_cache ";
 		$sql .= "(cache_uuid, cache_body) ";
 		$sql .= "values (:cache_uuid, :cache_body) ";
