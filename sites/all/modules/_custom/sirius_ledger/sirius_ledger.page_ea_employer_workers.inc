@@ -14,7 +14,7 @@ function sirius_ledger_node_tab_ea_employer_workers($ea_node) {
 
 	$params = array();
 	$params['employer_nid'] = $entity_node->nid;
-	$params['status'] = 'accepted';
+	$params['statuses'] = array('accepted', 'accepted_secondary');
 	$params['return_workers'] = TRUE;
 	$params['nids_only'] = TRUE;
 	$params['order'] = 'field_sirius_name_family, field_sirius_name_given, field_sirius_name_middle';
