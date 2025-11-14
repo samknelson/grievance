@@ -70,6 +70,11 @@ class Sirius_Ledger_Currency_Plugin_USD extends Sirius_Ledger_Currency_Plugin {
 
 	public function render_amt($amt, $options = array()) {
 		if (!$amt) { $amt = 0; }
+
+		if ($options['format'] == 'text') {
+			return '$' . number_format($amt, 2);
+		}
+		
 		$class = "";
 		if ($amt >= 0) {
 			$html = "<span class=\"sirius_currency_usd sirius_currency_usd_positive\">";
