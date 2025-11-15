@@ -6,10 +6,14 @@ function sirius_worker_notify($worker_node, $params) {
 	$params['handler_nids'] = array($worker_node->nid);
 
 	$medium = $worker_node->field_sirius_dispatch_medium['und'][2]['value'];
+	// @TODO: THIS IS FOR EDLS ONLY!!! NEEDS TO BE FIXED!!!
+	$medium = 'sms';
+
 	if (!$medium) { $medium = 'email'; }
 	if ($medium == 'email') 	{ $to = $worker_node->field_sirius_email['und'][0]['value']; }
 	if ($medium == 'sms') 		{ $to = $worker_node->field_sirius_phone['und'][0]['value']; }
 	if ($medium == 'sms_alt') { $to = $worker_node->field_sirius_phone_alt['und'][0]['value']; }
+
 
 	if (!$to) {
 		sirius_minilog("Here with $medium, $to, " . $worker_node->title);
