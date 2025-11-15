@@ -269,7 +269,9 @@ function sirius_worker_sirius_jsonfield_form_definitions() {
  */
 
 function sirius_worker_form_alter(&$form, &$form_state, $form_id) {
-  if ($form_id == 'sirius_worker_node_form') {
+  global $user;
+
+  if ($form_id == 'sirius_worker_node_form' && ($user->uid != 1)) {
     // Some fields must be edited within tabs, can't be modified here.
     $form['field_sirius_skill']['#access'] = FALSE;
     $form['field_sirius_skill_expire']['#access'] = FALSE;
