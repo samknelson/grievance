@@ -12,6 +12,7 @@ function sirius_worker_notify($worker_node, $params) {
 	if ($medium == 'sms_alt') { $to = $worker_node->field_sirius_phone_alt['und'][0]['value']; }
 
 	if (!$to) {
+		sirius_minilog("Here with $medium, $to, " . $worker_node->title);
 		$msg = "The worker has no notification medium set.";
 	  sirius_log('worker:notify', 'error', $msg, '', $params['X-Sirius-Id'], array($worker_node->nid), NULL, json_encode($params));
 	  return array('success' => FALSE, 'msg' => $msg);
