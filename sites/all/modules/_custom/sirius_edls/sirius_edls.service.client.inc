@@ -196,6 +196,11 @@ function sirius_edls_client_worker_fetch_employer($employer_nid, $mode = 'test',
 				$need_save = TRUE;
 			}
 
+			if ($worker_node->field_sirius_dispatch_medium['und'][0]['value'] != 'sms') {
+				$worker_node->field_sirius_dispatch_medium['und'][0]['value'] = 'sms';
+				$need_save = TRUE;
+			}
+
 			if ($need_save) {
 				node_save($worker_node);
 				sirius_minilog("Saved worker record: " . $worker_node->title);
