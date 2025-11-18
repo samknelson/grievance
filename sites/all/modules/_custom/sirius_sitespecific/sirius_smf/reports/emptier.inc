@@ -322,16 +322,21 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
         $row['MULTIPLIER'] = 0;
       }
 
+      if ($row['ADD'] && !$row['DENTAL'] && !$row['MEDICAL']) {
+        $row['NON ENROLLED'] = 1;
+      }
 
-      if ($row['DENTAL'] && (!$row['MEDICAL'])) { $row['NON ENROLLED'] = 1; }
+      if ($row['ADD'] && $row['DENTAL'] && !$row['MEDICAL']) {
+        $row['NON ENR NO DDS'] = 1;
+      }
+
+
       if ($row['HOURS'] && !$row['ADD']) {
         $row['NON ELIG'] = 1;
         $row['NON ELIG HRS'] = $row['HOURS'];
       } else {
         $row['EL HRS'] = $row['HOURS'];
       }
-
-      if ($row['ADD'] && !$row['MEDICAL'] && !$row['DENTAL']) { $row['NON ENR NO DDS'] = 1; }
 
       $rows[$pk] = $row;
     }
