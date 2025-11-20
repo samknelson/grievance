@@ -218,3 +218,7 @@
 	display: inline-block;
 	width: 130px;
 }
+
+.sirius_edls_worker_ratings {
+	clear: left;
+}

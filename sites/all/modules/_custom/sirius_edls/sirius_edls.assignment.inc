@@ -22,11 +22,33 @@ function sirius_edls_assignment_fetch_crew($sheet_node, $crew_uuid) {
 }
 
 function sirius_edls_assignment_fetch_sheet($sheet_node) {
+  if (sirius_domain_component_enabled('worker:rating')) {
+    $rating = Sirius_Worker_Rating::getInstance();
+    $rating_type_tid = $rating->user_default_type();
+  }
+
+
   $date = $sheet_node->field_sirius_date_start['und'][0]['value'];
   $employer_node = node_load($sheet_node->field_grievance_shop['und'][0]['target_id']);
-  $sql = "select * from sirius_edls_assignments ";
-  $sql .= "where assignment_date = :date and sirius_edls_assignments.sheet_nid = :sheet_nid ";
-  $stmt = sirius_sql_query($sql, array(':date' => $date, ':sheet_nid' => $sheet_node->nid));
+
+  $sql_args = array();
+  $sql = "select sirius_edls_assignments.*, sirius_worker_rating_cache.value as rating ";
+  $sql .= "from sirius_edls_assignments ";
+  if ($rating_type_tid) {
+    $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.bundle = 'sirius_worker' and ";
+    $sql .= "field_sirius_id_value = (CASE WHEN worker_id LIKE 'I%' THEN SUBSTRING(worker_id, 2) ELSE 'NO_SUCH_ID' END) ";
+    $sql .= "left join sirius_worker_rating_cache on ";
+    $sql .= "  sirius_worker_rating_cache.worker_nid = field_data_field_sirius_id.entity_id and ";
+    $sql .= "  sirius_worker_rating_cache.rating_type_tid = :rating_type_tid ";
+    $sql_args[':rating_type_tid'] = $rating_type_tid;
+  }
+
+  $sql .= "where assignment_date = :date ";
+  $sql_args[':date'] = $date;
+
+  $sql .= "and sirius_edls_assignments.sheet_nid = :sheet_nid ";
+  $sql_args[':sheet_nid'] = $sheet_node->nid;
+  $stmt = sirius_sql_query($sql, $sql_args);
 
   $assignments = array();
   while ($hr = $stmt->fetchAssoc()) {

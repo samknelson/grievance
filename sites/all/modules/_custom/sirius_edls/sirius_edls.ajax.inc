@@ -159,6 +159,48 @@ function sirius_edls_ajax_sheet_assignments() {
 	}
 	$result['msg'] = 'Sheet loaded.';
 
+	// Ratings
+
+	if (sirius_domain_component_enabled('worker:rating')) {
+		$rating = Sirius_Worker_Rating::getInstance();
+		$rating_type_tid = $rating->user_default_type();
+	}
+
+	if ($rating_type_tid) {
+		$result['data']['rating_type_tid'] = $rating_type_tid;
+
+		$result['data']['stats']['rating_total'] = 0;
+
+		foreach ($result['data']['assignments'] as $crew_uuid => $crew) {
+			$result['data']['crews'][$crew_uuid]['rating_total'] = 0;
+
+			foreach ($crew as $assignment_delta => $assignment) {
+				$result['data']['crews'][$crew_uuid]['rating_total'] += $assignment['rating'];
+				$result['data']['stats']['rating_total'] += $assignment['rating'];
+			}
+
+			if ($result['data']['crews'][$crew_uuid]['assigned']) {
+				$result['data']['crews'][$crew_uuid]['rating_avg'] = 
+					$result['data']['crews'][$crew_uuid]['rating_total'] / $result['data']['crews'][$crew_uuid]['assigned'];
+
+				$result['data']['crews'][$crew_uuid]['rating_avg_render'] = 
+					'&nbsp;Average rating:&nbsp;' . round($result['data']['crews'][$crew_uuid]['rating_avg'], 2);
+
+			} else {
+				$result['data']['crews'][$crew_uuid]['rating_avg'] = 0;
+			}
+		}
+
+		if ($result['data']['stats']['assigned']) {
+			$result['data']['stats']['rating_avg'] = 
+				$result['data']['stats']['rating_total'] / $result['data']['stats']['assigned'];
+			$result['data']['stats']['rating_avg_render'] = 
+				'&nbsp;Average rating:&nbsp;' . round($result['data']['stats']['rating_avg'], 2);
+		} else {
+			$result['data']['stats']['rating_avg'] = 0;
+		}
+	}
+
 	return drupal_json_output($result);
 }
 

@@ -141,7 +141,6 @@ function sirius_edls_worker_fetch($employer_nid, $worker_id, $date = NULL) {
 }
 
 function sirius_edls_worker_render_details($worker_record) {
-  $html .= '<div class="sirius_edls_worker_detail">';
 
   /*
   $worker_id = $worker_record['worker_id'];
@@ -151,14 +150,50 @@ function sirius_edls_worker_render_details($worker_record) {
   }
   */
 
+  $html .= '<div class="sirius_edls_worker_detail">';
   $html .= '<h2>' . t('Assignment Details for ') . $worker_record['worker_name'] . ' (' . $worker_record['worker_id'] . ')' . '</h2>';
   $html .= sirius_edls_worker_render_details_assignment($worker_record, $worker_record['assignments']['prev'], array('title' => t('Previous Assignment')));
   $html .= sirius_edls_worker_render_details_assignment($worker_record, $worker_record['assignments']['curr'], array('title' => t('Current Assignment')));
   $html .= sirius_edls_worker_render_details_assignment($worker_record, $worker_record['assignments']['next'], array('title' => t('Next Assignment')));
+
+  $html .= sirius_edls_worker_render_details_rating($worker_record);
+
   $html .= '</div>';
 
   return $html;
 }
+
+function sirius_edls_worker_render_details_rating($worker_record) {
+  // Component must be enabled.
+  if (!sirius_domain_component_enabled('worker:rating')) { return ''; }
+
+  $worker_id = $worker_record['worker_id'];
+
+  // Outsource workers don't have ratings
+  if (!preg_match('/^I/', $worker_id)) { return ''; }
+
+  $real_id = preg_replace('/^I/', '', $worker_id);
+  $worker_node =  sirius_worker_get_by_id($real_id);
+  if (!$worker_node) { return ''; }
+
+  $rating_instance = Sirius_Worker_Rating::getInstance();
+
+  $types = $rating_instance->types(array('indent' => TRUE));
+
+  $html = '<div class="sirius_edls_worker_ratings">';
+  $ratings = $rating_instance->ratings_get($worker_node);
+  foreach ($types as $type_tid => $type_name) {
+    $value = $ratings[$type_tid];
+    $html .= '<div class="sirius_edls_worker_rating">';
+    $html .= $rating_instance->render_stars($value);
+    $html .= $type_name;
+    $html .= '</div>';
+  }
+  $html .= '</div>';
+  return $html;
+}
+
+
 
 function sirius_edls_worker_render_details_assignment($worker_record, $assignment, $options = array()) {
   $class = 'sirius_edls_worker_detail_assignment';
@@ -356,9 +391,17 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
   }
   // $sql .= "and node.nid = 881432 ";
 
+  if ($filters['rating_type_tid']) {
+    $sql .= "and sirius_worker_rating_cache.value > 0 ";
+  }
+
   $sql .= "group by node.nid ";
 
-  $sql .= "order by field_sirius_name_family, field_sirius_name_given ";
+  if ($filters['rating_type_tid']) {
+    $sql .= "order by sirius_worker_rating_cache.value desc, field_sirius_name_family, field_sirius_name_given ";
+  } else {
+    $sql .= "order by field_sirius_name_family, field_sirius_name_given ";
+  }
 
   $ms_name_lookup = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
 

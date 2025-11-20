@@ -18,14 +18,19 @@
 						result = handle_ajax_response(jqXHR, textStatus, 'info');
 						if (!result) { return; }
 
+						console.log(result['data']);
+
 						assignments = result['data']['assignments'];
 						crews = result['data']['crews'];
 
 						for (crew_uuid in crews) {
 							count = result['data']['crews'][crew_uuid]['count'];
 							assigned = result['data']['crews'][crew_uuid]['assigned'];
+							rating_avg_render = result['data']['crews'][crew_uuid]['rating_avg_render'];
+
 							$('.sirius_edls_crew[data-uuid=\'' + crew_uuid + '\'] .sirius_edls_crew_stats_assigned').html(assigned);
 							$('.sirius_edls_crew[data-uuid=\'' + crew_uuid + '\'] .sirius_edls_crew_stats_count').html(count);
+							$('.sirius_edls_crew[data-uuid=\'' + crew_uuid + '\'] .sirius_edls_crew_stats_rating_avg').html(rating_avg_render);
 
 							for (position = 0; position < count; ++position) {
 								var assignment_div = $('#crew_' + crew_uuid + '_position_' + position);
@@ -74,13 +79,15 @@
 
 						$('#sirius_edls_sheet_stats_assigned').html(result['data']['stats']['assigned']);
 						$('#sirius_edls_sheet_stats_count').html(result['data']['stats']['count']);
+
+						$('#sirius_edls_sheet_stats_rating_avg').html(result['data']['stats']['rating_avg_render']);
 					}
 				});
 			}
 
 			function worker_search() {
 				flash('Loading workers ...', 'info');
-				console.log(settings);
+				// console.log(settings);
 				$('#sirius_edls_worker_search').prop('disabled', true);
 
 				$.ajax({
@@ -429,7 +436,7 @@
 			worker_search();
 
 			// Search for workers every X seconds
-  		interval = 300;
+  			interval = 300;
 			setInterval(worker_search, interval * 1000);
 
 			// Select the first crew by default

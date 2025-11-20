@@ -78,6 +78,7 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 	$html .= '<span class="sirius_worker_edls_sheet_stats_inner">';
 	$html .= '<span id="sirius_edls_sheet_stats_assigned">0</span> / ';
 	$html .= '<span id="sirius_edls_sheet_stats_count">0</span> ';
+	$html .= '<span id="sirius_edls_sheet_stats_rating_avg"></span> ';
 	$html .= '</span>';
 	$html .= '</div>';
 	$form['col1_stats'] = array('#markup' => $html);
@@ -122,6 +123,7 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 			'<span class="sirius_edls_crew_stats">' . 
 			'<span class="sirius_edls_crew_stats_assigned">0</span> / ' .
 			'<span class="sirius_edls_crew_stats_count">0</span> ' .
+			'<span class="sirius_edls_crew_stats_rating_avg"></span>' .
 			'</span>' .
 			'</div>' .
 			'<table class="sirius_table sirius_table_basic sirius_table_form">'
