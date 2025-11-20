@@ -56,6 +56,13 @@ class Sirius_Worker_Rating extends Sirius_Singleton {
 		}
 	}
 
+	public function rating_get($worker_nid, $rating_type_tid) {
+		// @todo: Caching!!!!
+		$worker_node = node_load($worker_nid);
+		$ratings = $this->ratings_get($worker_node);
+		return $ratings[$rating_type_tid];
+	}
+
 	public function ratings_get($worker_node) {
 		$json = sirius_json_get($worker_node);
 		$ratings = $json['worker_ratings']['ratings'];
@@ -101,78 +108,13 @@ class Sirius_Worker_Rating extends Sirius_Singleton {
 
 
 		return $form;
-
-		$form['intro'] = array('#markup' => sirius_domain_variable_get('sirius_worker_rating_intro'));
-
-		$rating_node = $this->worker_active_record($worker_node->nid);
-
-		if ($rating_node) {
-			$status = $this->status($rating_node);
-			$form['action'] = array('#type' => 'value', '#value' => 'cancel');
-
-			$html = '<p>' . '<strong><span class="sirius_text_red">' . t('You are currently marked as "Absent".') . '</span></strong></p>';
-
-			$class = 'sirius_callout_basic ';
-			if ($status == 'active') { $class .= 'sirius_callout_red '; }
-			$class .= "sirius_worker_rating sirius_worker_rating_$status";
-
-			$html .= "<div class=\"$class\">";
-			$html .= sirius_fakerender_field('Record ID:', $rating_node->uuid);
-			$html .= sirius_fakerender_field('Status:', $this->status_label($status));
-			$html .= sirius_fakerender_field('Absent at:', date('l, F j, Y g:i A T', $rating_node->created));
-			$rating_json = sirius_json_get($rating_node);
-			$ts = $rating_json['worker_rating']['cancel']['ts'];
-			if ($ts) {
-				$html .= sirius_fakerender_field('Returned at:', date('l, F j, Y g:i A T', $ts));
-			}
-			$html .= '<p>' . sirius_text_to_html($rating_node->field_sirius_summary['und'][0]['value']) . '</p>';
-			$html .= '</div>';
-
-			$form['cancel']['intro'] = array('#markup' => $html);
-
-			$form['cancel']['confirm'] = array(
-				'#type' => 'checkbox',
-				'#title' => t('Remove me from the "Absent" list.'),
-				'#required' => TRUE,
-			);
-
-			$form['cancel']['submit'] = array(
-				'#type' => 'submit',
-				'#value' => t('Remove me from the "Absent" list'),
-			);
-
-		} else {
-			$form['action'] = array('#type' => 'value', '#value' => 'activate');
-
-			$html = '<p>' . '<strong><span class="sirius_text_green">' . t('You are not on the "Absent" list.') . '</span></strong></p>';
-			$form['activate']['intro'] = array('#markup' => $html);
-
-			$form['activate']['comments'] = array(
-				'#type' => 'textarea',
-				'#title' => t('Comments'),
-				'#required' => TRUE,
-			);
-
-			$form['activate']['confirm'] = array(
-				'#type' => 'checkbox',
-				'#title' => t('Place me on the "Absent" list.'),
-				'#required' => TRUE,
-			);
-
-			$form['activate']['submit'] = array(
-				'#type' => 'submit',
-				'#value' => t('Mark me absent now'),
-			);
-		}
-
-		return $form;
 	}
 
 	public function worker_form_validate($form, &$form_state) {
 		foreach ($form_state['values']['ratings'] as $tid => $value) {
 			if ($value === '' || $value === null) { continue; }
-			if (is_numeric($value) && (int)$value == $value && $value >= 0 && $value <= 10) { continue; }
-			form_set_error("ratings][$tid", 'Please enter a number between 0 and 10.');
+			if (is_numeric($value) && (int)$value == $value && $value >= 0 && $value <= 4) { continue; }
+			form_set_error("ratings][$tid", 'Please enter a number between 0 and 4.');
 		}
 	}
 
@@ -183,4 +125,52 @@ class Sirius_Worker_Rating extends Sirius_Singleton {
 		node_save($worker_node);
 		drupal_set_message("Ratings saved.");
 	}
+
+	public function user_default_type_set($type_tid) {
+		global $user;
+		$user_full = user_load($user->uid);
+		$json = sirius_json_get($user_full);
+		$json['worker']['rating']['default'] = $type_tid;
+		sirius_json_set($user_full, $json);
+		user_save($user_full);
+	}
+
+	public function user_default_type() {
+		global $user;
+		$user_full = user_load($user->uid);
+		$json = sirius_json_get($user_full);
+		return $json['worker']['rating']['default'];
+	}
+
+	public function render_stars($rating_val) {
+		drupal_add_css(drupal_get_path('module', 'sirius') . '/css/form.css');
+		drupal_add_css(drupal_get_path('module', 'sirius_worker_rating') . '/css/rating.css');
+
+		$html = '<span class="sirius_worker_rating_stars">';
+
+		for ($i=0; $i<4; ++$i) {
+			if ($i < $rating_val) {
+				$html .= '<i class="fas fa-star"></i>';
+			} else {
+				$html .= '<i class="far fa-star"></i>';
+			}
+		}
+		$html .= '</span>';
+		return $html;
+	}
+
+	public function cache_sync($worker_node) {
+		$sql = "delete from sirius_worker_rating_cache where worker_nid = :worker_nid ";
+		$stmt = sirius_sql_query($sql, array(':worker_nid' => $worker_node->nid));
+
+		$ratings = $this->ratings_get($worker_node);
+		foreach ($ratings as $rating_type_tid => $value) {
+			$sql = "insert into sirius_worker_rating_cache ";
+			$sql .= "(worker_nid, rating_type_tid, value) ";
+			$sql .= " values (:worker_nid, :rating_type_tid, :value) ";
+			$stmt = sirius_sql_query($sql, array(':worker_nid' => $worker_node->nid, ':rating_type_tid' => $rating_type_tid, ':value' => $value));
+		}
+		return array('success' => TRUE);
+	}
+
 }

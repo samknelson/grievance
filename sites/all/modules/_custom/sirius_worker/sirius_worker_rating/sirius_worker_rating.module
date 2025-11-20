@@ -50,3 +50,46 @@ function sirius_worker_rating_sirius_backlinks_from_node_alter(&$links, $rating_
   unset($links["node/$worker_nid/sirius_worker_log"]);
   $links["node/$worker_nid/sirius_worker_rating"] = array('name' => "Worker");
 }
+
+
+
+/**
+ * Implements hook_node_update
+ */
+
+function sirius_worker_rating_node_update($node) { return sirius_worker_rating_denormalize_queue($node); }
+
+/**
+ * Implements hook_node_insert
+ */
+
+function sirius_worker_rating_node_insert($node) { return sirius_worker_rating_denormalize_queue($node); }
+
+/**
+ * Implements hook_node_delete
+ */
+
+function sirius_worker_rating_node_delete($node) { return sirius_worker_rating_denormalize_queue($node); }
+
+function sirius_worker_rating_denormalize_queue($node) {
+  if ($node->type == 'sirius_worker') {
+    if ($node->sirius_nodenorm) { return; }
+    sirius_denorm_queue_add($node->nid, $node->nid, 'sirius_worker_rating');
+  }
+}
+
+/**
+ * Implements hook_sirius_denorm
+ */
+
+function sirius_worker_rating_sirius_denorm($item) {
+  if ($item['denorm_trigger'] == 'sirius_worker_rating') { sirius_worker_rating_denorm($item); }
+}
+
+function sirius_worker_rating_denorm($item) {
+  $node = node_load($item['denorm_source_nid']);
+  if (!$node) { return array('success' => TRUE); }
+  if ($node->type != 'sirius_worker') { return array('success' => TRUE); }
+  $rating = Sirius_Worker_Rating::getInstance();
+  return $rating->cache_sync($node);
+}

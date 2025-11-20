@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * Add rating cache table
+ */
+
+function sirius_worker_rating_update_7001() {
+  $sqls = array(
+    '
+create table sirius_worker_rating_cache (
+  worker_nid integer, 
+  index(worker_nid),
+  rating_type_tid integer,
+  index(rating_type_tid),
+  value integer,
+  unique(worker_nid, rating_type_tid)
+);
+    ',
+
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}
+
