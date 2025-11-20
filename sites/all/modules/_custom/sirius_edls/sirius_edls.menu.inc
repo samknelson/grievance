@@ -458,6 +458,26 @@ function sirius_edls_menu() {
     'file' => 'sirius_edls.page_worker_view.inc'
   );
 
+  $items['sirius/edls/rating'] = array(
+    'title' => 'Ratings',
+    'page callback' => 'sirius_edls_page_rating',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'rating_view',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+    'file' => 'sirius_edls.page_rating.inc'
+  );
+
   $items['sirius/edls/notification/%'] = array(
     'title' => 'Notification',
     'page callback' => 'sirius_edls_page_notification',
