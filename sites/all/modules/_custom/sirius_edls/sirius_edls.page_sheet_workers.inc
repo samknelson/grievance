@@ -5,6 +5,9 @@ function sirius_edls_node_tab_sheet_workers_access($sheet_node) {
 }
 
 function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_node) {
+	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/form.css');
+	drupal_add_css(drupal_get_path('module', 'sirius_worker_rating') . '/css/rating.css');
+
 	$employer_nid = $sheet_node->field_grievance_shop['und'][0]['target_id'];
 	$employer_node = node_load($employer_nid);
 
@@ -22,13 +25,24 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 	drupal_add_js(drupal_get_path('module', 'sirius') . '/js/sirius.popup.js');
 	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/sirius.popup.css');
 
+  $show_rating = FALSE;
+  if (!$filters['hide_rating'] && sirius_domain_component_enabled('worker:rating')) {
+    $rating = Sirius_Worker_Rating::getInstance();
+    $rating_type_tid = $rating->user_default_type();
+    if ($rating_type_tid) { $show_rating = TRUE; }
+  }
+
 	$js_settings = array();
 	$js_settings['employer_nid'] = $employer_nid;
 	$js_settings['sheet_nid'] = $sheet_node->nid;
 	$js_settings['date'] = $sheet_node->field_sirius_date_start['und'][0]['value'];
+	if ($show_rating) {
+		$js_settings['show_rating'] = TRUE;
+	}
 
 	$classification_options = sirius_edls_worker_classification_options();
 	$js_settings['classification_options'] = $classification_options;
+
 
 	// js_settings for associative arrays don't preserve key order. Ick.
 	$ms_list = sirius_edls_ms_list($employer_node, 'name');
