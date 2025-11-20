@@ -14,6 +14,16 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 	$status_options = sirius_edls_sheet_status_options();
 	$sheet_json = sirius_json_get($sheet_node);
 
+	$show_rating = FALSE;
+	if (!$options['hide_rating'] && sirius_domain_component_enabled('worker:rating')) {
+		$rating = Sirius_Worker_Rating::getInstance();
+		$rating_type_tid = $rating->user_default_type();
+		if ($rating_type_tid) { $show_rating = TRUE; }
+	}
+
+	// Disabled for now
+	$show_rating = FALSE;
+
 	$col1 = $col2  = '';
 	if (!$options['hide_version']) { $col1 .= sirius_fakerender_field('Version:', sirius_sheet_render_version($sheet_node)); }
 	if (!$options['hide_status']) { $col1 .= sirius_fakerender_field('Status:', $status_options[$sheet_node->field_sirius_edls_sheet_status['und'][0]['value']]); }
@@ -29,6 +39,9 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 	if (!$options['hide_facility']) {
 		$col2 .= sirius_fakerender_field('Facility:', sirius_node_title($sheet_node->field_sirius_dispatch_facility['und'][0]['target_id']));
 		$col2 .= sirius_fakerender_field('Hall:', sirius_node_title($sheet_node->field_sirius_dispatch_hall['und'][0]['target_id']));
+	}
+	if ($show_rating) {
+		$col1 .= sirius_fakerender_field('Rating:', sirius_term_title($rating_type_tid));
 	}
 
 	if (!$options['hide_count']) {
@@ -197,7 +210,14 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 						$render_ms = $assignment['position'] . '.&nbsp;';
 						$render_ms .= $ms_names[$assignment['worker_ms']];
 
-						$render = $assignment['worker_name'];
+						$render = '';
+						
+						if ($show_rating) {
+							$render .= sirius_edls_worker_render_rating($assignment['worker_id'], $rating_type_tid);
+						}
+
+						$render .= $assignment['worker_name'];
+
 						$render .= sirius_edls_notify_render_status($assignment, $notifications[$assignment_id], array('can_edit_notifications' => $can_edit_notifications));
 						$render .= sirius_edls_assignment_render_extra($assignment);
 
@@ -346,4 +366,23 @@ function sirius_sheet_render_version_impl($nid, $vid, $options = array()) {
 		$html .= '</span>';
 	}
 	return $html;
+}
+
+function sirius_edls_worker_render_rating($worker_id, $rating_type_tid) {
+	$rating = Sirius_Worker_Rating::getInstance();
+
+  if (preg_match('/^I/', $worker_id)) { 
+    $worker_id_external = preg_replace('/^I/', '', $worker_id);
+    $worker_nid =  sirius_worker_get_by_id($worker_id_external, TRUE);
+  }
+
+  if (!$worker_nid) { return ''; }
+
+  if ($worker_nid) {
+  	$rating_val = $rating->rating_get($worker_nid, $rating_type_tid);
+  }
+
+  if (!$rating_val) { $rating_val = 0; }
+
+  return $rating->render_stars($rating_val); 
 }
