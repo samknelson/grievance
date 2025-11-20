@@ -32,7 +32,10 @@ function sirius_edls_assignment_fetch_sheet($sheet_node) {
   $employer_node = node_load($sheet_node->field_grievance_shop['und'][0]['target_id']);
 
   $sql_args = array();
-  $sql = "select sirius_edls_assignments.*, sirius_worker_rating_cache.value as rating ";
+  $sql = "select sirius_edls_assignments.*, ";
+  if ($rating_type_tid) {
+    $sql .= "sirius_worker_rating_cache.value as rating ";
+  }
   $sql .= "from sirius_edls_assignments ";
   if ($rating_type_tid) {
     $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.bundle = 'sirius_worker' and ";
