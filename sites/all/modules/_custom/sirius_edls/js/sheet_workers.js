@@ -95,6 +95,7 @@
 							'has_assignment_next': $('#sirius_edls_worker_filter_has_assignment_next').val(),
 							'prev_department': $('#sirius_edls_worker_filter_prev_department').val(),
 							'curr_sheet_nid': settings.sheet_nid,
+							'rating_type_tid': $('#sirius_edls_worker_filter_rating_type_tid').val(),
 						},
 					},
 					'type': 'GET',
@@ -161,6 +162,20 @@
 							*/
 
 							html += '</span>';
+
+							if (settings['show_rating']) {
+								html += '<span class="sirius_edls_worker_rating sirius_worker_rating_stars">';
+								rating = worker['rating'];
+								if (!rating) { rating = 0; }
+								for (r=0; r<4; ++r) {
+									if (r<rating) {
+										html += '<i class="fas fa-star"></i>';
+									} else {
+										html += '<i class="far fa-star"></i>';
+									}
+								}
+								html += '</span>';
+							}
 
 							if (settings['show_worker_link']) {
 								html += '<span class="sirius_edls_worker_link">';
