@@ -55,6 +55,9 @@ class Sirius_Edls_Access extends Sirius_Access {
       'notification_accept',
       'notification_decline',
       'notification_view_delivery',
+
+      // Ratings
+      'rating_view',
     );
 
     $sheet_node = $context['sheet_node'];
@@ -286,6 +289,19 @@ class Sirius_Edls_Access extends Sirius_Access {
 
       // Labor advisors can edit sheets that are not in "lock"
       if ($is_worker_advisor && ($sheet_status != 'lock')) { return TRUE; }
+
+      // Oh well
+      return FALSE;
+    }
+
+    // Ratings
+    if (in_array($action, array('rating_view'))) {
+      // Component must be enabled
+      if (!sirius_domain_component_enabled('worker:rating')) { return $this->deny('The component worker:rating is not enabled.'); }
+
+      // Anybody can access
+      if ($is_employer_supervisor) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
 
       // Oh well
       return FALSE;
