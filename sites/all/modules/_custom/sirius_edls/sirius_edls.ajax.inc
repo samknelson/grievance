@@ -12,6 +12,13 @@ function sirius_edls_ajax_worker_list() {
 
 	$filters = $_REQUEST['filters'];
 
+	if (sirius_domain_component_enabled('worker:rating') && isset($filters['rating_type_tid'])) {
+		$rating = Sirius_Worker_Rating::getInstance();
+		if ($filters['rating_type_tid'] != $rating->user_default_type()) {
+			$rating->user_default_type_set($filters['rating_type_tid']);
+		}
+	}
+
 	$workers = sirius_edls_worker_list($employer_nid, $date, $filters);
 
 	// return drupal_json_output(array('success' => FALSE, 'msg' => print_r($filters, 1)));
