@@ -230,6 +230,13 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
 
   $sql_args = array();
 
+  $show_rating = FALSE;
+  if (!$filters['hide_rating'] && sirius_domain_component_enabled('worker:rating')) {
+    $rating = Sirius_Worker_Rating::getInstance();
+    $rating_type_tid = $rating->user_default_type();
+    if ($rating_type_tid) { $show_rating = TRUE; }
+  }
+
   $sql = "select ";
 
   /*
@@ -277,6 +284,10 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
     $sql .= "field_sirius_dispatch_medium_value as worker_dispatch_medium, ";
   }
 
+  if ($show_rating) {
+    $sql .= "sirius_worker_rating_cache.value as rating, ";
+  }
+
   $sql .= "concat('I', field_sirius_id_value) as worker_id, ";
   $sql .= "concat(field_sirius_name_family, ', ', field_sirius_name_given) as worker_name, ";
   $sql .= "ms_term.tid as worker_ms ";
@@ -305,6 +316,11 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
   $sql .= "left join node job_node on job_node.nid = field_sirius_dispatch_job_target_id ";
 
   $sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = job_node.nid ";
+
+  if ($show_rating) {
+    $sql .= "left join sirius_worker_rating_cache on sirius_worker_rating_cache.worker_nid = node.nid and sirius_worker_rating_cache.rating_type_tid = :rating_type_tid ";
+    $sql_args[':rating_type_tid'] = $rating_type_tid;
+  }
 
   $sql .= "where node.type = 'sirius_worker' ";
 
@@ -338,6 +354,7 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
     $sql .= "and field_sirius_id_value = :real_id ";
     $sql_args[':real_id'] = preg_replace('/^I/', '', $filters['worker_id']);
   }
+  // $sql .= "and node.nid = 881432 ";
 
   $sql .= "group by node.nid ";
 
@@ -476,6 +493,25 @@ function sirius_worker_form_filters($options = array()) {
       '#id' => 'sirius_edls_worker_filter_prev_department',
       '#prefix' => '<div class="container-inline">',
       '#suffix' => '</div>',
+    );
+  }
+
+
+  $show_rating = FALSE;
+  if (sirius_domain_component_enabled('worker:rating')) {
+    $rating = Sirius_Worker_Rating::getInstance();
+
+    $rating_types = $rating->types(array('indent' => TRUE));
+    if (!$rating_types) { return sirius_form_error("No rating types are defined."); }
+
+    $form['rating_type_tid'] = array(
+      '#type' => 'select',
+      '#title' => 'Rating',
+      '#options' => array(NULL => t('-- Select --')) + $rating_types,
+      '#default_value' => $rating->user_default_type(),
+      '#prefix' => '<div class="container-inline">',
+      '#suffix' => '</div>',
+      '#id' => 'sirius_edls_worker_filter_rating_type_tid',
     );
   }
 
