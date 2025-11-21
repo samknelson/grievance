@@ -32,35 +32,6 @@ function mightysearch_maketree(&$clauses) {
 	return $tree;
 }
 
-function mightysearch_makecondition_anyactor($op, $value) {
-	$condition = db_or();
-	
-	for ($i=1; $i<=7; ++$i) {
-		$aliased_field = 'any_actor_' . $i . '_node.title';
-		if ($op == 'like') {
-			$condition->condition($aliased_field, '%' . $value . '%', $op);
-		} else if ($op == 'starts_with') {
-			$condition->condition($aliased_field, $value . '%', 'like');
-		} else if ($op == 'ends_with') {
-			$condition->condition($aliased_field, '%' . $value, 'like');
-		} else if ($op == 'empty') {
-			$a = db_or();
-			$a->isNull($aliased_field);
-			$a->condition($aliased_field, '', '=');
-			$condition->condition($a);
-		} else if ($op == 'not_empty') {
-			$a = db_and();
-			$a->isNotNull($aliased_field);
-			$a->condition($aliased_field, '', '!=');
-			$condition->condition($a);
-		}	else {
-			$condition->condition($aliased_field, $value, $op);
-		}
-	}
-	
-	return $condition;
-}
-
 function mightysearch_makecondition($tree, &$query, &$already_joined, $schema) {
 	if ($tree['connector'] == 'or') {
 		$condition = db_or(); 
@@ -85,43 +56,36 @@ function mightysearch_makecondition($tree, &$query, &$already_joined, $schema) {
 		
 		mightysearch_join($query, $already_joined, $schema, $table, $field);
 		
-		if ($table == 'any_actor') {
-			$sub_condition = mightysearch_makecondition_anyactor($op, $value);
-			$condition->condition($sub_condition);
+		if ($schema[$table]['fields'][$field]['type'] == 'tid') {
+			$aliased_field = "${table}_${field}_term.name";
+		} else if ($field == 'title') {
+			$aliased_field = "${table}_node.title";
+		} else if ($field == 'name') {
+			$aliased_field = "${table}_term.name";
+		} else if ($field == 'nid') {
+			$aliased_field = "${table}_node.nid";
 		} else {
-			if ($table == 'any_actor') {
-				$aliased_field = 'any_actor_1_node.title';
-			} else if ($schema[$table]['fields'][$field]['type'] == 'tid') {
-				$aliased_field = "${table}_${field}_term.name";
-			} else if ($field == 'title') {
-				$aliased_field = "${table}_node.title";
-			} else if ($field == 'name') {
-				$aliased_field = "${table}_term.name";
-			} else if ($field == 'nid') {
-				$aliased_field = "${table}_node.nid";
-			} else {
-				$aliased_field = "${table}_${field}.field_${field}_${col}";
-			}
-			
-			if ($op == 'like') {
-				$condition->condition($aliased_field, '%' . $value . '%', $op);
-			} else if ($op == 'starts_with') {
-				$condition->condition($aliased_field, $value . '%', 'like');
-			} else if ($op == 'ends_with') {
-				$condition->condition($aliased_field, '%' . $value, 'like');
-			} else if ($op == 'empty') {
-				$a = db_or();
-				$a->isNull($aliased_field);
-				$a->condition($aliased_field, '', '=');
-				$condition->condition($a);
-			} else if ($op == 'not_empty') {
-				$a = db_and();
-				$a->isNotNull($aliased_field);
-				$a->condition($aliased_field, '', '!=');
-				$condition->condition($a);
-			}	else {
-				$condition->condition($aliased_field, $value, $op);
-			}
+			$aliased_field = "${table}_${field}.field_${field}_${col}";
+		}
+		
+		if ($op == 'like') {
+			$condition->condition($aliased_field, '%' . $value . '%', $op);
+		} else if ($op == 'starts_with') {
+			$condition->condition($aliased_field, $value . '%', 'like');
+		} else if ($op == 'ends_with') {
+			$condition->condition($aliased_field, '%' . $value, 'like');
+		} else if ($op == 'empty') {
+			$a = db_or();
+			$a->isNull($aliased_field);
+			$a->condition($aliased_field, '', '=');
+			$condition->condition($a);
+		} else if ($op == 'not_empty') {
+			$a = db_and();
+			$a->isNotNull($aliased_field);
+			$a->condition($aliased_field, '', '!=');
+			$condition->condition($a);
+		}	else {
+			$condition->condition($aliased_field, $value, $op);
 		}
 	}
 

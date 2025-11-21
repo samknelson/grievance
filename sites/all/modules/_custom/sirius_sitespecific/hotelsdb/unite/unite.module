@@ -264,6 +264,31 @@ function unite_field_group_build_pre_render_alter(&$element) {
 	);
 	$element['group_lg']['#id'] = 'group_lg';
 
+	$element['group_union']['#states'] = array(
+		'visible' => array(
+  		':input[id="edit-field-relationship-type-und"]' => array(
+  			array('value' => 'Union'),
+  		),
+		),
+	);
+	$element['group_union']['#id'] = 'group_union';
+
+	$element['field_start_date']['#states'] = array(
+		'visible' => array(
+  		':input[id="edit-field-relationship-type-und"]' => array(
+  			array('!value' => 'Union'),
+  		),
+		),
+	);
+
+	$element['field_end_date']['#states'] = array(
+		'visible' => array(
+  		':input[id="edit-field-relationship-type-und"]' => array(
+  			array('!value' => 'Union'),
+  		),
+		),
+	);
+
 	// kpr($element);
 }
 	

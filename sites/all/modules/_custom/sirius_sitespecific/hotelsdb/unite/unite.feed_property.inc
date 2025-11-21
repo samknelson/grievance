@@ -19,14 +19,21 @@ function unite_feed_property_info() {
       'pks' => array(
         'nid' => 'Internal ID (NID)',
         'pk_addr' => 'Address',
-        // 'id' => 'External ID',
-        // 'addr' => 'Address',
+        'pk_title' => 'Title',
       ),
       'create_new_records' => 'optional',
+      'results_fields' => array(
+        'property_nid' => 'property_nid',
+      ),
       'fields' => array(
         'nid' => array('group' => 'pk', 'title' => 'Internal ID (NID)'),
-
         'title' => array('group' => 'core', 'title' => 'Title'),
+
+        'is_hotel' => array('group' => 'core', 'title' => 'Hotel?', 'type' => 'list'),
+        'is_casino' => array('group' => 'core', 'title' => 'Casino?', 'type' => 'list'),
+        'is_fs' => array('group' => 'core', 'title' => 'Food Service?', 'type' => 'list'),
+
+
         'rooms' => array('group' => 'core', 'type' => 'integer'),
         'brand' => array('group' => 'core', 'type' => 'term_reference', 'taxonomy' => 'brand'),
         'niche' => array('group' => 'core', 'type' => 'term_reference', 'taxonomy' => 'hdb_niche'),
@@ -51,13 +58,10 @@ function unite_feed_property_info() {
 
         'local' => array('group' => 'contract', 'type' => 'entity_reference', 'entity_type' => 'local'),
         'hotel_contract_covered' => array('group' => 'contract', 'type' => 'integer'),
-        'rest_contract_covered' => array('group' => 'contract', 'type' => 'integer'),
         'union_status' => array('group' => 'contract', 'type' => 'list'),
         'union_other' => array('group' => 'contract', 'type' => 'text',),
         'hotel_contract_start_date' => array('group' => 'contract', 'type' => 'date'),
         'hotel_contract_end_date' => array('group' => 'contract', 'type' => 'date'),
-        'rest_contract_start_date' => array('group' => 'contract', 'type' => 'date'),
-        'rest_contract_end_date' => array('group' => 'contract', 'type' => 'date'),
 
         'convention_center' => array('group' => 'convention', 'type' => 'entity_reference', 'entity_type' => 'hdb_convention_center'),
         'convention_center_attached' => array('group' => 'convention', 'type' => 'list'),
@@ -85,6 +89,10 @@ function unite_feed_property_info() {
         'csno_slots_date' => array('group' => 'casino', 'type' => 'date'),
         'csno_tables_date' => array('group' => 'casino', 'type' => 'date'),
 
+        'fs_segment' => array('group' => 'fs', 'type' => 'list'),
+        'fs_dbe' => array('group' => 'fs', 'type' => 'list'),
+        'fs_concession_type' => array('group' => 'fs', 'type' => 'list'),
+
         'labor_activity_index' => array('group' => 'fairhotel', 'type' => 'list'),
         'fh_notes' => array('group' => 'fairhotel', 'type' => 'long'),
         'fh_nonunion' => array('group' => 'fairhotel', 'type' => 'long'),
@@ -104,6 +112,7 @@ function unite_feed_property_info() {
     'core' => 'Core',
     'amenities' => 'Amenities',
     'casino' => 'Casino',
+    'fs' => 'Food Service',
     'fairhotel' => 'FairHotel',
     'airport' => 'Airport',
     'convention' => 'Convention',
@@ -188,11 +197,12 @@ function unite_feed_property_handle_entity_reference($entity_type, $value) {
   $sql = "select min(nid) as mn, max(nid) as mx from node ";
   $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_name_short on field_data_field_sirius_name_short.entity_type = 'node' and field_data_field_sirius_name_short.entity_id = node.nid ";
-  $sql .= "where nid = :v1 ";
+  $sql .= "where type = :entity_type ";
+  $sql .= "and (nid = :v1 ";
   $sql .= "or title = :v2 ";
   $sql .= "or field_sirius_id_value = :v3 ";
-  $sql .= "or field_sirius_name_short_value = :v4 ";
-  $stmt = sirius_sql_query($sql, array(':v1' => $value, ':v2' => $value, ':v3' => $value, ':v4' => $value));
+  $sql .= "or field_sirius_name_short_value = :v4) ";
+  $stmt = sirius_sql_query($sql, array(':entity_type' => $entity_type, ':v1' => $value, ':v2' => $value, ':v3' => $value, ':v4' => $value));
   $hr = $stmt->fetchAssoc();
   if (!$hr['mn']) { return NULL; }
   if ($hr['mn'] != $hr['mx']) { return NULL; }
@@ -248,7 +258,7 @@ function unite_feed_property_row_verify($feed_node, $info, $data, &$row, $precom
       $probe = node_load($nid);
       if (!$probe) { return array('success' => FALSE, 'msg' => 'No node was found with this NID.'); }
       if ($probe->type != 'property') { return array('success' => FALSE, 'msg' => 'The node for this NID was found, but it is not a property.'); }
-    } else if ($pk = 'pk_addr') {
+    } else if ($pk == 'pk_addr') {
       $parts = array('thoroughfare', 'locality', 'administrative_area', 'postal_code', 'country');
       $addr = array();
       foreach ($parts as $part) {
@@ -288,6 +298,26 @@ function unite_feed_property_row_verify($feed_node, $info, $data, &$row, $precom
           return $result;
         }
       }
+    } else if ($pk == 'pk_title') {
+      $title = $row['title'];
+      $sql = "select nid from node where type = 'property' and title = :title";
+      $stmt = sirius_sql_query($sql, array(':title' => $title));
+      $hr = $stmt->fetchAssoc();
+      $hr2 = $stmt->fetchAssoc();
+
+      if ($hr2) {
+        return array('success' => FALSE, 'msg' => 'There are multiple properties with this title.');
+      }
+
+      if (!$hr && $data['create_new_records'] != 'Yes') {
+        return array('success' => FALSE, 'msg' => 'A property with that title already exists.');
+      } else if ($hr) {
+        $msg = "An existing property will be updated.";
+      } else {
+        $msg = "A new property will be created.";
+      }
+
+      $row['nid'] = $hr['nid'];
     } else {
       return array('success' => FALSE, 'msg' => 'Missing or unknown pk $pk.');
     }
@@ -358,10 +388,11 @@ function unite_feed_property_row_process($feed_node, $info, $data, $row) {
 
   $property_node = node_submit($property_node);
   node_save($property_node);
+  $property_nid = $property_node->nid;
 
   if ($is_new) {
-    return array('success' => TRUE, 'msg' => 'Created a new property.');
+    return array('success' => TRUE, 'msg' => 'Created a new property.', 'property_nid' => $property_nid);
   } else {
-    return array('success' => TRUE, 'msg' => 'Updated an existing property.');
+    return array('success' => TRUE, 'msg' => 'Updated an existing property.', 'property_nid' => $property_nid);
   }
 }

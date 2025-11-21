@@ -1,17 +1,18 @@
 <?php
 
 function unite_relationships_type_order($type_name) {
-	$order['Colocation Host'] = -2;
-	$order['Colocated'] = -1;
-	$order['Owner'] = 0;
-	$order['Operator'] = 1;
-	$order['Leaseholder'] = 2;
-	$order['Land Leaseholder'] = 3;
-	$order['Landowner'] = 4;
-	$order['Developer'] = 5;
-	$order['Loan Servicer'] = 6;
+	$order['Union'] 						= -3;
+	$order['Colocation Host'] 	= -2;
+	$order['Colocated'] 				= -1;
+	$order['Owner'] 						= 0;
+	$order['Operator'] 					= 1;
+	$order['Leaseholder'] 			= 2;
+	$order['Land Leaseholder'] 	= 3;
+	$order['Landowner'] 				= 4;
+	$order['Developer'] 				= 5;
+	$order['Loan Servicer'] 		= 6;
 	$order['Previous Operator'] = 7;
-	$order['Previous Owner'] = 8;
+	$order['Previous Owner'] 		= 8;
 
 	return $order[$type_name];
 }
@@ -54,6 +55,60 @@ function unite_relationships_render_ownership($pa_node) {
 	if ($pa_node->field_lg_amount['und'][0]['value']) {
 		$parts[] = 'Initial $' . number_format($pa_node->field_lg_amount['und'][0]['value'], 0);
 	}
+
+	return join(' / ', $parts);
+}
+
+function unite_relationships_render_union($pa_node) {
+	if ($pa_node->field_relationship_type['und'][0]['value'] != 'Union') { return ''; }
+
+	$parts = array();
+	if ($pa_node->field_ur_juris['und'][0]['value'] == 'Y') {
+		$parts[] = 'Jurisdiction';
+	}
+
+	if ($pa_node->field_ur_orgag['und'][0]['value'] == 'Y') {
+		$notes = 'Organizing Agreement';
+		$duration = array();
+		if ($pa_node->field_ur_orgag_start['und'][0]['value']) {
+			$duration[] = 'Start: ' . date('Y-m-d', strtotime($pa_node->field_ur_orgag_start['und'][0]['value']));
+		}
+		if ($pa_node->field_ur_orgag_end['und'][0]['value']) {
+			$duration[] = 'End: ' . date('Y-m-d', strtotime($pa_node->field_ur_orgag_end['und'][0]['value']));
+		}
+		if ($duration) { $notes .= ' ' . join(' / ', $duration); }
+
+		$parts[] = $notes;
+	}
+
+	if ($pa_node->field_ur_rep['und'][0]['value'] == 'Y') {
+		$notes = 'Represented';
+		$duration = array();
+		if ($pa_node->field_ur_rep_start['und'][0]['value']) {
+			$duration[] = 'Start: ' . date('Y-m-d', strtotime($pa_node->field_ur_rep_start['und'][0]['value']));
+		}
+		if ($pa_node->field_ur_rep_end['und'][0]['value']) {
+			$duration[] = 'End: ' . date('Y-m-d', strtotime($pa_node->field_ur_rep_end['und'][0]['value']));
+		}
+		if ($duration) { $notes .= ' ' . join(' / ', $duration); }
+
+		$parts[] = $notes;
+	}
+
+	if ($pa_node->field_ur_contract['und'][0]['value'] == 'Y') {
+		$notes = 'Contract';
+		$duration = array();
+		if ($pa_node->field_ur_contract_start['und'][0]['value']) {
+			$duration[] = 'Start: ' . date('Y-m-d', strtotime($pa_node->field_ur_contract_start['und'][0]['value']));
+		}
+		if ($pa_node->field_ur_contract_end['und'][0]['value']) {
+			$duration[] = 'End: ' . date('Y-m-d', strtotime($pa_node->field_ur_contract_end['und'][0]['value']));
+		}
+		if ($duration) { $notes .= ' ' . join(' / ', $duration); }
+
+		$parts[] = $notes;
+	}
+
 	return join(' / ', $parts);
 }
 
@@ -107,6 +162,7 @@ function unite_relationships_render_property($property_node, $options = array())
 		$tools .= l('Edit Relationship', 'node/' . $pa_node->nid . '/edit', array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => $path)));
 
 		$ownership = unite_relationships_render_ownership($pa_node);
+		$union = unite_relationships_render_union($pa_node);
 
 		$name = $actor_node->title;
 
@@ -118,6 +174,19 @@ function unite_relationships_render_property($property_node, $options = array())
 			$notes[] = l(sirius_node_title($parent_nid), "node/$parent_nid");
 		}
 		$notes[] = $ownership;
+		$notes[] = $union;
+		if ($pa_node->field_sirius_id['und'][0]['value']) {
+			$notes[] = 'ID: ' . $pa_node->field_sirius_id['und'][0]['value'];
+		}
+
+		$duration = array();
+		if ($pa_node->field_start_date['und'][0]['value']) {
+			$duration[] = 'Start: ' . date('Y-m-d', strtotime($pa_node->field_start_date['und'][0]['value']));
+		}
+		if ($pa_node->field_end_date['und'][0]['value']) {
+			$duration[] = 'End: ' . date('Y-m-d', strtotime($pa_node->field_end_date['und'][0]['value']));
+		}
+		if ($duration) { $notes[] = join(' / ', $duration); }
 		$notes = join('<br />', array_filter($notes));
 
 	  $last_verified = $pa_node->field_verified_date['und'][0]['value'];
@@ -225,17 +294,10 @@ function unite_relationships_render_actor($actor_node, $options = array()) {
 
 		$ownership = unite_relationships_render_ownership($pa_node);
 
-		if ($property_node->field_rooms['und'][0]['value']) {
-			$rooms = number_format($property_node->field_rooms['und'][0]['value'], 0);
-		} else {
-			$rooms = '';
-		}
-
 		$row = array();
 		$row[] = $property_node->title;
 		$row[] = $pa_node->field_relationship_type['und'][0]['value'];
 		$row[] = $ownership;
-		$row[] = $rooms;
 		$row[] = $property_node->field_address['und'][0]['locality'];
 		$row[] = $property_node->field_address['und'][0]['administrative_area'];
 		$row[] = $union_status_lookup[$property_node->field_union_status['und'][0]['value']];
@@ -326,6 +388,23 @@ function unite_relationships_render_actor($actor_node, $options = array()) {
  */
 
 function unite_relationship_node_presave($relationship_node) {
+	////////////////////////////////
+	// Handle address updates
+	////////////////////////////////
+
+	if (in_array($relationship_node->field_relationship_type['und'][0]['value'], array('Colocated', 'Colocation Host'))) {
+		$property_node = node_load($relationship_node->field_property['und'][0]['target_id']);
+		$actor_node = node_load($relationship_node->field_actor['und'][0]['target_id']);
+		if ($actor_node->field_address['und'][0]['thoroughfare'] && !$property_node->field_address['und'][0]['thoroughfare']) {
+			$property_node->field_address = $actor_node->field_address;
+			node_save($property_node);
+		}
+	}
+
+	////////////////////////////////
+	// Handle owner and operator update
+	////////////////////////////////
+
 	$original_node = $relationship_node->original;
 
 	// Are we updating the owner and / or operator?
@@ -354,6 +433,7 @@ function unite_relationship_node_presave($relationship_node) {
 		if ($is_operator) { $property_node->field_calc_operator_last_updated['und'][0]['value'] = gmdate('Y-m-d H:i'); }
 		node_save($property_node);
 	}
+
 }
 
 /**

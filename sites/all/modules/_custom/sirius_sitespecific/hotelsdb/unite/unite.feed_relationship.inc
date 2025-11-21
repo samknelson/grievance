@@ -19,6 +19,7 @@ function unite_feed_relationship_info() {
       'pks' => array(
         'nid' => 'Internal ID (NID)',
         'pat' => 'Property + Actor + Type',
+        'pati' => 'Property + Actor + Type + ID',
       ),
       'create_new_records' => 'optional',
       'fields' => array(
@@ -26,6 +27,7 @@ function unite_feed_relationship_info() {
         'property_nid' => array('group' => 'pk', 'title' => 'Property NID'),
         'actor_title' => array('group' => 'pk', 'title' => 'Actor Name'),
         'pk_relationship_type' => array('group' => 'pk', 'title' => 'Relationship Type'),
+        'sirius_id' => array('group' => 'pk', 'title' => 'ID', 'type' => 'text'),
 
         'replace' => array(
           'group' => 'pk', 
@@ -61,6 +63,17 @@ function unite_feed_relationship_info() {
         'lg_sources' => array('group' => 'lg', 'type' => 'long'),
         'lg_date_sources' => array('group' => 'lg', 'type' => 'date'),
 
+        'ur_juris' => array('group' => 'union', 'type' => 'list'),
+        'ur_orgag' => array('group' => 'union', 'type' => 'list'),
+        'ur_orgag_start' => array('group' => 'union', 'type' => 'date'),
+        'ur_orgag_end' => array('group' => 'union', 'type' => 'date'),
+        'ur_rep' => array('group' => 'union', 'type' => 'list'),
+        'ur_rep_start' => array('group' => 'union', 'type' => 'date'),
+        'ur_rep_end' => array('group' => 'union', 'type' => 'date'),
+        'ur_contract' => array('group' => 'union', 'type' => 'list'),
+        'ur_contract_start' => array('group' => 'union', 'type' => 'date'),
+        'ur_contract_end' => array('group' => 'union', 'type' => 'date'),
+
         'verified_date' => array('group' => 'verified', 'type' => 'date'),
         'verified_user' => array('group' => 'verified', 'type' => 'entity_reference', 'entity_type' => 'user'),
 
@@ -78,6 +91,7 @@ function unite_feed_relationship_info() {
     'core' => 'Core',
     'ownership' => 'Ownership',
     'lg' => 'Loans and Grants',
+    'union' => 'Union',
     'verified' => 'Verified',
   );
   foreach ($items['unite_feed_relationship']['feed']['fields'] as $field_name => $field_info) {
@@ -208,13 +222,18 @@ function unite_feed_relationship_row_verify($feed_node, $info, $data, &$row, $pr
       if ($probe->type != 'actor') { return array('success' => FALSE, 'msg' => 'The node for this NID was found, but it is not a actor.'); }
 
       $msg = "An existing actor will be updated.";
-    } else if ($pk == 'pat') {
+    } else if (in_array($pk, array('pat', 'pati'))) {
       $property_nid = $row['property_nid'];
       $actor_title = $row['actor_title'];
       $relationship_type = $row['pk_relationship_type'];
+      $sirius_id = $row['sirius_id'];
 
       if (!$property_nid || !$actor_title || !$relationship_type) {
         return array('success' => FALSE, 'msg' => "This record has no value for at least one of the elements of the primary key (property, actor, relationship type.");
+      }
+
+      if ($pk == 'pati' && !$sirius_id) {
+        return array('success' => FALSE, 'msg' => "This record has no value for the ID.");
       }
 
       if (!in_array($relationship_type, $relationship_type_allowed_values)) { 
@@ -238,6 +257,9 @@ function unite_feed_relationship_row_verify($feed_node, $info, $data, &$row, $pr
       $query->fieldCondition('field_property', 'target_id', $property_nid);
       $query->fieldCondition('field_actor', 'target_id', $actor_nid);
       $query->fieldCondition('field_relationship_type', 'value', $relationship_type);
+      if ($pk == 'pati') {
+        $query->fieldCondition('field_sirius_id', 'value', $sirius_id);
+      }
       $stmt = $query->execute();
       $relationship_nid = NULL;
       if ($stmt['node']) {
@@ -341,11 +363,13 @@ function unite_feed_relationship_row_process($feed_node, $info, $data, $row) {
     }
   }
 
+  //dpm($relationship_node);
   node_save($relationship_node);
 
   if ($is_new) {
-    return array('success' => TRUE, 'msg' => 'Created a new relationshiop.');
+    return array('success' => TRUE, 'msg' => 'Created a new relationship.');
   } else {
     return array('success' => TRUE, 'msg' => 'Updated an existing relationship.');
   }
 }
+

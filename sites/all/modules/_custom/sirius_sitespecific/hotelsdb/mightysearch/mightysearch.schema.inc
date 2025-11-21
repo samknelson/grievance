@@ -118,21 +118,6 @@ function mightysearch_mschema() {
 		'type' => 'integer',
 	);
 
-	$schema['property']['fields']['rest_contract_start_date'] = array(
-		'prompt' => 'Restaurant Contract Start Date',
-		'type' => 'date',
-	);
-
-	$schema['property']['fields']['rest_contract_end_date'] = array(
-		'prompt' => 'Restaurant Contract End Date',
-		'type' => 'date',
-	);
-
-	$schema['property']['fields']['rest_contract_covered'] = array(
-		'prompt' => 'Restaurant Contract Covered Workers',
-		'type' => 'integer',
-	);
-
 	$schema['property']['fields']['calc_owner_last_updated'] = array(
 		'prompt' => 'Owner Last Updated',
 		'type' => 'date',
@@ -193,14 +178,19 @@ function mightysearch_mschema() {
 		'type' => 'text',
 	);
 
-	$schema['property']['fields']['calc_airport_dist'] = array(
-		'prompt' => 'Airport Distance',
-		'type' => 'integer',
+	$schema['property']['fields']['fs_segment'] = array(
+		'prompt' => 'Food Service - Segment',
+		'type' => 'text',
 	);
 
-	$schema['property']['fields']['calc_airport_dist_alt'] = array(
-		'prompt' => 'Airport (Secondary) Distance',
-		'type' => 'integer',
+	$schema['property']['fields']['fs_dbe'] = array(
+		'prompt' => 'Food Service - DBE?',
+		'type' => 'text',
+	);
+
+	$schema['property']['fields']['fs_concession_type'] = array(
+		'prompt' => 'Food Service - Concession Type',
+		'type' => 'text',
 	);
 
 	$schema['property']['fields']['legacy_id'] = array(
@@ -215,8 +205,8 @@ function mightysearch_mschema() {
 		'actor_a' => 'Actor A',
 		'actor_b' => 'Actor B',
 		'actor_c' => 'Actor C',
-		'actor_d' => 'Actor D',
-		'actor_e' => 'Actor E',
+		// 'actor_d' => 'Actor D',
+		// 'actor_e' => 'Actor E',
 	);
 	
 	foreach ($relationship_types as $relationship_type => $relationship_prompt) {
@@ -279,7 +269,61 @@ function mightysearch_mschema() {
 			'prompt' => 'Verified Date',
 			'type' => 'text',
 		);
-	
+
+		if (!in_array($relationship_type, array('owner', 'operator'))) {
+
+			$schema[$relationship_type . '_pa']['fields']['ur_juris'] = array(
+				'prompt' => 'Union Jurisdiction?',
+				'type' => 'text',
+			);
+
+			$schema[$relationship_type . '_pa']['fields']['ur_orgag'] = array(
+				'prompt' => 'Union Organizing Agreement?',
+				'type' => 'text',
+			);
+
+			$schema[$relationship_type . '_pa']['fields']['ur_orgag_start'] = array(
+				'prompt' => 'Union Organizing Agreement Start',
+				'type' => 'date',
+			);
+
+			$schema[$relationship_type . '_pa']['fields']['ur_orgag_end'] = array(
+				'prompt' => 'Union Organizing Agreement End',
+				'type' => 'date',
+			);
+
+
+			$schema[$relationship_type . '_pa']['fields']['ur_rep'] = array(
+				'prompt' => 'Union Represented?',
+				'type' => 'text',
+			);
+
+			$schema[$relationship_type . '_pa']['fields']['ur_rep_start'] = array(
+				'prompt' => 'Union Represented Start',
+				'type' => 'date',
+			);
+
+			$schema[$relationship_type . '_pa']['fields']['ur_rep_end'] = array(
+				'prompt' => 'Union Represented End',
+				'type' => 'date',
+			);
+
+			$schema[$relationship_type . '_pa']['fields']['ur_contract'] = array(
+				'prompt' => 'Union Contract?',
+				'type' => 'text',
+			);
+
+			$schema[$relationship_type . '_pa']['fields']['ur_contract_start'] = array(
+				'prompt' => 'Union Contract Start',
+				'type' => 'date',
+			);
+
+			$schema[$relationship_type . '_pa']['fields']['ur_contract_end'] = array(
+				'prompt' => 'Union Contract End',
+				'type' => 'date',
+			);
+		}
+
 		//
 		// Actor Table
 		//
@@ -312,6 +356,10 @@ function mightysearch_mschema() {
 			'type' => 'tid',
 			'vocabulary' => 'actor_type'
 		);
+		$schema[$relationship_type]['fields']['public'] = array(
+			'prompt' => 'Public?',
+			'type' => 'text',
+		);
 		$schema[$relationship_type]['fields']['address'] = array(
 			'prompt' => 'Address',
 			'type' => 'text',
@@ -324,24 +372,26 @@ function mightysearch_mschema() {
 				'country' => 'Country',
 			),
 		);
+
+		//
+		// Parent Table
+		//
+		
+		$schema[$relationship_type . '_node_parent'] = array();
+		$schema[$relationship_type . '_node_parent']['table'] = array(
+			'prompt' => $relationship_prompt . ': Parent',
+			'bundle' => 'actor',
+		);
+
+		$schema[$relationship_type . '_node_parent']['fields']['title'] = array(
+			'prompt' => 'Name',
+			'type' => 'text',
+		);
 	}
 	
 	$schema['owner']['fields']['title']['highlighted'] = 1;
 	$schema['operator']['fields']['title']['highlighted'] = 1;
 	
-	//
-	// Any Actor
-	//
-	
-	$schema['any_actor'] = array();
-	$schema['any_actor']['table'] = array(
-		'prompt' => 'Any Actor'
-	);
-	$schema['any_actor']['fields']['title'] = array(
-		'prompt' => 'Name',
-		'type' => 'text',
-	);
-
 	//
 	// Local Table
 	//
@@ -402,32 +452,6 @@ function mightysearch_mschema() {
 		'type' => 'text',
 		'col' => '',
 	);
-
-
-	//
-	// Airport Table and fields
-	//
-	
-	foreach (array('airport' => 'Airport', 'airport_alt' => 'Airport (Secondary)') as $table => $label) {
-		$schema[$table] = array();
-		$schema[$table]['table'] = array(
-			'prompt' => $label,
-		);
-
-		$schema[$table]['fields'] = array();
-		$schema[$table]['fields']['nid'] = array(
-			'prompt' => 'ID',
-			'type' => 'text',
-		);
-		$schema[$table]['fields']['title'] = array(
-			'prompt' => 'Name',
-			'type' => 'text',
-		);
-		$schema[$table]['fields']['sirius_name_short'] = array(
-			'prompt' => 'Abbreviation',
-			'type' => 'text',
-		);
-	}
 
 	return $schema;
 }
