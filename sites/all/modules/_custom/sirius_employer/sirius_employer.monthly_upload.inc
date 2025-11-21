@@ -163,15 +163,32 @@ class Sirius_Employer_Monthly_Upload extends Sirius_Singleton {
     $year = $form_state['values']['year'] + 0;
     $month = $form_state['values']['month'] + 0;
 
+    $year_now = date('Y') + 0;
+    $month_now = date('m') + 0;
+
+    $cutoff_year = $year_now;
+    $cutoff_month = $month_now;
+    for ($i=0; $i<4; ++$i) {
+      --$cutoff_month; 
+      if ($cutoff_month < 1) { $cutoff_month = 12; --$cutoff_year; }
+    }
+
     // This should be in "validate", but you can't fucking set "rebuild" in _validate, or
     // send anything back to the form.
+
     if (!$form_state['values']['future_confirm']) {
-      $year_now = date('Y') + 0;
-      $month_now = date('m') + 0;
       if ($year > $year_now || ($year == $year_now && $month >= $month_now)) {
         drupal_set_message("The month you are trying to report is not complete.", 'warning');
         $form_state['rebuild'] = TRUE;
         $form_state['need_future_confirm'] = TRUE;
+        return;
+      }
+    }
+
+    if (!$this->access('staff')) {
+      if ($year < $cutoff_year || ($year == $cutoff_year && $month <= $cutoff_month)) {
+        drupal_set_message("You cannot upload more than three months prior.", 'error');
+        $form_state['rebuild'] = TRUE;
         return;
       }
     }

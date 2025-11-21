@@ -26,7 +26,11 @@ class Sirius_Ledger_Currency_Plugin extends Sirius_Singleton {
 
 	public function plugin_class() { return 'ledger_currency'; }
 
-	public function render_amt($amt) {
+	public function render_amt($amt, $options = array()) {
+		if ($options['format'] == 'text') {
+			return '$' . number_format($amt, 2);
+		}
+
 		$class = "sirius_currency";
 		if ($amt >= 0) {$class .= " sirius_currency_positive"; }
 		else { $class .= "sirius_currency_negative"; }
@@ -64,8 +68,13 @@ class Sirius_Ledger_Currency_Plugin_USD extends Sirius_Ledger_Currency_Plugin {
 	public $name = 'USD';
 	public $description = 'U.S. Dollars';
 
-	public function render_amt($amt) {
+	public function render_amt($amt, $options = array()) {
 		if (!$amt) { $amt = 0; }
+
+		if ($options['format'] == 'text') {
+			return '$' . number_format($amt, 2);
+		}
+		
 		$class = "";
 		if ($amt >= 0) {
 			$html = "<span class=\"sirius_currency_usd sirius_currency_usd_positive\">";
@@ -90,7 +99,7 @@ class Sirius_Ledger_Currency_Plugin_Points extends Sirius_Ledger_Currency_Plugin
 	public $name = 'Points';
 	public $description = '"Points" or other non-monetary awards.';
 
-	public function render_amt($amt) {
+	public function render_amt($amt, $options = array()) {
 		if (!$amt) { $amt = 0; }
 		$class = "";
 		if ($amt >= 0) {

@@ -48,3 +48,18 @@ function sirius_cardcheck_sirius_wizard_info() {
   return $items;
 }
 
+/***
+ * Implements hook_report_cache_info()
+ */
+
+function sirius_cardcheck_report_cache_info() {
+  $items = array();
+
+  sirius_require('sirius_cardcheck', 'reports/acceptance.inc');
+  sirius_require('sirius_cardcheck', 'reports/invalid.inc');
+
+  Sirius_Cardcheck_Report_Acceptance::getInstance()->setInfo($items);
+  Sirius_Cardcheck_Report_Invalid::getInstance()->setInfo($items);
+
+  return $items;
+}

@@ -7,7 +7,7 @@ function sirius_smf_page_register() {
 function sirius_smf_page_register_form($form, &$form_state) {
 	$form['ssn'] = array(
 		'#type' => 'textfield',
-		'#title' => 'Social Securtity Number',
+		'#title' => 'Social Security Number',
 		'#size' => 11,
 		'#required' => TRUE,
 	);
@@ -120,6 +120,9 @@ function sirius_smf_page_register_form_submit($form, &$form_state) {
 		return;
 	}
 
+	// Switch into the domain!
+	sirius_domain($worker_node->field_sirius_domain['und'][0]['target_id']);
+
 	// Make sure the worker has at least one hour entry
 	$sql = "select sirius_hours_cache.*, field_data_field_sirius_attachments.entity_id as attachment_entity_id from sirius_hours_cache ";
 	$sql .= "left join field_data_field_sirius_attachments on field_data_field_sirius_attachments.entity_type = 'node' and field_data_field_sirius_attachments.entity_id = sirius_hours_cache.payperiod_nid and field_data_field_sirius_attachments.delta = 0 ";
@@ -132,17 +135,87 @@ function sirius_smf_page_register_form_submit($form, &$form_state) {
 		return;
 	}
 
-	// Success
 	unset($form_state['rebuild']);
+
+	// Success
 	$worker_node->field_sirius_email['und'][0]['value'] = $email;
 	node_save($worker_node);
 	$result = sirius_worker_usersync($worker_node->nid, array('manual' => TRUE));
+
 	if ($result['success']) {
 		drupal_set_message("User registration successful.");
+
+		$result = sirius_smf_page_register_form_notify($worker_node);
+
 		drupal_goto('smf/register/thanks');
 	} else {
 		drupal_set_message("Registration failed: " . $result['msg'], 'error');
 	}
+}
 
-	drupal_set_message("Registration failed: [under development]", 'warning');
+function sirius_smf_page_register_form_notify($worker_node) {
+	$contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+	if (!$contact_node) { return array('succes' => FALSE, 'msg' => 'Contact node not found.'); }
+
+	// Send a letter
+	$sql_args = array();
+	$sql = "select * from node ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "left join field_data_field_grievance_shortname on field_data_field_grievance_shortname.entity_type = 'node' and field_data_field_grievance_shortname.entity_id = node.nid ";
+	$sql .= "where 1 = 1 ";
+	$sql .= "and node.type = 'grievance_letter_template' ";
+	$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+	$sql_args[':domain_nid'] = sirius_domain_nid();
+
+	$sql .= "and field_grievance_shortname_value = :shortname ";
+	$sql_args[':shortname'] = 'member_registration';
+
+	$stmt = sirius_sql_query($sql, $sql_args);
+	$hr = $stmt->fetchAssoc();
+	$letter_template_nid = $hr['nid'];
+	if (!$letter_template_nid) {
+		return array('success' => FALSE, 'msg' => 'No letter found with shortname: ' . $sql_args[':shortname']);
+	}
+
+	$letter_template_node = node_load($letter_template_nid);
+	if (!$letter_template_node) {
+		return array('success' => FALSE, 'msg' => 'No letter template found with nid: ' . $letter_template_nid);
+	}
+
+	$tokens = array();
+	$tokens['worker_node'] = $worker_node;
+	$tokens['contact_node'] = $contact_node;
+
+	$aliases = array();
+	$aliases['contact_node'] = 'node';
+	$aliases['worker_node'] = 'node';
+
+	$postal_client = sirius_postal_client_instance();
+	$to = $postal_client->addr_from_node($worker_node);
+
+	$tmp = $postal_client->mail_options_form();
+
+	$params = array();
+	$params['medium'] = 'postal';
+	$params['handler_nids'] = array($worker_node->nid);
+	$params['to'] = $to;
+
+	// Replace tokens in our message
+	$token_replace_options =  array();
+	$token_replace_options['clear'] = TRUE;
+	$token_replace_options['aliases'] = $aliases;
+
+	$tmp = $letter_template_node->field_sirius_rawhtml['und'][0]['value'];
+	if (!$tmp) { $tmp = $letter_template_node->field_grievance_notify_body['und'][0]['value']; }
+	$params['body'] = token_replace($tmp, $tokens, $token_replace_options);
+
+	$params['X-Sirius-Id'] = "UNIQUE/bulk/" . $worker_node->nid . '/' . md5(json_encode($to));
+	$params['options'] = array('mail_type' => 'usps_standard');
+
+	$result = sirius_postal_send($params);
+	if ($result['success']) {
+		drupal_set_message("A confirmation letter has been sent to the address on file.");
+	}
+
+	return $result;
 }

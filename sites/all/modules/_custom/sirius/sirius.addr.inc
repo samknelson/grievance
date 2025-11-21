@@ -108,7 +108,7 @@ function sirius_addr_geocode_impl($addr_oneline, $approximate_ok = FALSE) {
 	}
 
 	if (!$approximate_ok) {
-		if (!($point->data['geocoder_formatted_address']) || ($point->data['geocoder_accuracy'] == 'APPROXIMATE')) {
+		if (!($point->data['geocoder_formatted_address']) || ($point->data['geocoder_accuracy'] != 'ROOFTOP')) {
 			return array('success' => FALSE, 'msg' => 'The mapping service was unable to find an exact location for that address.', 'point' => $point);
 		}
 	}

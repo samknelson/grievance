@@ -103,6 +103,15 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 				$subject .= $letter_template_node->field_grievance_notify_subject['und'][0]['value'];
 			}
 		}
+
+		$tmp = $letter_template_node->field_sirius_rawhtml['und'][0]['value'];
+		if (!$tmp) { $tmp = $letter_template_node->field_grievance_notify_body['und'][0]['value']; }
+
+		if (strlen($tmp) > 10) {
+			if ($body) { $body .= '<div class="grievance-letter-page-break">&nbsp;</div>'; }
+			$body .= $tmp;
+		}
+
 		if (strlen($letter_template_node->field_grievance_notify_body['und'][0]['value']) > 10) {
 			if ($body) { $body .= '<div class="grievance-letter-page-break">&nbsp;</div>'; }
 			$body .= $letter_template_node->field_grievance_notify_body['und'][0]['value'];

@@ -1,0 +1,17 @@
+#page-banner,
+#header,
+#page-footer,
+.banner-menu-outer-wrapper,
+.primary-local-tasks-wrapper,
+.secondary-tasks-wrapper { 
+	display: none;
+}
+
+.sirius_btu_public input.form-submit {
+	margin-left: 0;
+}
+
+.sirius_btu_public label {
+	display: inline-block;
+	width: 150px;
+}

@@ -160,6 +160,10 @@ class Report_Cache_Report_Generator {
   }
 
   public function preview_links($row) {
+    // @todo: Sometimes $preview_links needs a context, but I didn't want to change the definition by adding an explicit argument 
+    //        because it would have meant touching every report instance, ugh.
+    // $context = func_get_arg(1);
+
     return array();
   }
 

@@ -10,7 +10,8 @@ function sirius_trust_election_wizard_post_form($form, &$form_state, $info, $dat
 
 	$form['#tree'] = TRUE;
 
-	$form['status'] = array('#markup' => sirius_trust_election_wizard_status_render($info, $data, $wizard_node, $current_step));
+	$status = sirius_trust_election_wizard_get_status($wizard_node);
+	$form['status'] = array('#markup' => sirius_trust_election_wizard_status_render($status));
 	
 	$steps = sirius_trust_election_wizard_steps($data, $wizard_node);
 	foreach ($steps as $step_id => $step) {
@@ -37,8 +38,16 @@ function sirius_trust_election_wizard_post_form($form, &$form_state, $info, $dat
 	$access_context = array('election_wizard_node' => $wizard_node, 'current_step' => $current_step);
 
 	if ($access->access('election_wizard_edit', $access_context)) {
-		$form['post'] = array(
-			'#markup' => '<p><strong>Click below to post this election wizard. This will create or update any dependent and relationship records, and will create an active election for the worker.</strong></p>',
+		$form['action'] = array(
+			'#type' => 'select',
+			'#title' => t('Action'),
+			'#options' => array(
+				NULL => t('-- Select --'),
+				'approve' => t('Approve the election but do not post'),
+				'post' => t('Post the election'),
+			),
+			'#required' => TRUE,
+			'#suffix' => '<p><strong>Posting will create or update any dependent and relationship records, and will create an active election for the worker</strong></p>',
 		);
 	}
 
@@ -51,38 +60,28 @@ function sirius_trust_election_wizard_post_form_submit($form, &$form_state) {
 	$wizard_node = $form_state['wizard_node'];
 	$current_step = $form_state['current_step'];
 
-	// Create any relationships
-	$steps = sirius_trust_election_wizard_steps($data, $wizard_node);
-	foreach ($steps as $step_id => $step) {
-		if (!$step['callback_post']) { continue; }
-		drupal_set_message("Posting: " . $step['label']);
-		if (!function_exists($step['callback_post'])) {
-			drupal_set_message("Missing callback: " . $step['callback_post'], 'error');
-			return;
+	$action = $form_state['values']['action'];
+	if ($action == 'approve') {
+		$wizard_node->field_sirius_type['und'][0]['value'] = 'approved';
+	} else if ($action == 'post') {
+		// Post all steps
+		$steps = sirius_trust_election_wizard_steps($data, $wizard_node);
+		foreach ($steps as $step_id => $step) {
+			if (!$step['callback_post']) { continue; }
+			drupal_set_message("Posting: " . $step['label']);
+			if (!function_exists($step['callback_post'])) {
+				drupal_set_message("Missing callback: " . $step['callback_post'], 'error');
+				return;
+			}
+
+			$result = SiriusResult::create($step['callback_post']($info, $data, $wizard_node, $step_id));
+			if (!$result->success()) { return $result->drupalSetMessage(); }
 		}
-
-		$result = SiriusResult::create($step['callback_post']($info, $data, $wizard_node, $step_id));
-		if (!$result->success()) { return $result->drupalSetMessage(); }
+		$wizard_node->field_sirius_type['und'][0]['value'] = 'posted';
+	} else {
+		drupal_set_message("Error: Unknown action $action");
 	}
-
-	$wizard_node->field_sirius_type['und'][0]['value'] = 'posted';
 	sirius_wizard_submit($info, $data, $wizard_node, $current_step, "Response saved.", array('nonsequential' => FALSE));
-}
-
-function sirius_trust_election_wizard_status_render($info, $data, $wizard_node, $current_step) {
-	$status = sirius_trust_election_wizard_get_status($wizard_node);
-	$html .= '<div class="sirius_wizard_render_section sirius_callout_basic">';
-	$html .= '<strong>';
-	if ($status == 'draft') {
-		$html .= 'This is a DRAFT election. It can still be edited.';
-	} else if ($status == 'submitted') {
-		$html .= 'This is a SUBMITTED election. It is locked and can only be edited by staff. It has not yet been posted.';
-	} else if ($status == 'posted') {
-		$html .= 'This is a POSTED election. It has been posted to the member\'s record, and cannot be changed. To make any changes, a new election must be created.';
-	}
-	$html .= '</strong>';
-	$html .= '</div>';
-	return $html;
 }
 
 function sirius_trust_election_wizard_post_post($info, &$data, $wizard_node, $current_step) {

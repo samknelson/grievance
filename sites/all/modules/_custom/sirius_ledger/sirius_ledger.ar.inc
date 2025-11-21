@@ -395,3 +395,52 @@ function sirius_ledger_ar_reset($account_nid, $participant_nid, $date, $memo) {
 
 	drupal_set_message("Resetting: $account_nid, $participant_nid, " . date('c', $ts) . ", $memo");
 }
+
+function sirius_ledger_ar_orphan_scan($mode = 'test', $force = FALSE) {
+
+	$sqls = array();
+
+	$limit = 1000;
+
+	$sql = 'select sirius_ledger_ar.* from sirius_ledger_ar ';
+	$sql .= 'left join node on node.nid = ledger_reference ';
+	$sql .= 'where node.nid is null ';
+	$sql .= "order by ledger_id limit $limit";
+	$sqls[] = $sql;
+
+	$sql = 'select sirius_ledger_ar.* from sirius_ledger_ar ';
+	$sql .= 'left join node on node.nid = ledger_account ';
+	$sql .= 'where node.nid is null ';
+	$sql .= "order by ledger_id limit $limit";
+	$sqls[] = $sql;
+
+	$sql = 'select sirius_ledger_ar.* from sirius_ledger_ar ';
+	$sql .= 'left join node on node.nid = ledger_participant ';
+	$sql .= 'where node.nid is null ';
+	$sql .= "order by ledger_id limit $limit";
+	$sqls[] = $sql;
+
+	$entries = array();
+	foreach ($sqls as $sql) {
+		$stmt = sirius_sql_query($sql, array());
+		while ($hr = $stmt->fetchAssoc()) {
+			$entries[$hr['ledger_id']] = $hr;
+		}
+	}
+
+	$count = 0;
+	foreach ($entries as $entry) {
+		++$count;
+		sirius_minilog("Deleting " . print_r($entry, 1));
+		if ($mode != 'live') {
+			sirius_minilog("[skipping delete because mode = $mode]");
+			continue;
+		}
+
+		sirius_ledger_ar_delete($entry);
+	}
+
+	sirius_minilog("Purged $count entries.");
+
+	return array('success' => TRUE, 'count' => $count);
+}

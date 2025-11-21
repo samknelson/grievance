@@ -44,9 +44,20 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 		);
 	}
 
-	if (in_array($data['format'], array('email', 'postal'))) {
+	if (in_array($data['format'], array('email'))) {
 		$form['body'] = array(
 			'#type' => 'text_format',
+			'#title' => t('Body'),
+			'#default_value' => $data['body'],
+			'#rows' => 20,
+			'#format' => 'sirius_form_editor',
+			'#allowed_formats' => array('full_html'),
+		);
+	}
+
+	if (in_array($data['format'], array('postal'))) {
+		$form['body'] = array(
+			'#type' => 'textarea',
 			'#title' => t('Body'),
 			'#default_value' => $data['body'],
 			'#rows' => 20,

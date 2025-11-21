@@ -251,6 +251,24 @@ function sirius_trust_election_wizard_status_options() {
 	return array(
 		'draft' => t('Draft'),
 		'submitted' => t('Submitted'),
+		'approved' => t('Approved'),
 		'posted' => t('Posted'),
 	);
+}
+
+function sirius_trust_election_wizard_status_render($status) {
+	$html .= '<div class="sirius_wizard_render_section sirius_callout_basic">';
+	$html .= '<strong>';
+	if ($status == 'draft') {
+		$html .= 'This is a DRAFT election. It can still be edited.';
+	} else if ($status == 'submitted') {
+		$html .= 'This is a SUBMITTED election. It is locked and can only be edited by staff. It has not yet been posted.';
+	} else if ($status == 'posted') {
+		$html .= 'This is a POSTED election. It has been posted to the member\'s record, and cannot be changed. To make any changes, a new election must be created.';
+	} else if ($status == 'approved') {
+		$html .= 'This is a APPROVED election. It is locked and can only be edited by staff. It has not yet been posted.';
+	}
+	$html .= '</strong>';
+	$html .= '</div>';
+	return $html;
 }

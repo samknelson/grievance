@@ -1,0 +1,4 @@
+name = Sirius BTU
+description = Custom functionality for the Boston Teachers' Union
+package = Sirius
+core = 7.x

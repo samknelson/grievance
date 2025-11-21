@@ -78,6 +78,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
     $fields[] = 'employer_nid';
     $fields[] = 'worker_name';
     $fields[] = 'employer_name';
+    $fields[] = 'employer_id';
     $fields[] = 'WORK MONTH';
     $fields[] = 'HN';
     $fields[] = 'HN T1';
@@ -194,8 +195,8 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
     $y = $parameters['year'] + 0;
     $m = $parameters['month'] + 0;
 
-    for ($i=0; $i<4; ++$i) {
-      --$m; if ($m < 0) { $m = 12; --$y; }
+    for ($i=0; $i<3; ++$i) {
+      --$m; if ($m < 1) { $m = 12; --$y; }
     }
 
     $worker_nids = array();
@@ -206,6 +207,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
     $stmt = sirius_sql_query($sql, array(':y' => $y, ':m' => $m));
 
     $format = '%010d';
+    $pks = array();
     while ($hr = $stmt->fetchAssoc()) {
       $pks[] = sprintf($format, $hr['employer_nid']) . ':' . sprintf($format, $hr['worker_nid']);
     }
@@ -217,7 +219,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
     $date = $parameters['year'] . '-' . $parameters['month'] . '-15';
 
     $ts = strtotime($date);
-    $work_ts = strtotime('-4 months', $ts);
+    $work_ts = strtotime('-3 months', $ts);
     $work_display = date('Y-m', $work_ts);
     $work_year = date('Y', $work_ts);
     $work_month = date('n', $work_ts);
@@ -243,6 +245,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
       }
     }
 
+    $employer_lookup = array();
 
     $rows = array();
     foreach ($pks as $pk) {
@@ -252,12 +255,17 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
 
       $worker_node = node_load($worker_nid);
 
+      if (!$employer_lookup[$employer_nid]) {
+        $employer_lookup[$employer_nid] = node_load($employer_nid);
+      }
+
       $row = array();
 
       $row['worker_nid'] = $worker_nid;
       $row['employer_nid'] = $employer_nid;
       $row['worker_name'] = $worker_node->title;
-      $row['employer_name'] = sirius_node_title($employer_nid);
+      $row['employer_name'] = $employer_lookup[$employer_nid]->title;
+      $row['employer_id'] = $employer_lookup[$employer_nid]->field_sirius_id['und'][0]['value'];
 
       $row['WORK MONTH'] = $work_display;
 
@@ -314,16 +322,21 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
         $row['MULTIPLIER'] = 0;
       }
 
+      if ($row['ADD'] && !$row['DENTAL'] && !$row['MEDICAL']) {
+        $row['NON ENROLLED'] = 1;
+      }
 
-      if ($row['DENTAL'] && (!$row['MEDICAL'])) { $row['NON ENROLLED'] = 1; }
+      if ($row['ADD'] && $row['DENTAL'] && !$row['MEDICAL']) {
+        $row['NON ENR NO DDS'] = 1;
+      }
+
+
       if ($row['HOURS'] && !$row['ADD']) {
         $row['NON ELIG'] = 1;
         $row['NON ELIG HRS'] = $row['HOURS'];
       } else {
         $row['EL HRS'] = $row['HOURS'];
       }
-
-      if ($row['ADD'] && !$row['MEDICAL'] && !$row['DENTAL']) { $row['NON ENR NO DDS'] = 1; }
 
       $rows[$pk] = $row;
     }
@@ -382,7 +395,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
       $employer_name = $row['employer_name'];
       if (!$employer_name) { continue; }
 
-      if (!$data[$employer_name]) { $data[$employer_name] = array(); }
+      if (!$data[$employer_name]) { $data[$employer_name] = array('employer_id' => $row['employer_id']); }
 
       foreach ($summary_fields as $field_name) {
         $val = $row[$field_name];
@@ -404,6 +417,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
     foreach ($data as $employer_name => $employer_data) {
       $row = array();
       $row[] = $employer_name;
+      $row[] = $employer_data['employer_id'];
       $row[] = $month;
       foreach ($summary_fields as $field_name) {
         $val = $employer_data[$field_name];
@@ -415,6 +429,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
 
     $header = array();
     $header[] = 'Employer';
+    $header[] = 'Employer ID';
     $header[] = 'WORK MONTH';
     foreach ($summary_fields as $field_name) { $header[] = $field_name; }
 

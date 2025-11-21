@@ -150,6 +150,7 @@ function sirius_trust_report_cache_info() {
   Sirius_Trust_Report_Election_Pair::getInstance()->setInfo($items);
   Sirius_Trust_Report_Relationship_Reciprocal::getInstance()->setInfo($items);
   Sirius_Trust_Report_Missing_Demog::getInstance()->setInfo($items);
+  Sirius_Trust_Report_Worker_Benefit_Multiple::getInstance()->setInfo($items);
   // Sirius_Trust_Report_Election_No_Hours::getInstance()->setInfo($items);
 
   // $items['sirius-trust-worker-detail'] = sirius_trust_report_worker_benefit_detail_info();
@@ -167,22 +168,6 @@ function sirius_trust_report_cache_info() {
     ),
     'module' => 'sirius_trust',
     'file' => 'sirius_trust.report_worker_benefit_warning.inc',
-    'dashboard' => TRUE,
-  );
-
-  $items['sirius-trust-worker-benefit-multiple'] = array(
-    'name' => t('Coverage - Data Integrity - Multiple'),
-    'description' => '',
-    'access' => 'sirius trust staff',
-    'fields' => sirius_trust_report_worker_benefit_multiple_fields(),
-    'form_callback' => 'sirius_trust_report_worker_benefit_multiple_form',
-    'pk_list_callback' => 'sirius_trust_report_worker_benefit_multiple_pks',
-    'batch_callback' => 'sirius_trust_report_worker_benefit_multiple_batch',
-    'render_callbacks' => array(
-      'View' => 'sirius_trust_report_worker_benefit_multiple_view',
-    ),
-    'module' => 'sirius_trust',
-    'file' => 'sirius_trust.report_worker_benefit_multiple.inc',
     'dashboard' => TRUE,
   );
 

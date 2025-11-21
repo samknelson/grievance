@@ -46,11 +46,26 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 
 		$balance_out = $total + $balance_in;
 
+		$params['ledger_participant'] = $participant_nid;
+		$params['ledger_account'] = $account_nid;
+		$params['ledger_ts_min'] = $interval['start_ts'];
+		$params['ledger_ts_max'] = $interval['end_ts'];
+		$params['ledger_amount_max'] = 0;
+		$params['balance'] = TRUE;
+		$payments = sirius_ledger_ar_fetch($params);
+
+		unset($params['ledger_amount_max']);
+		$params['ledger_amount_min'] = 0;
+		$params['balance'] = TRUE;
+		$charges = sirius_ledger_ar_fetch($params);
+
 		$balances = array();
 		$balances['total'] = $total;
 		$balances['balance_in'] = $balance_in;
 		$balances['balance_out'] = $balance_out;
 		$balances['account_nid'] = $account_nid;
+		$balances['payments'] = $payments;
+		$balances['charges'] = $charges;
 
 		return $balances;
 	}

@@ -262,7 +262,7 @@ function sirius_contact_tag_add(&$contact_node, $tid, $save_later = FALSE) {
 	if (in_array($tid, $current_tids)) { return array('success' => TRUE, 'msg' => 'Contact already had the tag.'); }
 
 	$contact_node->field_sirius_contact_tags['und'][] = array('tid' => $tid); 
-	if (!$save_later) { node_save($contact_node); drupal_set_message("Adding $tid"); }
+	if (!$save_later) { node_save($contact_node); }
 	return array('success' => TRUE, 'msg' => 'Contact saved.', 'changed' => TRUE);
 }
 
