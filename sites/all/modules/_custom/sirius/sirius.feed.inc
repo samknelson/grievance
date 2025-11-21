@@ -844,6 +844,8 @@ function sirius_feed_wizard_process_form_submit($form, &$form_state) {
 	$current_step = $form_state['current_step'];
 	$limit = $form_state['values']['limit'];
 
+	$data['limit'] = $limit;
+
 	$batch_size = sirius_feed_batch_size($info['name']);
 	$idx = 0;
 	$rows = $data['rows'];
@@ -859,7 +861,6 @@ function sirius_feed_wizard_process_form_submit($form, &$form_state) {
 		$operations[] = array('sirius_feed_wizard_process_batch', array($feed_node, $info, $data, $idx));
 		$idx += $batch_size + 1;
 		++$batch_count;
-		if ($limit && $batch_count >= $limit) { break; }
 	}
 	$callback_postprocess = $info['feed']['callback_postprocess'];
 	if ($callback_postprocess) { 
@@ -923,6 +924,11 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 		++$count;
 		if ($count < $idx) { continue; }
 		if ($count > $idx+$batch_size) { break; }
+
+		if ($data['limit'] && ($count > $data['limit'] + 1)) {
+			break;
+		}
+
 		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header);
 		$result = $callback($feed_node, $info, $data, $import_data_row);
 
