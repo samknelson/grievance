@@ -30,6 +30,9 @@ class Sirius_Smf_Report_Electionrequest extends Report_Cache_Report_Generator {
     $cols = sirius_addr_cols();
     foreach ($cols as $col => $title) { $fields["worker_address_$col"] = $title; }
 
+    $fields['employer_nid'] = 'Employer NID';
+    $fields['employer_name'] = 'Employer Name';
+
     return $fields;
   }
 
@@ -61,6 +64,8 @@ class Sirius_Smf_Report_Electionrequest extends Report_Cache_Report_Generator {
         'no_fieldsets' => TRUE,
       )
     );
+
+    if (!$html) { $html = '&nbsp;'; }
 
     return $html;
   }
@@ -143,6 +148,10 @@ class Sirius_Smf_Report_Electionrequest extends Report_Cache_Report_Generator {
       foreach ($cols as $col => $title) {
         $row["worker_address_$col"] = $worker_node->field_sirius_address['und'][0][$col];
       }
+
+      $row['employer_nid'] = $election_node->field_grievance_shop['und'][0]['target_id'];
+      $row['employer_name'] = sirius_node_title($row['employer_nid']);
+
       $rows[$worker_nid] = $row;
     }
 
