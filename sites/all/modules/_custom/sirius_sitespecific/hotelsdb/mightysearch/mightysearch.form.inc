@@ -43,7 +43,7 @@ function mightysearch_search_form($form, &$form_state) {
 	}
 	
 	// Re-order our options
-	$highlights = array('', 'property.title', 'property.address.locality', 'owner.title', 'operator.title', 'any_actor.title');
+	$highlights = array('', 'property.title', 'property.address.locality', 'owner.title', 'operator.title');
 	$new_field_options = array();
 	foreach ($field_options as $key => $value) {
 		if (in_array($key, $highlights)) {
@@ -66,12 +66,7 @@ function mightysearch_search_form($form, &$form_state) {
 		}
 	}
 
-	// Can't display on "Any Actor"
-	unset($display_options['any_actor.title']);
-	
-	// Can't sort on "Any Actor"
 	$sort_options = $field_options;
-	unset($sort_options['any_actor.title']);
 	
 	// Flatten includes NID
 	$flatten_options = array();

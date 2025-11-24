@@ -78,6 +78,7 @@ function unite_node_tabs() {
 		'weight' => 3,
 	);
 
+	/*
 	$node_tabs['property']['unite_contract'] = array(
 		'title' => 'Contract',
 		'description' => '',
@@ -86,6 +87,7 @@ function unite_node_tabs() {
 		'file' => 'unite.page_property_contract_edit.inc',
 		'weight' => 4,
 	);
+	*/
 
 	$node_tabs['property']['unite_fairhotel'] = array(
 		'title' => 'FairHotel',

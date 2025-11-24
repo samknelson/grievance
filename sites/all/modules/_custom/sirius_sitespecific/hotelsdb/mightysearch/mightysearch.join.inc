@@ -19,13 +19,11 @@ function mightysearch_join(&$query, &$already_joined, $schema, $table, $field) {
 	}
 	
 	// 
-	// Joins for Local, airport
+	// Joins for Local
 	//
 	
 	$simple_joins = array(
 		'local' => 'local', 
-		'airport' => 'hdb_airport',
-		'airport_alt' => 'hdb_airport',
 	);
 	if ($simple_joins[$table]) {
 		if (!$already_joined["field_data_field_${table}"]) {
@@ -74,7 +72,7 @@ function mightysearch_join(&$query, &$already_joined, $schema, $table, $field) {
 	);
 	
 	foreach ($relationship_types as $relationship_type => $relationship_prompt) {
-		if ($table == $relationship_type || $table == $relationship_type . '_pa') {
+		if ($table == $relationship_type || $table == $relationship_type . '_pa' || $table == $relationship_type . '_node_parent') {
 
 			if ($already_joined[$relationship_type]) { continue; }
 			$already_joined[$relationship_type] = 1;
@@ -112,6 +110,18 @@ function mightysearch_join(&$query, &$already_joined, $schema, $table, $field) {
 				"node",
 				"${relationship_type}_node",
 				"${relationship_type}_node.nid = ${relationship_type}_field_data_field_actor.field_actor_target_id"
+			);
+
+			$query->leftJoin(
+				"field_data_field_actors",
+				"${relationship_type}_field_data_field_actors",
+				"${relationship_type}_field_data_field_actors.entity_type = 'node' and ${relationship_type}_field_data_field_actors.entity_id = ${relationship_type}_node.nid"
+			);
+
+			$query->leftJoin(
+				"node",
+				"${relationship_type}_node_parent_node",
+				"${relationship_type}_node_parent_node.nid = ${relationship_type}_field_data_field_actors.field_actors_target_id"
 			);
 
 			/*

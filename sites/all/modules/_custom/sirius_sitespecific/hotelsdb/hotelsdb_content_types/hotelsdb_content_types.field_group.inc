@@ -214,15 +214,10 @@ function hotelsdb_content_types_field_group_info() {
     'label' => 'Contracts',
     'weight' => '4',
     'children' => array(
-      0 => 'field_union_status',
-      1 => 'field_local',
-      2 => 'field_hotel_contract_start_date',
-      3 => 'field_hotel_contract_end_date',
-      4 => 'field_hotel_contract_covered',
-      5 => 'field_rest_contract_start_date',
-      6 => 'field_rest_contract_end_date',
-      7 => 'field_rest_contract_covered',
-      8 => 'field_union_other',
+      0 => 'field_local',
+      1 => 'field_hotel_contract_start_date',
+      2 => 'field_hotel_contract_end_date',
+      3 => 'field_union_other',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -250,15 +245,10 @@ function hotelsdb_content_types_field_group_info() {
     'label' => 'Contract',
     'weight' => '8',
     'children' => array(
-      0 => 'field_union_status',
-      1 => 'field_local',
-      2 => 'field_hotel_contract_start_date',
-      3 => 'field_hotel_contract_end_date',
-      4 => 'field_hotel_contract_covered',
-      5 => 'field_rest_contract_start_date',
-      6 => 'field_rest_contract_end_date',
-      7 => 'field_rest_contract_covered',
-      8 => 'field_union_other',
+      0 => 'field_local',
+      1 => 'field_hotel_contract_start_date',
+      2 => 'field_hotel_contract_end_date',
+      3 => 'field_union_other',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -455,7 +445,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Loans and Grants',
-    'weight' => '20',
+    'weight' => '10',
     'children' => array(
       0 => 'field_lg_balance',
       1 => 'field_lg_servicer_commentary',
@@ -573,7 +563,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Ownership',
-    'weight' => '10',
+    'weight' => '8',
     'children' => array(
       0 => 'field_pension',
       1 => 'field_percent_owned',
@@ -608,15 +598,17 @@ function hotelsdb_content_types_field_group_info() {
     'label' => 'Property',
     'weight' => '0',
     'children' => array(
-      0 => 'field_brand',
-      1 => 'field_development_status',
-      2 => 'field_is_casino',
-      3 => 'field_notes',
-      4 => 'field_legacy_id',
-      5 => 'field_owner_of_record',
-      6 => 'field_is_fs',
-      7 => 'field_is_hotel',
-      8 => 'title',
+      0 => 'field_union_status',
+      1 => 'field_brand',
+      2 => 'field_development_status',
+      3 => 'field_is_casino',
+      4 => 'field_notes',
+      5 => 'field_legacy_id',
+      6 => 'field_owner_of_record',
+      7 => 'field_hotel_contract_covered',
+      8 => 'field_is_fs',
+      9 => 'field_is_hotel',
+      10 => 'title',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -716,6 +708,81 @@ function hotelsdb_content_types_field_group_info() {
   );
   $field_groups['group_tabs|node|property|form'] = $field_group;
 
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_union|node|property_actor|default';
+  $field_group->group_name = 'group_union';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'property_actor';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Union',
+    'weight' => '47',
+    'children' => array(
+      0 => 'field_ur_juris',
+      1 => 'field_ur_orgag',
+      2 => 'field_ur_orgag_start',
+      3 => 'field_ur_orgag_end',
+      4 => 'field_ur_rep',
+      5 => 'field_ur_rep_start',
+      6 => 'field_ur_rep_end',
+      7 => 'field_ur_contract',
+      8 => 'field_ur_contract_start',
+      9 => 'field_ur_contract_end',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Union',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-union field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_union|node|property_actor|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_union|node|property_actor|form';
+  $field_group->group_name = 'group_union';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'property_actor';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Union',
+    'weight' => '14',
+    'children' => array(
+      0 => 'field_ur_juris',
+      1 => 'field_ur_orgag',
+      2 => 'field_ur_orgag_start',
+      3 => 'field_ur_orgag_end',
+      4 => 'field_ur_rep',
+      5 => 'field_ur_rep_start',
+      6 => 'field_ur_rep_end',
+      7 => 'field_ur_contract',
+      8 => 'field_ur_contract_start',
+      9 => 'field_ur_contract_end',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Union',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-union field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_union|node|property_actor|form'] = $field_group;
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Airports');
@@ -733,6 +800,7 @@ function hotelsdb_content_types_field_group_info() {
   t('Property');
   t('Restaurant');
   t('Tabs');
+  t('Union');
 
   return $field_groups;
 }

@@ -216,7 +216,6 @@ function unite_feed_actor_row_verify($feed_node, $info, $data, &$row, $precomput
             return $result;
           }
           $row['parent_nid'] = $result['nid'];
-          drupal_set_message("Here with $owner_nid");
         }
       }
     }
