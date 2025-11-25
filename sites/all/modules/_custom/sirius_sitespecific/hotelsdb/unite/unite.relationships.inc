@@ -175,9 +175,11 @@ function unite_relationships_render_property($property_node, $options = array())
 		}
 		$notes[] = $ownership;
 		$notes[] = $union;
+		/*
 		if ($pa_node->field_sirius_id['und'][0]['value']) {
 			$notes[] = 'ID: ' . $pa_node->field_sirius_id['und'][0]['value'];
 		}
+		*/
 
 		$duration = array();
 		if ($pa_node->field_start_date['und'][0]['value']) {

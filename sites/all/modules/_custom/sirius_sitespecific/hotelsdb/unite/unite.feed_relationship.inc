@@ -38,6 +38,9 @@ function unite_feed_relationship_info() {
         'relationship_type' => array('group' => 'core', 'title' => 'New Relationship Type', 'type' => 'list'),
         'notes' => array('group' => 'core', 'type' => 'long'),
 
+        'start_date' => array('group' => 'core', 'type' => 'date', 'title'),
+        'end_date' => array('group' => 'core', 'type' => 'date'),
+
         'percent_owned' => array('group' => 'ownership', 'type' => 'integer'),
         'amount_owned' => array('group' => 'ownership', 'type' => 'integer'),
         'owned_raw' => array('group' => 'ownership', 'type' => 'text'),

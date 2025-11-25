@@ -44,6 +44,22 @@ function mightysearch_mschema() {
 		'prompt' => 'Development Status',
 		'type' => 'text',
 	);
+
+	$schema['property']['fields']['is_hotel'] = array(
+		'prompt' => 'Hotel?',
+		'type' => 'text',
+	);
+
+	$schema['property']['fields']['is_fs'] = array(
+		'prompt' => 'Food Service?',
+		'type' => 'text',
+	);
+
+	$schema['property']['fields']['is_casino'] = array(
+		'prompt' => 'Casino?',
+		'type' => 'text',
+	);
+
 	$schema['property']['fields']['address'] = array(
 		'prompt' => 'Address',
 		'type' => 'text',
@@ -126,11 +142,6 @@ function mightysearch_mschema() {
 	$schema['property']['fields']['calc_operator_last_updated'] = array(
 		'prompt' => 'Operator Last Updated',
 		'type' => 'date',
-	);
-
-	$schema['property']['fields']['is_casino'] = array(
-		'prompt' => 'Casino?',
-		'type' => 'text',
 	);
 
 	$schema['property']['fields']['csno_type'] = array(
