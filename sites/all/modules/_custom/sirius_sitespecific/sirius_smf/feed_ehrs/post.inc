@@ -4,10 +4,14 @@ function sirius_smf_feed_ehrs_post_form($form, &$form_state, $info, $data, $wiza
 	$pk = $data['pk'];
 	$fields = sirius_feed_wizard_fields($info, $data, $wizard_node, $current_step);
 
+	$total_withheld = 0;
 	$total_hrs = 0;
 	foreach ($data['records']['rows'] as $data_row) {
-		$total_hrs += $data_row['hrs']; 
+		if ($data_row['hrs']) { $total_hrs += $data_row['hrs']; }
+		if ($data_row['withheld']) { $total_withheld += $data_row['withheld']; }
 	}
+
+	$currency = sirius_ledger_currency_from_account_nid(NULL); // Just take the default currency
 
 	$html = '';
 
@@ -19,6 +23,9 @@ function sirius_smf_feed_ehrs_post_form($form, &$form_state, $info, $data, $wiza
 		$row[] = $data_row['name_last'];
 		$row[] = $data_row['hour_type_id'];
 		$row[] = $data_row['hrs'];
+		if ($total_withheld) {
+			$row[] = $currency->render_amt($data_row['withheld']);
+		}
 		$rows[] = $row;
 	}
 
@@ -42,6 +49,9 @@ function sirius_smf_feed_ehrs_post_form($form, &$form_state, $info, $data, $wiza
 		$total_row[] = '';
 		$total_row[] = '';
 		$total_row[] = '<strong>' . number_format($total_hrs, 2) . '</strong>';
+		if ($total_withheld) {
+			$total_row[] = '<strong>' . $currency->render_amt($total_withheld) . '</strong>';
+		}
 		$rows[] = $total_row;
 
 		$html .= '<p>';
@@ -55,6 +65,9 @@ function sirius_smf_feed_ehrs_post_form($form, &$form_state, $info, $data, $wiza
 		$header[] = t('Last Name');
 		$header[] = t('Status');
 		$header[] = t('Hours This Month');
+		if ($total_withheld) {
+			$header[] = t('Withheld');
+		}
 
 		$html .= sirius_table_render($header, $rows);
 		$form['intro'] = array('#markup' => $html);
@@ -105,6 +118,24 @@ function sirius_smf_feed_ehrs_post_form_submit($form, &$form_state) {
 function sirius_smf_feed_ehrs_post_form_submit_complete($wizard_node, $info, $data, $current_step, &$context) {
 	sirius_require('sirius_smf', 'sirius_smf.ehrs.inc');
 	sirius_smf_feed_ehrs_load_includes();
+
+	// Post withholding
+	$eup_node = sirius_smf_feed_ehrs_get_eup($wizard_node);
+	if ($eup_node) {
+		$allocate = array('total' => 0);
+		foreach ($data['records']['rows'] as $row) {
+			if (!$row['withheld']) { continue; }
+
+			$allocate['workers'][$row['worker_nid']] = $row['withheld'];
+			$allocate['total'] += $row['withheld'];
+		}
+
+		$eup_json = sirius_json_get($eup_node);
+		$eup_json['allocate'] = $allocate;
+		sirius_json_set($eup_node, $eup_json);
+		node_save($eup_node);
+	}
+
 
 	drupal_set_message("Hour upload saved.");
 	sirius_wizard_submit($info, $data, $wizard_node, $current_step, "Hours upload has been confirmed, and charges have been generated.", array('nonsequential' => FALSE, 'feed_status' => 'complete'));
@@ -260,9 +291,6 @@ function sirius_smf_feed_ehrs_post_form_hrs_batch($wizard_node, $info, $data, $c
 			if (!$result->success()) { $result->drupalSetMessage(); }
 		}
 	}
-
-
-
 
   if ($row['addr_thoroughfare'] && $row['addr_locality'] && $row['addr_administrative_area'] && $row['addr_postal_code']) {
 		$newval = sirius_worker_address_canonicalize(

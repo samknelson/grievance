@@ -30,6 +30,9 @@ class Sirius_Smf_Report_Electionrequest extends Report_Cache_Report_Generator {
     $cols = sirius_addr_cols();
     foreach ($cols as $col => $title) { $fields["worker_address_$col"] = $title; }
 
+    $fields['employer_nid'] = 'Employer NID';
+    $fields['employer_name'] = 'Employer Name';
+
     return $fields;
   }
 
@@ -61,6 +64,8 @@ class Sirius_Smf_Report_Electionrequest extends Report_Cache_Report_Generator {
         'no_fieldsets' => TRUE,
       )
     );
+
+    if (!$html) { $html = '&nbsp;'; }
 
     return $html;
   }
@@ -110,6 +115,8 @@ class Sirius_Smf_Report_Electionrequest extends Report_Cache_Report_Generator {
 
     $rows = array();
     foreach ($worker_nids as $worker_nid) {
+      $row = array();
+
       $worker_node = node_load($worker_nid);
 
       if ($exclude_tag_tid) {
@@ -117,6 +124,14 @@ class Sirius_Smf_Report_Electionrequest extends Report_Cache_Report_Generator {
         $tag_tids = sirius_contact_tags_get($contact_node);
         if (in_array($exclude_tag_tid, $tag_tids)) { continue; }
       }
+
+      $sql = "select employer_nid from sirius_hours_cache ";
+      $sql .= "where worker_nid = :worker_nid ";
+      $sql .= "order by year desc, month desc, day desc limit 1";
+      $stmt = sirius_sql_query($sql, array(':worker_nid' => $worker_nid));
+      $hr = $stmt->fetchAssoc();
+      $row['employer_nid'] = $hr['employer_nid'];
+      $row['employer_name'] = sirius_node_title($row['employer_nid']);
 
       $elig_plugin_info = sirius_trust_eligibility_plugin_info('smf-buildup');
       $settings = array();
@@ -143,6 +158,10 @@ class Sirius_Smf_Report_Electionrequest extends Report_Cache_Report_Generator {
       foreach ($cols as $col => $title) {
         $row["worker_address_$col"] = $worker_node->field_sirius_address['und'][0][$col];
       }
+
+      // $row['employer_nid'] = $election_node->field_grievance_shop['und'][0]['target_id'];
+      // $row['employer_name'] = sirius_node_title($row['employer_nid']);
+
       $rows[$worker_nid] = $row;
     }
 

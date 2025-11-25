@@ -51,7 +51,21 @@ function sirius_smf_feed_ehrs_info() {
   return $items;
 }
 
-function sirius_smf_feed_ehrs_fields() {
+function sirius_smf_feed_ehrs_feed_is_primary($feed_node) {
+  $eup_node = sirius_smf_feed_ehrs_get_eup($feed_node);
+  if (!$eup_node) { return FALSE; }
+
+  $ehrs_monthly = Sirius_Smf_Ehrs_Monthly::getInstance();
+  if ($ehrs_monthly->feed_type_correction() == $feed_node->field_sirius_type['und'][0]['value']) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+function sirius_smf_feed_ehrs_fields($info, $data, $feed_node, $current_step) {
+  $feed_is_primary = sirius_smf_feed_ehrs_feed_is_primary($feed_node);
+
   $fields = array();
   $fields['ssn'] = array(
     'title' => 'SSN',
@@ -86,6 +100,12 @@ function sirius_smf_feed_ehrs_fields() {
     'taxonomy' => 'sirius_hour_type',
   );
   $fields['hrs'] = array('title' => 'Hours');
+
+  // Withholding only available for primary feeds, not corrections
+  if ($feed_is_primary) {
+    $fields['withheld'] = array('title' => 'Employee Contribution Amount Witheld');
+  }
+
   return $fields;
 }
 

@@ -181,6 +181,12 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
   if (!is_numeric($hrs)) { $errors[] = 'Please enter a numeric for hours.'; }
   if ($hrs < 0) { $errors[] = 'Please enter a positive value for hours.'; }
 
+  $withheld = $row['withheld'];
+  if ($withheld) {
+	  if (!is_numeric($withheld)) { $errors[] = 'Please enter a numeric for withholding.'; }
+	  if ($withheld < 0) { $errors[] = 'Please enter a positive value for withholding.'; }
+	}
+
   // Look up the worker
   $worker_node = sirius_smf_feed_ehrs_worker_lookup($feed_node, $info, $data, $row);
   if ($worker_node) { $row['worker_nid'] = $worker_node->nid; }
