@@ -39,6 +39,7 @@ function unite_feed_actor_info() {
         'address_country' => array('group' => 'location', 'title' => 'Country',),
         'phone' => array('group' => 'location', 'type' => 'text'),
         'notes' => array('group' => 'core', 'type' => 'long'),
+        'public' => array('group' => 'core', 'type' => 'list'),
      ),
       'batch_size' => 10,
       'callback_row_verify' => 'unite_feed_actor_row_verify',
