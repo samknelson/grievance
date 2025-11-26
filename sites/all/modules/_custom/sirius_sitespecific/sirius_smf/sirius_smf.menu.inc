@@ -141,6 +141,16 @@ function sirius_smf_node_tabs() {
     'skip_node_view_check' => TRUE,
   );
 
+  $node_tabs['sirius_log']['sirius_smf_ea_workers'] = array(
+    'title' => 'Workers',
+    'description' => '',
+    'callback' => 'sirius_smf_node_tab_ea_workers',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+    'file' => 'sirius_smf.page_ea_workers.inc',
+    'skip_node_view_check' => TRUE,
+  );
+
   //
   // Oneoffs
   //
@@ -207,9 +217,15 @@ function sirius_smf_node_tabs() {
     'weight' => 12,
   );
 
-
-
-
+  $node_tabs['sirius_payment']['sirius_payment_allocate/ehrs'] = array(
+    'title' => 'Employer Upload',
+    'callback' => 'sirius_smf_node_tab_payment_ehrs_allocate',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_smf.page_payment_ehrs_allocate.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 12,
+  );
 
   sirius_node_tab_set_module('sirius_smf', $node_tabs);
 	return $node_tabs;
