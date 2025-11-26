@@ -254,8 +254,8 @@ function sirius_ledger_payments_render($payment_nodes, $options = array()) {
 				$has_tools = TRUE;
 			}
 
-			if (drupal_valid_path('node/' . $payment_node->nid . '/sirius_payment_update')) {
-				$tools[] = l('Update', 'node/' . $payment_node->nid . '/sirius_payment_update', array('attributes' => array('class' => array('tool-button'))));
+			if (drupal_valid_path('node/' . $payment_node->nid . '/edit')) {
+				$tools[] = l('Edit', 'node/' . $payment_node->nid . '/edit', array('attributes' => array('class' => array('tool-button'))));
 				$has_tools = TRUE;
 			}
 		}
