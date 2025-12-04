@@ -5,6 +5,11 @@ trait SiriusCardcheckDefinition {
 		return sirius_log_handler($cardcheck_node, 'sirius_json_definition');
 	}
 
+	public function get_definition_by_id($id) {
+		$nodes = $this->definition_list(array('include_inactive' => TRUE, 'id' => $id));
+		return reset($nodes);
+	}
+
 	public function definition_list($options = array()) {
 		$domain_nid = sirius_domain_nid();
 
@@ -21,6 +26,10 @@ trait SiriusCardcheckDefinition {
 		}
 		if (!$options['include_inactive']) {
 			$sql .= "and json_extract(field_sirius_json_value, '\$.cardcheck_definition.active') = 'Yes' ";
+		}
+		if ($options['id']) {
+			$sql .= "and json_extract(field_sirius_json_value, '\$.cardcheck_definition.id') = :id ";
+			$sql_args[':id'] = $options['id'];
 		}
 		$sql .= "order by title ";
 
@@ -46,6 +55,12 @@ trait SiriusCardcheckDefinition {
 			'#type' => 'textfield',
 			'#title' => t('Title'),
 			'#default_value' => $definition['title'],
+		);
+
+		$form['cardcheck_definition']['id'] = array(
+			'#type' => 'textfield',
+			'#title' => t('ID'),
+			'#default_value' => $definition['id'],
 		);
 
 		$form['cardcheck_definition']['active'] = array(
