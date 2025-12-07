@@ -10,5 +10,9 @@ function sirius_btu_permission() {
       'title' => t('Sirius BTU BPS'), 
       'description' => t('Operate as a "super-employer", BPS, with access to *all* employers.'),
     ),
+    'sirius btu building rep' => array(
+      'title' => t('Sirius BTU Building Rep'), 
+      'description' => t('Operate as a "building rep".'),
+    ),
   );
 }
