@@ -18,8 +18,6 @@
 						result = handle_ajax_response(jqXHR, textStatus, 'info');
 						if (!result) { return; }
 
-						console.log(result['data']);
-
 						assignments = result['data']['assignments'];
 						crews = result['data']['crews'];
 
@@ -123,6 +121,7 @@
 
 						if (!workers.length) { return; }
 
+						rating_type_tid = $('#sirius_edls_worker_filter_rating_type_tid').val();
 						for (i=0; i<workers.length; ++i) {
 							worker = workers[i];
 
@@ -170,7 +169,7 @@
 
 							html += '</span>';
 
-							if (settings['show_rating']) {
+							if (rating_type_tid) {
 								html += '<span class="sirius_edls_worker_rating sirius_worker_rating_stars">';
 								rating = worker['rating'];
 								if (!rating) { rating = 0; }
@@ -182,6 +181,8 @@
 									}
 								}
 								html += '</span>';
+							} else {
+								html += '<span class="sirius_edls_worker_rating sirius_worker_rating_stars"></span>';
 							}
 
 							if (settings['show_worker_link']) {
