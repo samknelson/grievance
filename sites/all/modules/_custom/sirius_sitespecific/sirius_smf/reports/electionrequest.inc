@@ -93,7 +93,7 @@ class Sirius_Smf_Report_Electionrequest extends Report_Cache_Report_Generator {
   public function batch($worker_nids, $values, &$context) {
     $employer_industry_map = &drupal_static(__FUNCTION__);
 
-    // For buildup, we need an employer. Assum COBRA employer for no good reas.
+    // For buildup, we need an employer. Assume COBRA employer for no good reas.
     $cobra = Sirius_Trust_Cobra::getInstance();
     $employer_node = $cobra->cobra_employer();
     $policy_node = sirius_ledger_policy_lookup(NULL, $employer_node);
@@ -139,6 +139,7 @@ class Sirius_Smf_Report_Electionrequest extends Report_Cache_Report_Generator {
       $params['employer_node'] = $employer_node;
       $params['policy_node'] = $policy_node;
       $params['subscriber_worker_node'] = $worker_node;
+      $params['is_election'] = TRUE;
       $result = SiriusResult::create($elig_plugin_info['instance']->check($settings, $params));
       if (!$result->success()) { continue; }
 
