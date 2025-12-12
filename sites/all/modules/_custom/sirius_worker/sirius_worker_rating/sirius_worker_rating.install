@@ -9,11 +9,12 @@ function sirius_worker_rating_update_7001() {
     '
 create table sirius_worker_rating_cache (
   worker_nid integer, 
-  index(worker_nid),
   rating_type_tid integer,
-  index(rating_type_tid),
   value integer,
-  unique(worker_nid, rating_type_tid)
+  UNIQUE KEY worker_nid_2 (worker_nid, rating_type_tid),
+  KEY worker_nid (worker_nid),
+  KEY rating_type_tid (rating_type_tid),
+  KEY sirius_worker_rating_cache_i1 (worker_nid,rating_type_tid)
 );
     ',
 
