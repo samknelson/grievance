@@ -15,13 +15,41 @@ function sirius_node_tab_dispatch_job_1for1_list_form($form, &$form_state, $job_
 
 	$form_state['job_nid'] = $job_node->nid;
 
-	$form_state['job_nid'] = $job_node->nid;
+	$for1 = sirius_dispatch_elig_instance('1for1');
+  $data = $for1->for1_data($job_node);
 
-	$plugin = sirius_dispatch_elig_instance('1for1');
-  $data = $plugin->for1_data($job_node);
+  $statuses = $for1->for1_statuses();
 
-  $statuses = $plugin->for1_statuses();
+	$html = '<h2>' . 'Extra Slots' . '</h2>';
 
+	$total = $for1->extraslots_get_total($job_node);
+	$dispatch_nids = $for1->extraslots_dispatch_nids($job_node);
+	if ($dispatch_nids) {
+		$rows = array();
+
+		$count = 0;
+		foreach ($dispatch_nids as $dispatch_nid) {
+			++$count;
+
+			$dispatch_node = node_load($dispatch_nid);
+			$row = array();
+			$row[] = $count;
+			$row[] = sirius_node_title($dispatch_node->field_sirius_worker['und'][0]['target_id']);
+			$rows[] = $row;
+		}
+
+		while ($count < $total) {
+			++$count;
+			$row = array();
+			$row[] = $count;
+			$row[] = '';
+			$rows[] = $row;
+		}
+		$html .= sirius_table_render(array('Slot', 'Replaced By'), $rows);
+	}
+	$form['extraslots'] = array('#markup' => $html);
+
+	$form['list_intro'] = array('#markup' => '<h2>' . t('Replaced workers') . '</h2>');
   $header = array();
   $header['id'] = t('ID');
   $header['name'] = t('Name');
@@ -73,7 +101,7 @@ function sirius_node_tab_dispatch_job_1for1_list_form($form, &$form_state, $job_
 function sirius_node_tab_dispatch_job_1for1_list_form_submit($form, &$form_state) {
 	$job_node = node_load($form_state['job_nid']);
 
-	$plugin = sirius_dispatch_elig_instance('1for1');
+	$for1 = sirius_dispatch_elig_instance('1for1');
 
 	$worker_nids = array_filter(array_values($form_state['values']['worker_nids']));
 	if (!$worker_nids) {
@@ -83,7 +111,7 @@ function sirius_node_tab_dispatch_job_1for1_list_form_submit($form, &$form_state
 
 	foreach ($worker_nids as $worker_nid) {
 		$worker_node = node_load($worker_nid);
-		$result = $plugin->for1_remove($job_node, $worker_node, $form_state['values']['force']);
+		$result = $for1->for1_remove($job_node, $worker_node, $form_state['values']['force']);
 		if (!$result['success']) {
 			drupal_set_message($result['msg'], 'error');
 		} else {
