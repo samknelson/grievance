@@ -27,6 +27,33 @@ function sirius_node_tab_dispatch_job_1for1_add_form($form, &$form_state, $job_n
     '#value' => t('Submit'),
   );
 
+  if (sirius_domain_component_enabled('worker:tos')) {
+    $employer_nid = $job_node->field_grievance_shop['und'][0]['target_id'];
+    if ($employer_nid) {
+      $tos = Sirius_Worker_Tos::getInstance();
+
+      // Get the list of active ToS records
+      $search_params = array();
+      $search_params['employer_nid'] = $employer_nid;
+      $search_params['status'] = 'active';
+      $tos_nodes = $tos->search($search_params);
+
+      $rows = array();
+      foreach ($tos_nodes as $tos_nid => $tos_node) {
+        $worker_node = sirius_log_handler($tos_node, 'sirius_worker');
+        $row = array();
+        $row[] = $worker_node->field_sirius_id['und'][0]['value'];
+        $row[] = $worker_node->title;
+        $rows[] = $row;
+      }
+      if ($rows) {
+        $html = '<h2>' . t('Active Call-Outs') . '</h2>';
+        $html .= sirius_table_render(array('Badge ID', 'Worker'), $rows);
+        $form['tos'] = array('#markup' => $html);
+      }
+    }
+  }
+
   return $form;
 }
 
