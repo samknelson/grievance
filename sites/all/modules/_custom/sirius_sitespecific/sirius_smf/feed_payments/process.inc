@@ -1,7 +1,6 @@
 <?php
 
 function sirius_smf_feed_payments_row_process($feed_node, $info, $data, $row) {
-
 	$result = sirius_smf_feed_payments_row_verify($feed_node, $info, $data, $row, TRUE);
 	if (!$result['success']) { return $result; }
   $warnings = $result['warnings'];
@@ -38,8 +37,17 @@ function sirius_smf_feed_payments_row_process($feed_node, $info, $data, $row) {
   $payment_node->field_sirius_notes['und'][0]['value'] = $row['field_sirius_notes'];
   $payment_node->field_sirius_ledger_account['und'][0]['target_id'] = $data['account_nid'];
   $payment_node->field_sirius_payer['und'][0]['target_id'] = $row['payer_nid'];
+  if ($row['field_sirius_datetime']) {
+    $payment_node->field_sirius_datetime['und'][0]['value'] = 
+      $payment_node->field_sirius_datetime_created['und'][0]['value'] = 
+        date('Y-m-d 12:00:00', strtotime($row['field_sirius_datetime'] . ' PST'));
+  }
+  $payment_node->field_sirius_payment_type['und'][0]['tid'] = $row['field_sirius_payment_type'];
 
 	$payment_node = node_submit($payment_node);
+
+  sirius_ledger_payment_set_title($payment_node);
+
   node_save($payment_node);
 
   if ($is_new) { $msg = 'Created a new payment.'; } else { $msg = 'Updated an existing payment.'; }

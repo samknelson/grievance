@@ -77,6 +77,15 @@ function sirius_smf_feed_payments_fields() {
     'title' => 'Check Number',
   );
 
+  $fields['field_sirius_check_number'] = array(
+    'title' => 'Check Number',
+  );
+
+  $fields['field_sirius_datetime'] = array(
+    'title' => 'Date',
+    'type' => 'date',
+  );
+
   return $fields;
 }
 

@@ -40,6 +40,13 @@ function sirius_smf_feed_payments_row_verify($feed_node, $info, &$data, &$row, $
 
 	$result = sirius_feed_lookup_by_field('sirius_payment', 'field_data_field_sirius_id', 'field_sirius_id_value', $id);
 
+  if ($row['field_sirius_datetime'] !== '') {
+    $ts = strtotime($row['field_sirius_datetime']);
+    if ($ts === FALSE) {
+      return array('success' => FALSE, 'msg' => 'Please enter a valid date.');
+    }
+  }
+
   if ($result['success']) {
     $row['payment_nid'] = $result['nid'];
     $msg = "An existing payment will be updated.";
@@ -52,6 +59,16 @@ function sirius_smf_feed_payments_row_verify($feed_node, $info, &$data, &$row, $
       return $result;
     }
   }
+
+  $payment_types = sirius_taxonomy_load('sirius_payment_type', 'tid', 'name');
+  foreach ($payment_types as $tid => $name) {
+    if (!preg_match('/offline\s*payment/i', $name)) { continue; }
+    $payment_type_tid = $tid;
+  }
+  if (!$payment_type_tid) {
+    return array('success' => FALSE, 'msg' => 'Please make sure that there is a payment type called "offline payment".');
+  }
+  $row['field_sirius_payment_type'] = $payment_type_tid;
 
   return array('success' => TRUE, 'msg' => $msg);
 
