@@ -122,7 +122,7 @@ function unite_relationships_render_property($property_node, $options = array())
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'property_actor');
   $query->fieldCondition('field_property', 'target_id', $property_node->nid);
-  $query->range(0,1000);
+  $query->range(0,100);
   $stmt = $query->execute();
   if ($stmt['node']) {
   	$pa_nodes = node_load_multiple(array_keys($stmt['node']));
@@ -245,7 +245,7 @@ function unite_relationships_render_actor($actor_node, $options = array()) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'property_actor');
   $query->fieldCondition('field_actor', 'target_id', $actor_node->nid);
-  $query->range(0,1000);
+  $query->range(0,100);
   $stmt = $query->execute();
   if ($stmt['node']) {
   	$pa_nodes = node_load_multiple(array_keys($stmt['node']));
