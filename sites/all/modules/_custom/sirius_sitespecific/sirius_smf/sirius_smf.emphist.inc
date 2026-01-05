@@ -86,6 +86,8 @@ function sirius_smf_emphist_from_hours($worker_nid) {
     $first_hours_by_industry[$industry_tid] = $date;
   }
 
+  $first_hours_anywhere = min($first_hours_by_industry);
+
   // Figure out the correct member status
   sirius_minilog("Computing member status");
   sirius_minilog_indent();
@@ -109,7 +111,7 @@ function sirius_smf_emphist_from_hours($worker_nid) {
       } else if ($industry_id == 'R') {
         $ms_id = 'R60';
       } else if ($industry_id == 'E') {
-        if (time() - strtotime($first_hours_by_industry[$industry_tid]) > 60*60*24*365*5) {
+        if (time() - strtotime($first_hours_anywhere) > 60*60*24*365*5) {
           $ms_id = 'E80';
         } else {
           $ms_id = 'E100';

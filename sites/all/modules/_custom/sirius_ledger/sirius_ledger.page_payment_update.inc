@@ -39,7 +39,7 @@ function sirius_ledger_node_tab_payment_update_form($form, &$form_state, $paymen
 
   $form['payment']['notes'] = array(
     '#title' => t('Memo'),
-		'#type' => 'textfield',
+		'#type' => 'textarea',
 		'#default_value' => $payment_node->field_sirius_notes['und'][0]['value'],
   );
 

@@ -66,6 +66,28 @@ function sirius_smf_sirius_cron_scan_info() {
 }
 
 /**
+ * Implements hook_sirius_dashboard_info
+ */
+
+function sirius_smf_sirius_dashboard_plugin_info() {
+  $plugins = array();
+
+  $plugins['smf_payments_pending'] = array(
+    'title' => 'SMF: Payments Pending',
+    'description' => '',
+    'file' => 'sirius_smf.dashboard_payments_pending.inc',
+    'module' => 'sirius_smf',
+    'callbacks' => array(
+      'data' => 'sirius_smf_dashboard_payments_pending_data',
+      // 'config' => 'sirius_trust_dashboard_plugin_elections_config',
+      // 'prefs' => 'sirius_trust_dashboard_plugin_elections_prefs',
+    ),
+  );
+
+  return $plugins;
+}
+
+/**
  * Implements hook_sirius_denorm
  */
 

@@ -52,6 +52,12 @@ class Sirius_Dispatch_1for1 extends Sirius_Dispatch_Elig_Plugin {
 		$worker_nid = $dispatch_node->field_sirius_worker['und'][0]['target_id'];
 		$data = $this->for1_data($job_node);
 
+		// First try to use the extra slots
+		$result = $this->extraslots_replace($job_node, $dispatch_node);
+		if ($result['success']) {
+			return $result;
+		}
+
 		// Replace the next "ready" worker
 		$found = FALSE;
 		foreach ($data as $candidate => $record) {
@@ -179,5 +185,83 @@ class Sirius_Dispatch_1for1 extends Sirius_Dispatch_Elig_Plugin {
 		unset($data[$worker_node->nid]);
 		$this->for1_data_set($job_node, $data);
 		return array('success' => TRUE, 'msg' => 'Worker ' . $worker_node->title . ' has been removed.');
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public function extraslots_set_total($job_node, $total) {
+		if ($total === '' || $total === null) { $total = 0; }
+	
+		if (!is_numeric($total) || ((int)$total != $total) || ($total < 0) || ($total > 10) ) {
+			return array('success' => FALSE, 'msg' => 'Please enter an integer between 0 and 10.');
+		}
+
+		$job_json = sirius_json_get($job_node);
+		$job_json['1for1']['extraslots']['total'] = $total;
+		sirius_json_set($job_node, $job_json);
+		node_save($job_node);
+
+		return array('success' => TRUE, 'msg' => "Extra slots set to $total.");
+	}
+
+	public function extraslots_get_total($job_node) {
+		$job_json = sirius_json_get($job_node);
+		return $job_json['1for1']['extraslots']['total'];
+	}
+
+	public function extraslots_available($job_node) {
+		$total = $this->extraslots_get_total($job_node);
+		if (!$total) { return 0; }
+
+		$dispatch_nids = $this->extraslots_dispatch_nids($job_node);
+		foreach ($dispatch_nids as $dispatch_nid) {
+			/*
+			$dispatch_node = node_load($dispatch_nid);
+			$status = $dispatch_node->field_sirius_dispatch_status['und'][0]['value'];
+			if (!in_array($status, array('accepted', 'accepted_secondary'))) { continue; }
+			*/
+			
+			--$total;
+		}
+
+		return $total;
+	}
+
+	public function extraslots_dispatch_nids($job_node) {
+		$job_json = sirius_json_get($job_node);
+		$dispatch_nids = $job_json['1for1']['extraslots']['dispatches'];
+		if (!$dispatch_nids) { $dispatch_nids = array(); }
+		return $dispatch_nids;
+	}
+
+	public function extraslots_replace($job_node, $dispatch_node) {
+		$available = $this->extraslots_available($job_node);
+		if ($available <= 0) { return array('success' => FALSE, 'msg' => 'No extra slots are available.'); }
+
+		$job_json = sirius_json_get($job_node);
+		$job_json['1for1']['extraslots']['dispatches'][$dispatch_node->nid] = $dispatch_node->nid;
+		sirius_json_set($job_node, $job_json);
+		node_save($job_node);
+
+		$log_category = '1for1';
+		$log_type = 'replace';
+		$log_msg = 'Replaced extra slot';
+		$handlers = array();
+		$handlers[] = $dispatch_node->nid;
+		$handlers[] = $job_node->nid;
+		$handlers[] = $job_node->field_grievance_shop['und'][0]['target_id'];
+		$log_node = sirius_log($log_category, $log_type, $log_msg, '', '', $handlers);
+
+		return array('success' => TRUE, 'msg' => 'Replaced extra slot');
 	}
 }

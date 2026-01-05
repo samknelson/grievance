@@ -149,6 +149,17 @@ function sirius_dispatch_node_tabs() {
     'component' => 'dispatch:live',
   );
 
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_1for1/extra'] = array(
+    'title' => 'Extra Slots',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_job_1for1_extraslots',
+    'permissions' => array('sirius'),
+    'skip_node_view_check' => TRUE,
+    'weight' => 2,
+    'file' => 'sirius_dispatch.page_job_1for1_extraslots.inc',
+    'component' => 'dispatch:live',
+  );
+
   $node_tabs['sirius_dispatch']['sirius_dispatch_payrate'] = array(
     'title' => 'Pay Rate',
     'description' => '',

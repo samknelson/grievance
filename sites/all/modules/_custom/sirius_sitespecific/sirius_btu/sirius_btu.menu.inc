@@ -49,6 +49,15 @@ function sirius_btu_node_tabs() {
     'weight' => 2,
   );
 
+  $node_tabs['grievance_shop']['cardchecks'] = array(
+    'title' => 'Missing Card Checks',
+    'callback' => 'sirius_btu_node_tab_employer_cardchecks',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_btu.page_employer_cardchecks.inc',
+    'component' => 'cardcheck',
+    'weight' => 5,
+  );
+
   sirius_node_tab_set_module('sirius_btu', $node_tabs);
 
   return $node_tabs;
