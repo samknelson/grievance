@@ -1,5 +1,7 @@
 <?php
 
+// DEFUNCT
+
 function unite_local_acquire() {
 	return drupal_get_form('unite_local_acquire_form', $node);
 }
@@ -101,31 +103,8 @@ function unite_local_acquire_form_validate($form, &$form_state) {
 }
 
 function unite_local_acquire_form_submit($form, &$form_state) {
+	drupal_set_message("Disabled", 'error');
+	return;
 	// All done.
 	$form_state['rebuild'] = 1;
-
-	list($acquire_source_node, $acquire_target_node) = unite_local_acquire_form_get_locals($form, $form_state);
-
-	$stmt = db_update('field_data_field_local');
-	$stmt->condition('entity_type', 'node');
-	$stmt->condition('bundle', 'property');
-	$stmt->condition('field_local_target_id', $acquire_target_node->nid);
-	$stmt->fields(array('field_local_target_id' => $acquire_source_node->nid));
-	$count = $stmt->execute();
-
-	$stmt = db_update('field_revision_field_local');
-	$stmt->condition('entity_type', 'node');
-	$stmt->condition('bundle', 'property');
-	$stmt->condition('field_local_target_id', $acquire_target_node->nid);
-	$stmt->fields(array('field_local_target_id' => $acquire_source_node->nid));
-	$other_count = $stmt->execute();
-
-	field_cache_clear();
-
-	drupal_set_message(
-		$acquire_source_node->title . 
-		t(' has acquired ') . 
-		$count . 
-		t(' properties from ') . 
-		$acquire_target_node->title);
 }
