@@ -56,12 +56,8 @@ function unite_feed_property_info() {
         'fax' => array('group' => 'location', 'type' => 'text'),
         'msa' => array('group' => 'location', 'type' => 'term_reference', 'taxonomy' => 'msa'),
 
-        'local' => array('group' => 'contract', 'type' => 'entity_reference', 'entity_type' => 'local'),
         'hotel_contract_covered' => array('group' => 'contract', 'type' => 'integer'),
         'union_status' => array('group' => 'contract', 'type' => 'list'),
-        'union_other' => array('group' => 'contract', 'type' => 'text',),
-        'hotel_contract_start_date' => array('group' => 'contract', 'type' => 'date'),
-        'hotel_contract_end_date' => array('group' => 'contract', 'type' => 'date'),
 
         'convention_center' => array('group' => 'convention', 'type' => 'entity_reference', 'entity_type' => 'hdb_convention_center'),
         'convention_center_attached' => array('group' => 'convention', 'type' => 'list'),
