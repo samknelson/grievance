@@ -425,13 +425,6 @@ function mightysearch_search_form_submit($form, &$form_state) {
 				$nid = l($nid, 'node/' . $nid);
 			}
 			$hr['nid'] = join(',', $nids);
-
-			$nids = $hr['local_node___nid'];
-			$nids = explode(',', $nids);
-			foreach ($nids as &$nid) {
-				$nid = l($nid, 'node/' . $nid);
-			}
-			$hr['local_node___nid'] = join(',', $nids);
 		}
 	}
 

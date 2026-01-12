@@ -236,7 +236,6 @@ function mightysearch_search_form($form, &$form_state) {
 			'property.address.administrative_area',
 			'property.address.thoroughfare',
 			'property.address.postal_code',
-			'local.title',
 			'property.development_status',
 			'property.union_status',
 			'owner.title',
