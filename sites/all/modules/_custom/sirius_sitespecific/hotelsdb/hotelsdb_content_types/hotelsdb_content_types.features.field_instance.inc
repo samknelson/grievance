@@ -1953,7 +1953,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_csno_book',
-    'label' => 'Sports Book?',
+    'label' => 'Retail Sports Betting?',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -2031,7 +2031,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_csno_online',
-    'label' => 'Online Betting?',
+    'label' => 'Online Sports Betting?',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -3239,102 +3239,6 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-property-field_hotel_contract_end_date'.
-  $field_instances['node-property-field_hotel_contract_end_date'] = array(
-    'bundle' => 'property',
-    'default_value' => array(),
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 61,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_hotel_contract_end_date',
-    'label' => 'Hotel Contract Expiration Date',
-    'required' => 0,
-    'settings' => array(
-      'default_value' => 'blank',
-      'default_value2' => 'same',
-      'default_value_code' => '',
-      'default_value_code2' => '',
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'date',
-      'settings' => array(
-        'increment' => 15,
-        'input_format' => 'm/d/Y - H:i:s',
-        'input_format_custom' => '',
-        'label_position' => 'above',
-        'no_fieldset' => 0,
-        'text_parts' => array(),
-        'year_range' => '-3:2050',
-      ),
-      'type' => 'date_popup',
-      'weight' => 37,
-    ),
-  );
-
-  // Exported field_instance: 'node-property-field_hotel_contract_start_date'.
-  $field_instances['node-property-field_hotel_contract_start_date'] = array(
-    'bundle' => 'property',
-    'default_value' => array(),
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 60,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_hotel_contract_start_date',
-    'label' => 'Hotel Contract Start Date',
-    'required' => 0,
-    'settings' => array(
-      'default_value' => 'blank',
-      'default_value2' => 'same',
-      'default_value_code' => '',
-      'default_value_code2' => '',
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'date',
-      'settings' => array(
-        'increment' => 15,
-        'input_format' => 'm/d/Y - H:i:s',
-        'input_format_custom' => '',
-        'label_position' => 'above',
-        'no_fieldset' => 0,
-        'text_parts' => array(),
-        'year_range' => '-3:+3',
-      ),
-      'type' => 'date_popup',
-      'weight' => 35,
-    ),
-  );
-
   // Exported field_instance: 'node-property-field_is_casino'.
   $field_instances['node-property-field_is_casino'] = array(
     'bundle' => 'property',
@@ -3527,46 +3431,6 @@ function hotelsdb_content_types_field_default_field_instances() {
       ),
       'type' => 'text_textfield',
       'weight' => 28,
-    ),
-  );
-
-  // Exported field_instance: 'node-property-field_local'.
-  $field_instances['node-property-field_local'] = array(
-    'bundle' => 'property',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 57,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_local',
-    'label' => 'Local With Jurisdiction',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'entityreference',
-      'settings' => array(
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
-      ),
-      'type' => 'entityreference_autocomplete',
-      'weight' => 32,
     ),
   );
 
@@ -4012,45 +3876,6 @@ function hotelsdb_content_types_field_default_field_instances() {
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget_raw',
       'weight' => 31,
-    ),
-  );
-
-  // Exported field_instance: 'node-property-field_union_other'.
-  $field_instances['node-property-field_union_other'] = array(
-    'bundle' => 'property',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => 'Enter the name of any non-UNITE HERE Union, e.g. "IBT". If the local is known, include that as well, i.e. "IBT 631".',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 59,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_union_other',
-    'label' => 'Other Union',
-    'required' => 0,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'size' => 60,
-      ),
-      'type' => 'text_textfield',
-      'weight' => 34,
     ),
   );
 
@@ -5669,7 +5494,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     'label' => 'Contract End Date',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -5725,7 +5550,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     'label' => 'Contract Start Date',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -5859,7 +5684,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     'label' => 'Organizing Agreement End Date',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -5915,7 +5740,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     'label' => 'Organizing Agreement Start Date',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -6010,7 +5835,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     'label' => 'Represented End Date',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -6066,7 +5891,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     'label' => 'Represented Start Date',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -6402,7 +6227,6 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Employees Claimed');
   t('Employer ID');
   t('End date');
-  t('Enter the name of any non-UNITE HERE Union, e.g. "IBT". If the local is known, include that as well, i.e. "IBT 631".');
   t('Event Space');
   t('FairHotel Last Updated');
   t('FairHotel Notes');
@@ -6412,8 +6236,6 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Format as <em>ddd-ddd-dddd</em>');
   t('Format as: <em>ddd-ddd-dddd</em>');
   t('Horse Racing?');
-  t('Hotel Contract Expiration Date');
-  t('Hotel Contract Start Date');
   t('Hotel?');
   t('ID');
   t('Initial Balance');
@@ -6427,7 +6249,6 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Legacy ID');
   t('Level of Service');
   t('Loan Number / ID');
-  t('Local With Jurisdiction');
   t('MEG');
   t('MSA');
   t('Master Servicer');
@@ -6440,13 +6261,12 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Nonunion Exceptions');
   t('Notes');
   t('On public land');
-  t('Online Betting?');
+  t('Online Sports Betting?');
   t('Operator Last Updated');
   t('Organizing Agreement End Date');
   t('Organizing Agreement Start Date');
   t('Organizing Agreement?');
   t('Origination Date');
-  t('Other Union');
   t('Outdoor Event Area (sf)');
   t('Outdoor Event Space?');
   t('Owner Last Updated');
@@ -6470,6 +6290,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Represented End Date');
   t('Represented Start Date');
   t('Represented?');
+  t('Retail Sports Betting?');
   t('Rooms');
   t('Sales price');
   t('Search Body');
@@ -6483,7 +6304,6 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Source for Loan Data As Of');
   t('Sources / Notes');
   t('Special Servicer');
-  t('Sports Book?');
   t('Start date');
   t('Status');
   t('Terminal / Floor');
