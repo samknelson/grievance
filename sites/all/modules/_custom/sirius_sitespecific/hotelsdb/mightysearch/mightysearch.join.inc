@@ -23,7 +23,7 @@ function mightysearch_join(&$query, &$already_joined, $schema, $table, $field) {
 	//
 	
 	$simple_joins = array(
-		'local' => 'local', 
+		// 'local' => 'local', 
 	);
 	if ($simple_joins[$table]) {
 		if (!$already_joined["field_data_field_${table}"]) {

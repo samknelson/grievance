@@ -122,6 +122,7 @@ function unite_relationships_render_property($property_node, $options = array())
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'property_actor');
   $query->fieldCondition('field_property', 'target_id', $property_node->nid);
+  $query->range(0,100);
   $stmt = $query->execute();
   if ($stmt['node']) {
   	$pa_nodes = node_load_multiple(array_keys($stmt['node']));
@@ -244,6 +245,7 @@ function unite_relationships_render_actor($actor_node, $options = array()) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'property_actor');
   $query->fieldCondition('field_actor', 'target_id', $actor_node->nid);
+  $query->range(0,100);
   $stmt = $query->execute();
   if ($stmt['node']) {
   	$pa_nodes = node_load_multiple(array_keys($stmt['node']));
@@ -267,12 +269,9 @@ function unite_relationships_render_actor($actor_node, $options = array()) {
 
 	$header = array(
 		'entity_1' => t('Property'),
-		'relationship_type' => t('Relationship'),
-		'ownership' => t('Summary'),
-		'rooms' => t('Rooms'),
-		'city' => t('City'),
-		'state' => t('State'),
-		'union_status' => t('Union Status'),
+		'relationship_type' => t('Relationship Type'),
+		'ownership' => t('Details'),
+		'city' => t('City, State'),
 		'tools' => 'Tools',
 	);
 
@@ -295,14 +294,27 @@ function unite_relationships_render_actor($actor_node, $options = array()) {
 		$tools .= l('Edit Relationship', 'node/' . $pa_node->nid . '/edit', array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
 
 		$ownership = unite_relationships_render_ownership($pa_node);
+		$union = unite_relationships_render_union($pa_node);
+
+		$name = $actor_node->title;
+
+		$notes = array();
+		$notes[] = substr($pa_node->field_notes['und'][0]['value'], 0, 200);
+		$parent_nids = sirius_fieldvals($actor_node, 'field_actors', 'target_id');
+		$notes[] = $pa_node->field_sublocation['und'][0]['value'];
+		foreach ($parent_nids as $parent_nid) {
+			$notes[] = l(sirius_node_title($parent_nid), "node/$parent_nid");
+		}
+		$notes[] = $ownership;
+		$notes[] = $union;
+		$notes = join('<br />', array_filter($notes));
 
 		$row = array();
 		$row[] = $property_node->title;
 		$row[] = $pa_node->field_relationship_type['und'][0]['value'];
-		$row[] = $ownership;
-		$row[] = $property_node->field_address['und'][0]['locality'];
-		$row[] = $property_node->field_address['und'][0]['administrative_area'];
-		$row[] = $union_status_lookup[$property_node->field_union_status['und'][0]['value']];
+		$row[] = $notes;
+		$row[] = $property_node->field_address['und'][0]['locality'] . '<br>' . $property_node->field_address['und'][0]['administrative_area'];
+		// $row[] = $union_status_lookup[$property_node->field_union_status['und'][0]['value']];
 		$row[] = $tools;
 		$rows[] = $row;
 	}

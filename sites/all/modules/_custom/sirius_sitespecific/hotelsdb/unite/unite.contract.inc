@@ -2,13 +2,5 @@
 
 function unite_contract_fields() {
 	return array(
-		/*
-		'field_local',
-		'field_union_status',
-		'field_union_other',
-		'field_hotel_contract_start_date',
-		'field_hotel_contract_end_date',
-		'field_hotel_contract_covered',
-		*/
 	);
 }

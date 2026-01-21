@@ -36,9 +36,9 @@ function mightysearch_mschema() {
 		'prompt' => 'Union Status',
 		'type' => 'text',
 	);
-	$schema['property']['fields']['union_other'] = array(
-		'prompt' => 'Other Union',
-		'type' => 'text',
+	$schema['property']['fields']['hotel_contract_covered'] = array(
+		'prompt' => 'Covered Workers',
+		'type' => 'integer',
 	);
 	$schema['property']['fields']['development_status'] = array(
 		'prompt' => 'Development Status',
@@ -117,21 +117,6 @@ function mightysearch_mschema() {
 		'col' => array(
 			'URL' => 'url',
 		),
-	);
-
-	$schema['property']['fields']['hotel_contract_start_date'] = array(
-		'prompt' => 'Hotel Contract Start Date',
-		'type' => 'date',
-	);
-
-	$schema['property']['fields']['hotel_contract_end_date'] = array(
-		'prompt' => 'Hotel Contract End Date',
-		'type' => 'date',
-	);
-
-	$schema['property']['fields']['hotel_contract_covered'] = array(
-		'prompt' => 'Hotel Contract Covered Workers',
-		'type' => 'integer',
 	);
 
 	$schema['property']['fields']['calc_owner_last_updated'] = array(
@@ -403,29 +388,6 @@ function mightysearch_mschema() {
 	$schema['owner']['fields']['title']['highlighted'] = 1;
 	$schema['operator']['fields']['title']['highlighted'] = 1;
 	
-	//
-	// Local Table
-	//
-	
-	$schema['local'] = array();
-	$schema['local']['table'] = array(
-		'prompt' => 'Local'
-	);
-
-	//
-	// Local Fields
-	//
-	
-	$schema['local']['fields'] = array();
-	$schema['local']['fields']['nid'] = array(
-		'prompt' => 'ID',
-		'type' => 'text',
-	);
-	$schema['local']['fields']['title'] = array(
-		'prompt' => 'Name',
-		'type' => 'text',
-	);
-
 	//
 	// Brand fields
 	//

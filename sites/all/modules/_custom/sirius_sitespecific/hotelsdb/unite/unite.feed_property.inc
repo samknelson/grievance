@@ -34,13 +34,13 @@ function unite_feed_property_info() {
         'is_fs' => array('group' => 'core', 'title' => 'Food Service?', 'type' => 'list'),
 
 
-        'rooms' => array('group' => 'core', 'type' => 'integer'),
         'brand' => array('group' => 'core', 'type' => 'term_reference', 'taxonomy' => 'brand'),
-        'niche' => array('group' => 'core', 'type' => 'term_reference', 'taxonomy' => 'hdb_niche'),
         'development_status' => array('group' => 'core', 'type' => 'list'),
         'owner_of_record' => array('group' => 'core', 'type' => 'text'),
         'notes' => array('group' => 'core', 'type' => 'long'),
         'legacy_id' => array('group' => 'core', 'type' => 'text'),
+        'union_status' => array('group' => 'core', 'type' => 'list'),
+        'hotel_contract_covered' => array('group' => 'core', 'type' => 'integer'),
 
         'address_thoroughfare' => array('group' => 'location', 'title' => 'Address 1',),
         'address_premise' => array('group' => 'location', 'title' => 'Address 2',),
@@ -51,21 +51,14 @@ function unite_feed_property_info() {
         'on_public_land' => array('group' => 'location', 'type' => 'list'),
         'county' => array('group' => 'location', 'type' => 'text'),
         'neighborhood' => array('group' => 'location', 'type' => 'text'),
-        'pin' => array('group' => 'core', 'location' => 'text'),
+        'pin' => array('group' => 'location', 'location' => 'text'),
         'phone' => array('group' => 'location', 'type' => 'text'),
         'fax' => array('group' => 'location', 'type' => 'text'),
         'msa' => array('group' => 'location', 'type' => 'term_reference', 'taxonomy' => 'msa'),
 
-        'local' => array('group' => 'contract', 'type' => 'entity_reference', 'entity_type' => 'local'),
-        'hotel_contract_covered' => array('group' => 'contract', 'type' => 'integer'),
-        'union_status' => array('group' => 'contract', 'type' => 'list'),
-        'union_other' => array('group' => 'contract', 'type' => 'text',),
-        'hotel_contract_start_date' => array('group' => 'contract', 'type' => 'date'),
-        'hotel_contract_end_date' => array('group' => 'contract', 'type' => 'date'),
 
-        'convention_center' => array('group' => 'convention', 'type' => 'entity_reference', 'entity_type' => 'hdb_convention_center'),
-        'convention_center_attached' => array('group' => 'convention', 'type' => 'list'),
-
+        'niche' => array('group' => 'amenities', 'type' => 'term_reference', 'taxonomy' => 'hdb_niche'),
+        'rooms' => array('group' => 'amenities', 'type' => 'integer'),
         'fh_meeting_room_count' => array('group' => 'amenities', 'type' => 'integer'),
         'fh_meeting_room_capacity' => array('group' => 'amenities', 'type' => 'integer'),
         'fh_meeting_room_largest' => array('group' => 'amenities', 'type' => 'integer'),
@@ -76,6 +69,9 @@ function unite_feed_property_info() {
         'fh_parking_capacity' => array('group' => 'amenities', 'type' => 'integer'),
         'fh_outdoor' => array('group' => 'amenities', 'type' => 'list'),
         'fh_parking' => array('group' => 'amenities', 'type' => 'list'),
+
+        'convention_center' => array('group' => 'convention', 'type' => 'entity_reference', 'entity_type' => 'hdb_convention_center'),
+        'convention_center_attached' => array('group' => 'convention', 'type' => 'list'),
 
         'csno_type' => array('group' => 'casino', 'title' => 'Casino Type', 'type' => 'list'),
         'csno_slots_count' => array('group' => 'casino', 'title' => 'Slots count', 'type' => 'integer'),
