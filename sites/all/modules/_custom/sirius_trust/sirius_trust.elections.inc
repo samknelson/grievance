@@ -202,7 +202,12 @@ function sirius_trust_worker_election_scan($mode = 'test') {
 
 function sirius_trust_election_wizard_search($params) {
 	$sql_args = array();
-	$sql = "select nid, field_sirius_type_value, field_sirius_notes_value from node ";
+
+	if ($params['count_only']) {
+		$sql = "select count(distinct nid) as c from node ";
+	} else {
+		$sql = "select nid, field_sirius_type_value, field_sirius_notes_value from node ";
+	}
 	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_log_handler on field_data_field_sirius_log_handler.entity_type = 'node' and field_data_field_sirius_log_handler.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
@@ -228,18 +233,27 @@ function sirius_trust_election_wizard_search($params) {
 		$sql_args[':domain_nid'] = $domain_nid;
 	}
 
-	if ($params['order']) {
-		$sql .= "order by " . $params['order'] . ' ';
-	} else {
-		$sql .= "order by nid desc ";
+	if (!$params['count_only']) {
+		if ($params['order']) {
+			$sql .= "order by " . $params['order'] . ' ';
+		} else {
+			$sql .= "order by nid desc ";
+		}
+
+		if ($params['limit']) {
+			$sql .= "limit " . $params['limit'] . ' ';
+		} else {
+			$sql .= "limit 100 ";
+		}
 	}
 
-	if ($params['limit']) {
-		$sql .= "limit " . $params['limit'] . ' ';
-	} else {
-		$sql .= "limit 100 ";
-	}
 	$stmt = sirius_sql_query($sql, $sql_args);
+
+	if ($params['count_only']) {
+		$hr = $stmt->fetchAssoc();
+		return $hr['c'];
+	}
+
 	$results = array();
 	while ($hr = $stmt->fetchAssoc()) {
 		$results[$hr['nid']] = $hr;
