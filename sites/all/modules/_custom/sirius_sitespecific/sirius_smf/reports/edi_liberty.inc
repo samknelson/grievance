@@ -154,6 +154,7 @@ class Sirius_Smf_Report_Edi_Liberty extends Sirius_Trust_Provider_Edi_Report_Gen
     if (in_array($reltype_id, array('C', 'G', 'AC', 'H'))) { return '19'; }
     if (in_array($reltype_id, array('SP', 'DP'))) { return '01'; }
     if (in_array($reltype_id, array('QMSCO'))) { return 'G8'; }
+    if (in_array($reltype_id, array('SC'))) { return '19'; }
     return '';
   }
 
