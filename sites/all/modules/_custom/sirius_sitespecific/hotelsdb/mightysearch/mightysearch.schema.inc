@@ -160,7 +160,12 @@ function mightysearch_mschema() {
 	);
 
 	$schema['property']['fields']['csno_book'] = array(
-		'prompt' => 'Casino - Sports Book?',
+		'prompt' => 'Casino - Retail Sports Betting?',
+		'type' => 'text',
+	);
+
+	$schema['property']['fields']['csno_book_txt'] = array(
+		'prompt' => 'Casino - Retail Sports Betting - Operators',
 		'type' => 'text',
 	);
 
@@ -170,7 +175,42 @@ function mightysearch_mschema() {
 	);
 
 	$schema['property']['fields']['csno_online'] = array(
-		'prompt' => 'Casino - Online Betting?',
+		'prompt' => 'Casino - Online Sports Betting?',
+		'type' => 'text',
+	);
+
+	$schema['property']['fields']['csno_online_txt'] = array(
+		'prompt' => 'Casino - Online Sports Betting - Operators',
+		'type' => 'text',
+	);
+
+	$schema['property']['fields']['csno_igame'] = array(
+		'prompt' => 'Casino - iGaming?',
+		'type' => 'text',
+	);
+
+	$schema['property']['fields']['csno_igame_txt'] = array(
+		'prompt' => 'Casino - iGaming - operators',
+		'type' => 'text',
+	);
+
+	$schema['property']['fields']['csno_txt1'] = array(
+		'prompt' => 'Casino - Gaming Market',
+		'type' => 'text',
+	);
+
+	$schema['property']['fields']['csno_txt2'] = array(
+		'prompt' => 'Casino - State Gaming Revenue Report market region',
+		'type' => 'text',
+	);
+
+	$schema['property']['fields']['csno_txt3'] = array(
+		'prompt' => 'Casino - Nevada Gaming Control Location ID',
+		'type' => 'text',
+	);
+
+	$schema['property']['fields']['csno_txt4'] = array(
+		'prompt' => 'Casino - Nevada Gaming Control Area',
 		'type' => 'text',
 	);
 

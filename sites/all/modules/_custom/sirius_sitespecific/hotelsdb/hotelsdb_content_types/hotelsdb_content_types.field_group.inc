@@ -150,6 +150,14 @@ function hotelsdb_content_types_field_group_info() {
       7 => 'field_csno_horse',
       8 => 'field_csno_online',
       9 => 'field_csno_type',
+      10 => 'field_csno_book_txt',
+      11 => 'field_csno_online_txt',
+      12 => 'field_csno_igame',
+      13 => 'field_csno_igame_txt',
+      14 => 'field_csno_txt1',
+      15 => 'field_csno_txt2',
+      16 => 'field_csno_txt3',
+      17 => 'field_csno_txt4',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -187,6 +195,14 @@ function hotelsdb_content_types_field_group_info() {
       7 => 'field_csno_horse',
       8 => 'field_csno_online',
       9 => 'field_csno_type',
+      10 => 'field_csno_book_txt',
+      11 => 'field_csno_online_txt',
+      12 => 'field_csno_igame',
+      13 => 'field_csno_igame_txt',
+      14 => 'field_csno_txt1',
+      15 => 'field_csno_txt2',
+      16 => 'field_csno_txt3',
+      17 => 'field_csno_txt4',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -244,12 +260,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->data = array(
     'label' => 'Contract',
     'weight' => '8',
-    'children' => array(
-      0 => 'field_local',
-      1 => 'field_hotel_contract_start_date',
-      2 => 'field_hotel_contract_end_date',
-      3 => 'field_union_other',
-    ),
+    'children' => array(),
     'format_type' => 'fieldset',
     'format_settings' => array(
       'label' => 'Contract',

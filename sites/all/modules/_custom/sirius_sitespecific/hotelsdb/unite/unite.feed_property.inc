@@ -78,8 +78,18 @@ function unite_feed_property_info() {
         'csno_tables_count' => array('group' => 'casino', 'title' => 'Tables count', 'type' => 'integer'),
         'is_casino' => array('group' => 'casino', 'type' => 'list'),
         'csno_book' => array('group' => 'casino', 'type' => 'list'),
+        'csno_book_txt' => array('group' => 'casino', 'type' => 'text'),
         'csno_horse' => array('group' => 'casino', 'type' => 'list'),
         'csno_online' => array('group' => 'casino', 'type' => 'list'),
+        'csno_online_txt' => array('group' => 'casino', 'type' => 'text'),
+        'csno_igame' => array('group' => 'casino', 'type' => 'list'),
+        'csno_igame_txt' => array('group' => 'casino', 'type' => 'text'),
+        'csno_txt1' => array('group' => 'casino', 'type' => 'text'),
+        'csno_txt2' => array('group' => 'casino', 'type' => 'text'),
+        'csno_txt3' => array('group' => 'casino', 'type' => 'text'),
+        'csno_txt4' => array('group' => 'casino', 'type' => 'text'),
+
+
         'csno_regulator' => array('group' => 'casino', 'type' => 'text'),
         'csno_source' => array('group' => 'casino', 'type' => 'long'),
         'csno_slots_date' => array('group' => 'casino', 'type' => 'date'),
