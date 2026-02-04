@@ -1969,6 +1969,46 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-property-field_csno_book_txt'.
+  $field_instances['node-property-field_csno_book_txt'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 34,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_csno_book_txt',
+    'label' => 'Retail Sports Betting Operators',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 25,
+    ),
+  );
+
   // Exported field_instance: 'node-property-field_csno_horse'.
   $field_instances['node-property-field_csno_horse'] = array(
     'bundle' => 'property',
@@ -2005,6 +2045,85 @@ function hotelsdb_content_types_field_default_field_instances() {
       ),
       'type' => 'options_select',
       'weight' => 26,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_csno_igame'.
+  $field_instances['node-property-field_csno_igame'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 38,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_csno_igame',
+    'label' => 'iGaming?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 28,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_csno_igame_txt'.
+  $field_instances['node-property-field_csno_igame_txt'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 39,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_csno_igame_txt',
+    'label' => 'iGaming Operators',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 29,
     ),
   );
 
@@ -2047,6 +2166,46 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-property-field_csno_online_txt'.
+  $field_instances['node-property-field_csno_online_txt'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 37,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_csno_online_txt',
+    'label' => 'Online Sports Betting Operators',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 27,
+    ),
+  );
+
   // Exported field_instance: 'node-property-field_csno_regulator'.
   $field_instances['node-property-field_csno_regulator'] = array(
     'bundle' => 'property',
@@ -2059,7 +2218,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_plain',
-        'weight' => 36,
+        'weight' => 99,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2083,7 +2242,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 28,
+      'weight' => 99,
     ),
   );
 
@@ -2202,7 +2361,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_plain',
-        'weight' => 38,
+        'weight' => 100,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2226,7 +2385,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 29,
+      'weight' => 100,
     ),
   );
 
@@ -2329,6 +2488,166 @@ function hotelsdb_content_types_field_default_field_instances() {
       ),
       'type' => 'date_popup',
       'weight' => 24,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_csno_txt1'.
+  $field_instances['node-property-field_csno_txt1'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 40,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_csno_txt1',
+    'label' => 'Gaming Market',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 30,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_csno_txt2'.
+  $field_instances['node-property-field_csno_txt2'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 41,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_csno_txt2',
+    'label' => 'State Gaming Revenue Report market region',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 31,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_csno_txt3'.
+  $field_instances['node-property-field_csno_txt3'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 42,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_csno_txt3',
+    'label' => 'Nevada Gaming Control Location ID',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 32,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_csno_txt4'.
+  $field_instances['node-property-field_csno_txt4'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 43,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_csno_txt4',
+    'label' => 'Nevada Gaming Control Area',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 33,
     ),
   );
 
@@ -6235,6 +6554,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Food Service?');
   t('Format as <em>ddd-ddd-dddd</em>');
   t('Format as: <em>ddd-ddd-dddd</em>');
+  t('Gaming Market');
   t('Horse Racing?');
   t('Hotel?');
   t('ID');
@@ -6257,10 +6577,13 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Meeting Room Largest');
   t('Meeting Rooms');
   t('Neighborhood');
+  t('Nevada Gaming Control Area');
+  t('Nevada Gaming Control Location ID');
   t('Niche');
   t('Nonunion Exceptions');
   t('Notes');
   t('On public land');
+  t('Online Sports Betting Operators');
   t('Online Sports Betting?');
   t('Operator Last Updated');
   t('Organizing Agreement End Date');
@@ -6290,6 +6613,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Represented End Date');
   t('Represented Start Date');
   t('Represented?');
+  t('Retail Sports Betting Operators');
   t('Retail Sports Betting?');
   t('Rooms');
   t('Sales price');
@@ -6305,6 +6629,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Sources / Notes');
   t('Special Servicer');
   t('Start date');
+  t('State Gaming Revenue Report market region');
   t('Status');
   t('Terminal / Floor');
   t('Type');
@@ -6314,6 +6639,8 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Verified By');
   t('Verified Date');
   t('e.g. [Terminal A Gate 11] or [Terminal A] or [3rd Floor West Wing] or [Princess Ballroom] or [Widener Library] or [Google Building A 3rd Floor]');
+  t('iGaming Operators');
+  t('iGaming?');
 
   return $field_instances;
 }
