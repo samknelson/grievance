@@ -4,12 +4,13 @@ function sirius_trust_node_tab_worker_benefit_scan_form($form, &$form_state, $wo
 	$form_state['worker_nid'] = $worker_node->nid;
 	$form_state['#tree'] = TRUE;
 
+	$ts_now = strtotime(date('Y-m-15'));
 	$form['month'] = array(
 		'#type' => 'select',
 		'#title' => t('Month'),
 		'#options' => array(
-			'this_month' => date('F Y'),
-			'next_month' => date('F Y', strtotime('+1 month')),
+			'this_month' => date('F Y', $ts_now),
+			'next_month' => date('F Y', strtotime('+1 month', $ts_now)),
 		),
 	);
 

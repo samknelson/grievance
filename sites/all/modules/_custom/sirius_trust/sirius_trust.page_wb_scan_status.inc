@@ -75,13 +75,16 @@ function sirius_trust_page_wb_scan_status_form($form, &$form_state) {
 		),
 	);
 
+	$ts = time();
+	$ts = strtotime(date('Y-m-15', $ts));
+
 	$form['settings']['month'] = array(
 		'#type' => 'select',
 		'#title' => t('Mode'),
 		'#default_value' => $status['month'],
 		'#options' => array(
-			'this_month' => date('F Y'),
-			'next_month' => date('F Y', strtotime('+1 month')),
+			'this_month' => date('F Y', $ts),
+			'next_month' => date('F Y', strtotime('+1 month', $ts)),
 		),
 	);
 

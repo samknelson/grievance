@@ -12,10 +12,11 @@ function sirius_trust_worker_benefit_scan($mode = 'test', $force = FALSE) {
 
 	// Make sure we're in the right month. If we're not, reset.
 	$month = $status['month'];
+	$ts_now = strtotime(date('Y-m-15'));
 	if ($month == 'next_month') {
-		$ym = date('Y-m', strtotime(date('Y-m-15', strtotime('+1 month'))));
+		$ym = date('Y-m', strtotime('+1 month', $ts_now));
 	} else {
-		$ym = date('Y-m');
+		$ym = date('Y-m', $ts_now);
 	}
 
 	if ($ym != $status['ym']) {
@@ -114,10 +115,11 @@ function sirius_trust_worker_benefit_scan($mode = 'test', $force = FALSE) {
 
 function sirius_trust_wb_scan_worker($mode, $worker_node, $options = array()) {
 	sirius_domain($worker_node->field_sirius_domain['und'][0]['target_id']);
+	$ts_now = strtotime(date('Y-m-15'));
 	if ($options['month'] == 'next_month') {
-		$ts = strtotime(date('Y-m-15', strtotime('+1 month')));
+		$ts = strtotime('+1 month', $ts_now);
 	} else {
-		$ts = strtotime(date('Y-m-15'));
+		$ts = $ts_now;
 	}
 	$options['ts'] = $ts;
 

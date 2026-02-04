@@ -69,6 +69,7 @@ function sirius_trust_wb_scan_record_stop($mode, $wb_node, $options = array()) {
 	$params['shortcut'] = TRUE;
 	$params['scan_type'] = 'benefit_continue';
 	$params['ts'] = $options['ts'];
+	$params['wb_node'] = $wb_node;
 	$result = sirius_trust_eligibility_plugin_check_all($params);
 	if (!$result['success']) {
 		sirius_minilog("No longer eligible: " . $result['msg']);
