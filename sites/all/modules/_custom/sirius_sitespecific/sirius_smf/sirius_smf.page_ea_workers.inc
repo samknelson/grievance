@@ -20,7 +20,8 @@ function sirius_smf_node_tab_ea_workers($ea_node) {
 	$params['return_workers'] = TRUE;
 	$params['nids_only'] = TRUE;
 	$params['order'] = 'field_sirius_name_family, field_sirius_name_given, field_sirius_name_middle';
-	$params['limit'] = 1000000;
+
+	if ($csv) { $params['limit'] = 1000000; }
 	$worker_nids = sirius_dispatch_search($params);
 	if (!$worker_nids) { return sirius_page_error("No employees found."); }
 
