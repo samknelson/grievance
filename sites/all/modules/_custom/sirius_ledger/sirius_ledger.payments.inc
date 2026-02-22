@@ -187,13 +187,13 @@ function sirius_ledger_payment_update($payment_node, $params) {
 
 	if ($params['datetime_created']) {
 		$payment_node->field_sirius_datetime_created['und'][0]['value'] = gmdate('Y-m-d H:i:s', strtotime($params['datetime_created']));
-	} else {
+	} else if (isset($params['datetime_created'])) {
 		unset($payment_node->field_sirius_datetime_created['und']);
 	}
 
 	if ($params['datetime']) {
 		$payment_node->field_sirius_datetime['und'][0]['value'] = gmdate('Y-m-d H:i:s', strtotime($params['datetime']));
-	} else {
+	} else if (isset($params['datetime'])) {
 		unset($payment_node->field_sirius_datetime['und']);
 	}
 
