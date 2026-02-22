@@ -117,8 +117,9 @@ function sirius_smf_node_tab_ea_workers($ea_node) {
 	  drupal_exit();
 	}
 
-	$html .= sirius_table_render($header, $rows);
-	$html .= sirius_fakerender_field('Total balance:', $currency_info['instance']->render_amt($total));
+	// $html .= sirius_table_render($header, $rows);
+	// $html .= sirius_fakerender_field('Total balance:', $currency_info['instance']->render_amt($total));
+	
 	$html .= l(
 		'CSV Export', 
 		current_path(), 
