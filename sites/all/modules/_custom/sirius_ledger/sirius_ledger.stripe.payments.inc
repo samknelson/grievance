@@ -175,6 +175,9 @@ trait Sirius_Ledger_Service_Stripe_Payments {
 			$params = array();
 			$params['payment_status'] = $event_types[$event_type]['status'];
 			$params['allocate'] = 'Yes';
+			if ($params['payment_status'] == 'Cleared' && !$payment_node->field_sirius_datetime['und'][0]['value']) {
+				$params['datetime'] = date('c');
+			}
 			$result = sirius_ledger_payment_update($payment_node, $params);
 		}
 
@@ -192,6 +195,7 @@ trait Sirius_Ledger_Service_Stripe_Payments {
       array(),
       $event_json
 	  );
+		watchdog('sirius_ledger_stripe_webhook', "Logged " . $log_node->nid . " to " . $payment_node->nid);
 
   	$result = array('success' => FALSE, 'msg' => 'Payment intent webhooks not implemented yet.');
 	}
