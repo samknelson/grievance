@@ -14,6 +14,19 @@ function sirius_smf_node_tab_ea_workers($ea_node) {
 
 	$csv = $_REQUEST['csv'];
 
+	if (!$csv) {
+		$html .= l(
+			'CSV Export', 
+			current_path(), 
+			array(
+				'query' => array('csv' => '1'),
+				'attributes' => array('class' => array('tool-button'))
+			)
+		);
+		return $html;
+	}
+
+	if ($csv) {
 	$params = array();
 	$params['employer_nid'] = $entity_node->nid;
 	$params['statuses'] = array('accepted', 'accepted_secondary');
@@ -117,16 +130,6 @@ function sirius_smf_node_tab_ea_workers($ea_node) {
 	  drupal_exit();
 	}
 
-	// $html .= sirius_table_render($header, $rows);
-	// $html .= sirius_fakerender_field('Total balance:', $currency_info['instance']->render_amt($total));
-	
-	$html .= l(
-		'CSV Export', 
-		current_path(), 
-		array(
-			'query' => array('csv' => '1'),
-			'attributes' => array('class' => array('tool-button'))
-		)
-	);
-	return $html;
+	$html .= sirius_table_render($header, $rows);
+	$html .= sirius_fakerender_field('Total balance:', $currency_info['instance']->render_amt($total));
 }
