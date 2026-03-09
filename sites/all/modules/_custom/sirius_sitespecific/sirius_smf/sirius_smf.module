@@ -39,6 +39,9 @@ function sirius_smf_sirius_wizard_info() {
   sirius_require('sirius_smf', 'sirius_smf.feed_payments.inc');
   $items += sirius_smf_feed_payments_info();
 
+  sirius_require('sirius_smf', 'sirius_smf.feed_rdr.inc');
+  $items += sirius_smf_feed_rdr_info();
+
   return $items;
 }
 
