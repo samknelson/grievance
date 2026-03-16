@@ -368,8 +368,8 @@ class Sirius_Trust_Provider_Edi_Report_Generator extends Report_Cache_Report_Gen
       $row['edi_premium_tier'] = $hr['edi_premium_tier'];
       $row['edi_premium_amt'] = $hr['edi_premium_amt'];
       $row['edi_ssn'] = $hr['edi_ssn'];
-      $row['edi_firstname'] = strtoupper($hr['edi_firstname']);
       $row['edi_lastname'] = strtoupper($hr['edi_lastname']);
+      $row['edi_firstname'] = strtoupper($hr['edi_firstname']);
       $row['edi_premium_amt'] = '$' . number_format(round($hr['edi_premium_amt'], 2), 2);
       $row['edi_payment_month'] = $edi_payment_month;
       $rows[] = $row;
