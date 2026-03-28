@@ -96,6 +96,9 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 
 		$current_break_count = 0;
 		$current_break_over = FALSE;
+		$current_break_first_year = 0;
+		$current_break_first_month = 0;
+		$current_break_first_hrs = 0;
 
 		$current_buildup_count = 0;
 		$current_buildup_over = FALSE;
@@ -133,6 +136,9 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 				$current_break_over = TRUE;
 			} else if (!$current_break_over) {
 				++$current_break_count;
+				$current_break_first_year = $y;
+				$current_break_first_month = $m;
+				$current_break_first_hrs = $hrs;
 			}
 
 			// "Current Buildup"
@@ -197,6 +203,9 @@ class Sirius_Smf_Eligibility_Plugin_Buildup extends Sirius_Trust_Elgibility_Plug
 		$result['threemonthsprev_nonzero'] = $threemonthsprev_nonzero;
 		$result['current_break_over'] = $current_break_over;
 		$result['current_break_count'] = $current_break_count;
+		$result['current_break_first_year'] = $current_break_first_year;
+		$result['current_break_first_month'] = $current_break_first_month;
+		$result['current_break_first_hrs'] = $current_break_first_hrs;
 		$result['current_buildup_over'] = $current_buildup_over;
 		$result['current_buildup_count'] = $current_buildup_count;
 		$result['asof_month'] = $asof_month;
