@@ -71,6 +71,16 @@ function sirius_smf_node_tabs() {
     'weight' => 12,
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_ledger/smf_echp'] = array(
+    'title' => 'Event Center Hour Purchase',
+    'callback' => 'sirius_smf_node_tab_worker_echp',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_smf.page_worker_echp.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+  );
+
   $node_tabs['sirius_worker']['smf_autotag_history'] = array(
     'title' => 'Monthly History',
     'callback' => 'sirius_smf_node_tab_worker_autotag_history',
@@ -150,6 +160,17 @@ function sirius_smf_node_tabs() {
     'file' => 'sirius_smf.page_ea_workers.inc',
     'skip_node_view_check' => TRUE,
   );
+
+  /*
+  $node_tabs['sirius_log']['sirius_smf_ea_interest'] = array(
+    'title' => 'Interest',
+    'description' => '',
+    'callback' => 'sirius_smf_node_tab_ea_interest',
+    'permissions' => array('sirius admin'),
+    'weight' => 2,
+    'file' => 'sirius_smf.page_ea_interest.inc',
+  );
+  */
 
   //
   // Oneoffs
