@@ -454,3 +454,182 @@ class Sirius_Edls_Service_Client extends Sirius_Service_Client_Default {
 	public $name = 'EDLS Client';
   public $description = 'Client for the employer daily labor scheduler (EDLS).';
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function sirius_edls_client_tos_fetch($mode = 'test', $force = FALSE) {
+	sirius_denorm_realtime(FALSE);
+	$employers = sirius_edls_employer_list();
+	foreach ($employers as $employer_nid => $employer_name) {
+		sirius_minilog("Scanning: $employer_name");
+		sirius_minilog_indent();
+		sirius_edls_client_tos_fetch_employer($employer_nid, $mode, $force);
+		sirius_minilog_outdent();
+	}
+	return array('success' => TRUE);
+}
+
+function sirius_edls_client_tos_fetch_employer($employer_nid, $mode = 'test', $force = FALSE) {
+  // Get the employer
+	$employer_node = node_load($employer_nid);
+	$employer_json = sirius_json_get($employer_node);
+	if ($employer_json['edls']['client']['active'] != 'Yes') {
+		sirius_minilog("Employer is not active as a client.");
+		return;
+	}
+
+	// Fetch the TOS records
+	sirius_minilog("Fetching workers");
+	$employer_uuid = $employer_json['edls']['client']['uuid'];
+	$employer_access_code = $employer_json['edls']['client']['access_code'];
+	$result = sirius_edls_client_request('sirius_edls_server_tos_list', $employer_uuid, $employer_access_code);
+	if (!$result['success']) {
+		sirius_minilog("Fetch failed: " . $result['msg']);
+		return;
+	}
+	if (!isset($result['tos_nodes'])) {
+		sirius_minilog("TOS nodes not included in the payload.");
+		return;
+	}
+
+	sirius_minilog('=== Creating or Updating TOS nodes ===');
+	sirius_minilog_indent();
+	$active_nodes = array();
+	foreach ($result['tos_nodes'] as $tos_node_remote) {
+		sirius_minilog("Looking for worker with dispatch ID " . $tos_node_remote->worker_id);
+
+		// Must find the worker
+		$worker_node =  sirius_worker_get_by_field('field_sirius_id2', $tos_node_remote->worker_id);
+		if (!$worker_node) {
+			sirius_minilog("... Worker not found. Skipping.");
+			continue;
+		}
+		sirius_minilog("Found: " . $worker_node->title);
+
+		// Does the record already exist?
+		$domain_nid = sirius_domain_nid();
+		$sql_args = array();
+		$sql = "select distinct node.nid from node ";
+		$sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+		$sql .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
+		$sql .= "left join field_data_field_sirius_notes on field_data_field_sirius_notes.entity_type = 'node' and field_data_field_sirius_notes.entity_id = node.nid ";
+		$sql .= "where node.type = 'sirius_log' ";
+		$sql .= "and field_sirius_category_value = 'tos' ";
+		$sql .= "and field_sirius_notes_value = :remote_nid ";
+		$sql_args[':remote_nid'] = $tos_node_remote->nid;
+		$sql .= "order by node.nid desc limit 1 ";
+		$stmt = sirius_sql_query($sql, $sql_args);
+		$hr = $stmt->fetchAssoc();
+		$tos_node = node_load($hr['nid']);
+		if ($tos_node) {
+			// Update an existing node
+			sirius_minilog("Found existing record " . $tos_node->title);
+
+			$need_save = FALSE;
+
+			if ($tos_node->field_sirius_type['und'][0]['value'] != $tos_node_remote->field_sirius_type['und'][0]['value']) {
+				$tos_node->field_sirius_type['und'][0]['value'] = $tos_node_remote->field_sirius_type['und'][0]['value'];
+				$need_save = TRUE;
+			}
+
+			if ($tos_node->field_sirius_message['und'][0]['value'] != $tos_node_remote->field_sirius_message['und'][0]['value']) {
+				$tos_node->field_sirius_message['und'][0]['value'] = $tos_node_remote->field_sirius_message['und'][0]['value'];
+				$need_save = TRUE;
+			}
+
+			if ($tos_node->field_sirius_summary['und'][0]['value'] != $tos_node_remote->field_sirius_summary['und'][0]['value']) {
+				$tos_node->field_sirius_summary['und'][0]['value'] = $tos_node_remote->field_sirius_summary['und'][0]['value'];
+				$need_save = TRUE;
+			}
+
+			if ($need_save) {
+				sirius_minilog("... Updating the record.");
+				if ($mode == 'live') {
+					node_save($tos_node);
+				} else {
+					sirius_minilog("... (Skipping save because mode = $mode)");
+				}
+			} else {
+				sirius_minilog("... Record is unchanged.");
+			}
+
+		} else {
+			// Update an existing node
+			sirius_minilog("Created new record " . $tos_node->title);
+			if ($mode == 'live') {
+				$tos_node = sirius_log(
+					$tos_node_remote->field_sirius_category['und'][0]['value'],
+					$tos_node_remote->field_sirius_type['und'][0]['value'],
+					$tos_node_remote->field_sirius_message['und'][0]['value'],
+					$tos_node_remote->field_sirius_summary['und'][0]['value'],
+					$tos_node_remote->nid,
+					array($worker_node->nid)
+				);
+			} else {
+				sirius_minilog("(Skipping save because mode = $mode)");
+			}
+		}
+
+		$active_nodes[$tos_node->nid] = TRUE;
+	}
+	sirius_minilog_outdent();
+
+	// Now, terminate any TOS nodes that *aren't* in the payload.
+	$sql = "select distinct node.nid, field_sirius_notes_value from node ";
+	$sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_notes on field_data_field_sirius_notes.entity_type = 'node' and field_data_field_sirius_notes.entity_id = node.nid ";
+	$sql .= "where node.type = 'sirius_log' ";
+	$sql .= "and field_sirius_category_value = 'tos' ";
+	$sql .= "and field_sirius_type_value = 'active' ";
+	$sql .= "order by node.nid ";
+	$stmt = sirius_sql_query($sql, array());
+
+	sirius_minilog('=== Terminating inactive TOS nodes ===');
+	sirius_minilog_indent();
+
+	while ($hr = $stmt->fetchAssoc()) {
+		$tos_nid = $hr['nid'];
+		sirius_minilog("Checking: $tos_nid");
+		if ($active_nodes[$tos_nid]) {
+			sirius_minilog("... This node appeared in the payload. Skipping.");
+			continue;
+		}
+
+		$tos_node = node_load($tos_nid);
+
+		$tos_node->field_sirius_type['und'][0]['value'] = 'cancel';
+		$tos_json = sirius_json_get($tos_node);
+		$tos_json['worker_tos']['cancel']['ts'] = time();
+		sirius_json_set($tos_node, $tos_json);
+
+		sirius_minilog("... Expiring: " . $tos_node->title);
+		if ($mode == 'live') {
+			node_save($tos_node);
+		} else {
+			sirius_minilog("... (Skipping save because mode = $mode)");
+		}
+	}
+
+	sirius_minilog_outdent();
+
+	return array('success' => TRUE);
+}
