@@ -478,6 +478,26 @@ function sirius_edls_menu() {
     'file' => 'sirius_edls.page_rating.inc'
   );
 
+  $items['sirius/edls/tos'] = array(
+    'title' => 'Absences',
+    'page callback' => 'sirius_edls_page_tos',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'sheet_list',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 5,
+    'file' => 'sirius_edls.page_tos.inc'
+  );
+
   $items['sirius/edls/notification/%'] = array(
     'title' => 'Notification',
     'page callback' => 'sirius_edls_page_notification',
