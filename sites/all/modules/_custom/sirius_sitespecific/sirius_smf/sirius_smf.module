@@ -395,3 +395,21 @@ function sirius_smf_sirius_flood_info() {
 
   return $info;
 }
+
+
+/**
+ * Implements hook_sirius_plugin_info
+ */
+
+function sirius_smf_sirius_plugin_info($class) {
+  if ($class == 'ledger_charge') {
+    sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.hourly.inc');
+    sirius_require('sirius_smf', 'sirius_smf.charge_plugin_interest.inc');
+    sirius_require('sirius_smf', 'sirius_smf.charge_plugin_echp.inc');
+
+    $items = array();
+    Sirius_Smf_Charge_Plugin_Interest::getInstance()->setInfo($items);
+    Sirius_Smf_Charge_Plugin_Echp::getInstance()->setInfo($items);
+    return $items;
+  }
+}
