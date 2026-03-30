@@ -25,6 +25,7 @@ function sirius_edls_node_tab_sheet_view($sheet_node) {
 
   $options = array();
   $options['crew_uuid'] = sirius_node_tab_arg(0);
+  $options['show_oop'] = TRUE;
 	$html .= sirius_edls_sheet_render($sheet_node, $options);
 	return $html;
 }

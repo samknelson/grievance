@@ -24,6 +24,19 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 	// Disabled for now
 	$show_rating = FALSE;
 
+	$options['show_oop'] = TRUE;
+	if ($options['show_oop']) {
+		$all_workers = array();
+		$tmp = sirius_edls_worker_list(
+			$sheet_node->field_grievance_shop['und'][0]['target_id'],
+			$field_sirius_date_start['und'][0]['value'],
+			array('skip_assignment' => TRUE)
+		);
+		foreach ($tmp as $worker) {
+			$all_workers[$worker['worker_id']] = TRUE;
+		}
+	}
+
 	$col1 = $col2  = '';
 	if (!$options['hide_version']) { $col1 .= sirius_fakerender_field('Version:', sirius_sheet_render_version($sheet_node)); }
 	if (!$options['hide_status']) { $col1 .= sirius_fakerender_field('Status:', $status_options[$sheet_node->field_sirius_edls_sheet_status['und'][0]['value']]); }
@@ -216,6 +229,12 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 							$render .= sirius_edls_worker_render_rating($assignment['worker_id'], $rating_type_tid);
 						}
 
+						if ($assignment['worker_id'] && $options['show_oop'] && !$all_workers[$assignment['worker_id']]) {
+							$render .= '<span class="sirius_text_red">';
+							$render .= '<i class="fas fa-user-slash"></i>';
+							$render .= '</span>';
+							$render .= '&nbsp;';
+						}
 						$render .= $assignment['worker_name'];
 
 						$render .= sirius_edls_notify_render_status($assignment, $notifications[$assignment_id], array('can_edit_notifications' => $can_edit_notifications));
