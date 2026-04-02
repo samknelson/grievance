@@ -110,7 +110,7 @@ function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
 function sirius_edls_worker_fetch($employer_nid, $worker_id, $date = NULL) {
   // Fetch the worker. This is just a wrapper around a filtered "worker_list".
   if (!$date) { $date = date('Y-m-d'); }
-  $result = sirius_edls_worker_list($employer_nid, $date, array('worker_id' => $worker_id));
+  $result = sirius_edls_worker_list($employer_nid, $date, array('worker_id' => $worker_id, 'include_phone' => TRUE));
   $record = $result[0];
   if (!$record) { $record = array(); }
 
