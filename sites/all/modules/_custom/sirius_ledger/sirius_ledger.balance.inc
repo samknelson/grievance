@@ -58,6 +58,9 @@ function sirius_ledger_balance_search($params = array()) {
 		$sql .= "and worker_node.nid = :worker_nid ";
 		$sql_args[':worker_nid'] = $params['worker_nid'];
 	}
+	if ($params['is_worker']) {
+		$sql .= "and worker_node.nid is not null ";
+	}
 	if ($params['work_statuses']) {
 		$sql .= "and field_sirius_work_status_tid in (:work_statuses) ";
 		$sql_args[':work_statuses'] = $params['work_statuses'];
@@ -189,16 +192,6 @@ function sirius_ledger_balance_render($entries, $options = array()) {
 		$worker_node = node_load($entry['worker_nid']);
 
 		if ($header['account']) { $row[] = $entry['account_title']; }
-		if ($header['amount']) {
-			if ($options['display'] == 'csv') { $row[] = round(-1 * $entry['balance_amount'], 2); }
-			else { $row[] = $currency_info['instance']->render_amt(-1 * $entry['balance_amount']); }
-		}
-
-		if ($header['phone']) { $row[] = $worker_node->field_sirius_phone['und'][0]['value']; }
-		if ($header['address']) { $row[] = $worker_node->field_sirius_address['und'][0]['thoroughfare']; }
-		if ($header['city']) { $row[] = $worker_node->field_sirius_address['und'][0]['locality']; }
-		if ($header['state']) { $row[] = $worker_node->field_sirius_address['und'][0]['administrative_area']; }
-		if ($header['zip']) { $row[] = $worker_node->field_sirius_address['und'][0]['postal_code']; }
 
 		if ($header['participant']) {
 			$row[] = $entry['participant_title'];
@@ -207,6 +200,17 @@ function sirius_ledger_balance_render($entries, $options = array()) {
 			} else {
 				$tools .= l('Participant', 'node/' . $entry['balance_participant'], array('attributes' => array('class' => array('tool-button'))));
 			}
+		}
+
+		if ($header['phone']) { $row[] = $worker_node->field_sirius_phone['und'][0]['value']; }
+		if ($header['address']) { $row[] = $worker_node->field_sirius_address['und'][0]['thoroughfare']; }
+		if ($header['city']) { $row[] = $worker_node->field_sirius_address['und'][0]['locality']; }
+		if ($header['state']) { $row[] = $worker_node->field_sirius_address['und'][0]['administrative_area']; }
+		if ($header['zip']) { $row[] = $worker_node->field_sirius_address['und'][0]['postal_code']; }
+
+		if ($header['amount']) {
+			if ($options['display'] == 'csv') { $row[] = round(-1 * $entry['balance_amount'], 2); }
+			else { $row[] = $currency_info['instance']->render_amt(-1 * $entry['balance_amount']); }
 		}
 		if ($header['tools']) { $row[] = $tools; }
 
