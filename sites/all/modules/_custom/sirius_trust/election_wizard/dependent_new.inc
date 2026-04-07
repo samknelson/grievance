@@ -2,6 +2,7 @@
 
 function sirius_trust_election_wizard_dependent_new_form($form, &$form_state, $info, $data, $wizard_node, $current_step) {
 	$access = Sirius_Trust_Access::getInstance();
+	$access_context = array('election_wizard_node' => $wizard_node, 'current_step' => $current_step);
 
 	$policy_node = sirius_trust_election_wizard_get_policy($data);
 	$policy_json = sirius_json_get($policy_node);
@@ -105,6 +106,7 @@ function sirius_trust_election_wizard_dependent_new_form_validate($form, &$form_
 	$current_step = $form_state['current_step'];
 	$wizard_node = $form_state['wizard_node'];
 	$which = preg_replace('/dependent_new_/', '', $current_step);
+	$access = Sirius_Trust_Access::getInstance();
 
 	unset($form_state['storage']["file"]);
 
@@ -154,7 +156,7 @@ function sirius_trust_election_wizard_dependent_new_form_validate($form, &$form_
       form_set_error("file", t("Failed to write the uploaded file to the site's file folder."));
     }
   } else {
-  	if (!$data['dependents']['new'][$which]['file']) {
+  	if (!$data['dependents']['new'][$which]['file'] && !$access->access('staff')) {
 			form_set_error("file", t("Please upload a file."));
 		}
   }
