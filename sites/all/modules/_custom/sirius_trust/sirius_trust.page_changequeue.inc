@@ -12,28 +12,44 @@ function sirius_trust_page_changequeue_form($form, &$form_state, $status = NULL)
 	
 	$cq = Sirius_Trust_Changequeue::getInstance();
 
+	$form['search'] = array(
+		'#type' => 'textfield',
+		'#title' => 'Name',
+	);
+
+	$form['submit1'] = array(
+		'#type' => 'submit',
+		'#value' => t('Search'),
+		'#id' => 'search',
+	);
+
+
 	$search_params = array();
 	$search_params['status'] = $status;
+	$search_params['search'] = $form_state['values']['search'];
 	$cq_nodes = $cq->search($search_params);
 	$form['list'] = $cq->render_list($cq_nodes);
 
-	if ($cq_nodes) {
-		$form['submit'] = array(
-			'#type' => 'submit',
-			'#value' => t('Submit'),
-		);
-	}
 
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+	);
 
 	return $form;
 }
 
 function sirius_trust_page_changequeue_form_submit($form, &$form_state) {
+	$form_state['rebuild'] = TRUE;
+
 	$cq = Sirius_Trust_Changequeue::getInstance();
 	$status = $form_state['status'];
 
 	$also_saved = array();
 	$count = 0;
+
+	if (!$form_state['values']['list']) { $form_state['values']['list'] = array(); }
+	
 	foreach ($form_state['values']['list'] as $cq_nid => $tmp) {
 		$new_status = $tmp['action'];
 		$cq_node = node_load($cq_nid);
@@ -54,5 +70,7 @@ function sirius_trust_page_changequeue_form_submit($form, &$form_state) {
 		}
 	}
 	
-	drupal_set_message("Updated $count change records.");
+	if ($count) {
+		drupal_set_message("Updated $count change records.");
+	}
 }

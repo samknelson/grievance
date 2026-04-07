@@ -148,16 +148,24 @@ class Sirius_Trust_Changequeue extends Sirius_Singleton {
 	public function search($params = array()) {
 		$sql_args = array();
 		if ($params['count_only']) {
-			$sql = "select count(nid) as c "; 
+			$sql = "select count(node.nid) as c "; 
 		} else {
-			$sql = "select nid ";
+			$sql = "select node.nid ";
 		}
+
 		$sql .= "from node ";
 		$sql .= "left join field_data_field_sirius_notes on field_data_field_sirius_notes.entity_type = 'node' and field_data_field_sirius_notes.entity_id = node.nid ";
 		$sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
 		$sql .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
 		$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
-		$sql .= "where type = 'sirius_log' ";
+		$sql .= "left join field_data_field_sirius_log_handler on field_data_field_sirius_log_handler.entity_type = 'node' and field_data_field_sirius_log_handler.entity_id = node.nid ";
+		$sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
+
+		if ($params['search']) {
+			$sql .= "left join node handler_node on handler_node.nid = cast(json_unquote(json_extract(field_sirius_json_value, '\$.cq_item.node_field.nid')) as signed) ";
+		}
+
+		$sql .= "where node.type = 'sirius_log' ";
 		$sql .= "and field_sirius_category_value = 'changequeue' ";
 
 		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
@@ -173,7 +181,13 @@ class Sirius_Trust_Changequeue extends Sirius_Singleton {
 			$sql_args[':id'] = $params['id'];
 		}
 
-		$sql .= "order by changed desc, nid desc ";
+		if ($params['search']) {
+			$sql .= "and handler_node.title like :search ";
+			$sql_args[':search'] = '%' . $params['search'] . '%';
+		}
+
+		$sql .= "group by node.nid ";
+		$sql .= "order by node.changed desc, node.nid desc ";
 
 		$limit = $params['limit'];
 		if (!$limit) { $limit = 100; }
@@ -192,6 +206,7 @@ class Sirius_Trust_Changequeue extends Sirius_Singleton {
 		$cq_nids = array();
 		while ($hr = $stmt->fetchAssoc()) {
 			$cq_nids[] = $hr['nid'];
+			// drupal_set_message('<pre>' . print_r($hr, 1) . '</pre>');
 		}
 
 		if ($params['nids_only']) { return $cq_nids; }
