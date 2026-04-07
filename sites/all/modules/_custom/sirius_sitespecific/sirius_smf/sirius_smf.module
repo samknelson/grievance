@@ -265,6 +265,7 @@ function sirius_smf_report_cache_info() {
   sirius_require('sirius_smf', 'reports/autotag_interval.inc');
   sirius_require('sirius_smf', 'reports/disability_without_fmla.inc');
   sirius_require('sirius_smf', 'reports/multiindustry.inc');
+  sirius_require('sirius_smf', 'reports/arrears.inc');
   sirius_require('sirius_smf', 'reports/electionrequest.inc');
   sirius_require('sirius_smf', 'reports/benefit_ending_xtra.inc');
   sirius_require('sirius_smf', 'reports/edi_local11.inc');
@@ -288,6 +289,7 @@ function sirius_smf_report_cache_info() {
   Sirius_Smf_Report_Disabilitywithoutfmla::getInstance()->setInfo($items);
   Sirius_Smf_Report_Multiindustry::getInstance()->setInfo($items);
   Sirius_Smf_Report_Electionrequest::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Arrears::getInstance()->setInfo($items);
   Sirius_Smf_Report_Benefit_Ending_Xtra::getInstance()->setInfo($items);
   Sirius_Smf_Report_Edi_Local11::getInstance()->setInfo($items);
   Sirius_Smf_Report_Edi_Hinge::getInstance()->setInfo($items);
