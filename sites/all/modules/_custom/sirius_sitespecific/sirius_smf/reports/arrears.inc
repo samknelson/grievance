@@ -37,6 +37,7 @@ class Sirius_Smf_Report_Arrears extends Report_Cache_Report_Generator {
     $fields['balance'] = 'Balance Now';
     $fields['balance_ao'] = 'Balance at that date';
     $fields['payments_ao'] = 'Payments since that date';
+    $fields['due'] = 'Due Now';
 
     return $fields;
   }
@@ -174,6 +175,7 @@ class Sirius_Smf_Report_Arrears extends Report_Cache_Report_Generator {
       $row['balance'] = $balance;
       $row['balance_ao'] = $balance_ao;
       $row['payments_ao'] = $payments_ao;
+      $row['due'] = $row['balance_ao'] - $row['payments_ao'];
 
       $rows[$worker_nid] = $row;
     }
