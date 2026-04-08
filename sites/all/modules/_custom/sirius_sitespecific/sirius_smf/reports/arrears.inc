@@ -32,9 +32,11 @@ class Sirius_Smf_Report_Arrears extends Report_Cache_Report_Generator {
 
     $fields['status'] = 'Status';
     $fields['msg'] = 'Message';
-    $fields['balance'] = 'Balance';
     $fields['date_due'] = 'Payment Due Date';
     $fields['date_cutoff'] = 'Coverage Cutoff Date';
+    $fields['balance'] = 'Balance Now';
+    $fields['balance_ao'] = 'Balance at that date';
+    $fields['payments_ao'] = 'Payments since that date';
 
     return $fields;
   }
@@ -139,10 +141,14 @@ class Sirius_Smf_Report_Arrears extends Report_Cache_Report_Generator {
       if (!$result['success']) {
         $status = 'suspended';
         $date = $result['date1'];
+        $balance_ao = $result['balance1'];
+        $payments_ao = $result['payments1'];
       }
       else if ($result['warning']) {
         $status = 'warning';
         $date = $result['date2'];
+        $balance_ao = $result['balance2'];
+        $payments_ao = $result['payments2'];
       }
       else { continue; }
 
@@ -162,9 +168,12 @@ class Sirius_Smf_Report_Arrears extends Report_Cache_Report_Generator {
 
       $row['status'] = $status;
       $row['msg'] = $msg;
-      $row['balance'] = $balance;
       $row['date_cutoff'] = date('m/d/Y', strtotime($date));
       $row['date_due'] = date('m/d/Y', strtotime('-1 day', strtotime($date)));
+
+      $row['balance'] = $balance;
+      $row['balance_ao'] = $balance_ao;
+      $row['payments_ao'] = $payments_ao;
 
       $rows[$worker_nid] = $row;
     }
