@@ -101,14 +101,22 @@ class Sirius_Trust_Elgibility_Plugin_Arrears extends Sirius_Trust_Elgibility_Plu
 				'success' => FALSE, 
 				'msg' => "The amount due as of the end of $date1_render was $balance1_render, which is greater than the subsequent payments totaling $payments1_render",
 				'date1' => $date1,
-				'date2' => $date2);
+				'date2' => $date2,
+				'balance1' => $balance1,
+				'payments1' => $payments1,
+				'balance2' => $balance2,
+				'payments2' => $payments2);
 		} if ($balance2 > $payments2) {
 		return array(
 			'success' => TRUE, 
 			'msg' => "The amount due as of the end of $date2_render was $balance2_render, which is greater than the subsequent payments totaling $payments2_render", 
 			'warning' => TRUE,
 			'date1' => $date1,
-			'date2' => $date2);
+			'date2' => $date2,
+			'balance1' => $balance1,
+			'payments1' => $payments1,
+			'balance2' => $balance2,
+			'payments2' => $payments2);
 		} else {
 			return array('success' => TRUE, 'msg' => "The amount due as of the end of $date1_render was less than the subsquent payments totaling $payments1_render.");
 		}
