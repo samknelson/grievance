@@ -102,20 +102,22 @@ function sirius_smf_feed_ehrs_post_form_submit($form, &$form_state) {
 
 	$operations = array();
 	foreach ($data['records']['rows'] as $delta => $row) {
-		$operations[] = array('sirius_smf_feed_ehrs_post_form_hrs_batch', array($wizard_node, $info, $data, $current_step, $delta));
+		$operations[] = array('sirius_smf_feed_ehrs_post_form_hrs_batch', array($wizard_node, $info, $current_step, $delta));
 	}
 	if ($data['term_proposed']) {
 		foreach ($data['term_proposed'] as $delta => $ignore) {
-			$operations[] = array('sirius_smf_feed_ehrs_post_form_term_batch', array($wizard_node, $info, $data, $current_step, $delta));
+			$operations[] = array('sirius_smf_feed_ehrs_post_form_term_batch', array($wizard_node, $info, $current_step, $delta));
 		}
 	}
-	$operations[] = array('sirius_smf_feed_ehrs_post_form_submit_complete', array($wizard_node, $info, $data, $current_step));
+	$operations[] = array('sirius_smf_feed_ehrs_post_form_submit_complete', array($wizard_node, $info, $current_step));
 
 	$batch = array('operations' => $operations, 'file' => drupal_get_path('module', 'sirius_smf') . '/feed_ehrs/post.inc');
 	batch_set($batch);
 }
 
-function sirius_smf_feed_ehrs_post_form_submit_complete($wizard_node, $info, $data, $current_step, &$context) {
+function sirius_smf_feed_ehrs_post_form_submit_complete($wizard_node, $info, $current_step, &$context) {
+	$data = sirius_wizard_data($info, $wizard_node);
+
 	sirius_require('sirius_smf', 'sirius_smf.ehrs.inc');
 	sirius_smf_feed_ehrs_load_includes();
 
@@ -141,7 +143,9 @@ function sirius_smf_feed_ehrs_post_form_submit_complete($wizard_node, $info, $da
 	sirius_wizard_submit($info, $data, $wizard_node, $current_step, "Hours upload has been confirmed, and charges have been generated.", array('nonsequential' => FALSE, 'feed_status' => 'complete'));
 }
 
-function sirius_smf_feed_ehrs_post_form_hrs_batch($wizard_node, $info, $data, $current_step, $delta, &$context) {
+function sirius_smf_feed_ehrs_post_form_hrs_batch($wizard_node, $info, $current_step, $delta, &$context) {
+	$data = sirius_wizard_data($info, $wizard_node);
+
 	// Load all our include files
 	sirius_require('sirius_smf', 'sirius_smf.ehrs.inc');
 	sirius_smf_feed_ehrs_load_includes();
@@ -303,7 +307,6 @@ function sirius_smf_feed_ehrs_post_form_hrs_batch($wizard_node, $info, $data, $c
 	  		'country' => 'US',
 	  	)
 	  );
-	  // dpm($newval);
 
   	if (!$worker_node->field_sirius_address['und'][0]['addr_thoroughfare']) {
   		// drupal_set_message("Setting address for " . $worker_node->title);
@@ -385,7 +388,9 @@ function sirius_smf_feed_ehrs_post_form_hrs_batch($wizard_node, $info, $data, $c
 	node_save($payperiod_node);
 }
 
-function sirius_smf_feed_ehrs_post_form_term_batch($wizard_node, $info, $data, $current_step, $delta, &$context) {
+function sirius_smf_feed_ehrs_post_form_term_batch($wizard_node, $info, $current_step, $delta, &$context) {
+	$data = sirius_wizard_data($info, $wizard_node);
+
 	// Load all our include files
 	sirius_require('sirius_smf', 'sirius_smf.ehrs.inc');
 	sirius_smf_feed_ehrs_load_includes();
