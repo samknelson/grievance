@@ -310,11 +310,9 @@ function sirius_smf_feed_ehrs_post_form_hrs_batch($wizard_nid, $info, $current_s
 	  	)
 	  );
 
-  	if (!$worker_node->field_sirius_address['und'][0]['addr_thoroughfare']) {
-  		// drupal_set_message("Setting address for " . $worker_node->title);
+  	if (!$worker_node->field_sirius_address['und'][0]['thoroughfare']) {
   		$worker_node->field_sirius_address['und'][0] = $newval;
   	} else {
-  		// drupal_set_message("Queueing address for " . $worker_node->title);
 			$item = array();
 			$item['type'] = 'node_field';
 			$item['msg'] = $eup_node->title;
@@ -327,9 +325,6 @@ function sirius_smf_feed_ehrs_post_form_hrs_batch($wizard_nid, $info, $current_s
 			if (!$result->success()) { $result->drupalSetMessage(); }
 		}
 	}
-
-
-
 
   if ($row['dob']) {
   	$newval = $worker_node->field_sirius_dob['und'][0];
