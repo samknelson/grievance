@@ -60,6 +60,24 @@ function sirius_ledger_node_tabs() {
     'weight' => 1,
   );
 
+  $node_tabs['sirius_ledger_account']['sirius_ledger_account_ar/recent'] = array(
+    'title' => 'Recent',
+    'description' => '',
+    'callback' => 'sirius_ledger_node_tab_account_ar',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_ledger_account']['sirius_ledger_account_ar/export'] = array(
+    'title' => 'Export',
+    'description' => '',
+    'callback' => 'sirius_ledger_node_tab_account_ar_export',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 2,
+  );
+
+
   $node_tabs['sirius_ledger_account']['sirius_ledger_account_payments'] = array(
     'title' => 'Payments',
     'description' => '',
