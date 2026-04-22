@@ -29,11 +29,24 @@ class Sirius_Ledger_Charge_Plugin_Monthly_Benefit extends Sirius_Ledger_Charge_P
 			return array('success' => TRUE);
 		}
 
+		// Don't run in the first or last 3 days of the month.
+		$d = date('d', $context['ts']);
+		if ($d < 3) {
+			sirius_minilog("Benefit charge plugin does not run on the first three days of the month.");
+			return array('success' => TRUE);
+		}
+		if ($d > 26) {
+			sirius_minilog("Benefit charge plugin does not run on the last days of the month.");
+			return array('success' => TRUE);
+		}
+
+
 		$params = array();
 		$params['benefit_nid'] = $benefit_nid;
 		$params['worker_nid'] = $context['worker_node']->nid;
 		$params['ts'] = $context['ts'];
 		$params['nids_only'] = TRUE;
+		$params['relationship_nid'] = 'NULL';
 		$probe = sirius_trust_worker_benefits_search($params);
 		if (!$probe) {
 			sirius_minilog("The worker did not have [" . sirius_node_title($benefit_nid) . "] at the required time. No charges will be generated.");
