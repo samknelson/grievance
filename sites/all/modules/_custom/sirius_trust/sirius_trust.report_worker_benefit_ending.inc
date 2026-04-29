@@ -32,6 +32,7 @@ class Sirius_Trust_Report_Worker_Benefit_Ending extends Report_Cache_Report_Gene
           'benefit_type_name',
           'benefit_name',
           'wb_end_date',
+          'wb_scan_msg',
         ),
         'preview_links' => TRUE,
       ),
@@ -97,6 +98,7 @@ class Sirius_Trust_Report_Worker_Benefit_Ending extends Report_Cache_Report_Gene
     $fields['benefit_nid'] = 'Benefit NID';
     $fields['benefit_name'] = 'Benefit Name';
     $fields['wb_end_date'] = 'End Date';
+    $fields['wb_scan_msg'] = 'Scan Message';
 
     return $fields;
   }
@@ -167,9 +169,24 @@ class Sirius_Trust_Report_Worker_Benefit_Ending extends Report_Cache_Report_Gene
     foreach ($pks as $pk) {
       $wb_nid = $pk;
       $wb_node = node_load($wb_nid);
+      $wb_json = sirius_json_get($wb_node);
       $benefit_node = node_load($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
       $worker_node = node_load($wb_node->field_sirius_worker['und'][0]['target_id']);
       $contact_nid = $worker_node->field_sirius_contact['und'][0]['target_id'];
+
+      // Find out if they restart in the next month
+      if ($wb_node->field_sirius_date_end['und'][0]['value']) {
+        $next_ts = strtotime($wb_node->field_sirius_date_end['und'][0]['value']);
+        $next_ts += 24*60*60*7;
+        $params = array();
+        $params['benefit_type'] = $benefit_node->field_sirius_trust_benefit_type['und'][0]['tid'];
+        $params['worker_nid'] = $worker_node->nid;
+        $params['ts'] = $next_ts;
+        $params['nids_only'] = TRUE;
+        $probe = sirius_trust_worker_benefits_search($params);
+        if ($probe) { continue; }
+      }
+
 
       $row = array();
       $row['pk'] = $pk;
@@ -189,6 +206,7 @@ class Sirius_Trust_Report_Worker_Benefit_Ending extends Report_Cache_Report_Gene
       if ($wb_node->field_sirius_date_end['und'][0]['value']) {
         $row['wb_end_date'] = date('Y-m-d', strtotime($wb_node->field_sirius_date_end['und'][0]['value']));
       }
+      $row['wb_scan_msg'] = $wb_json['scan']['msg'];
 
       $rows['rows'][$pk] = $row;
     }
