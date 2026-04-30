@@ -62,12 +62,49 @@ trait Sirius_Ledger_Service_Stripe_PaymentMethods {
 		return array('success' => TRUE, 'setupintent' => $setupintent);
 	}
 
+	public function paymentmethod_json_fetch($customer_id, $paymentmethod_id) {
+		$result = $this->paymentmethod_list($customer_id);
+		if (!$result['success']) { return $result; }
+
+		$paymentmethods_json = $result['paymentmethods'];
+		$paymentmethods_json = $this->object_to_json($paymentmethods_json);
+
+		if (!$paymentmethods_json['data']) { return array('success' => FALSE, 'msg' => 'No payment methods found.'); }
+
+		foreach ($paymentmethods_json['data'] as $idx => $paymentmethod_json) {
+			if ($paymentmethod_json['id'] == $paymentmethod_id) { return array('success' => TRUE, 'paymentmethod_json' => $paymentmethod_json); }
+		}
+
+		return array('success' => FALSE, 'msg' => "Payment method $paymentmethod_id not found.");
+	}
+
 	public function paymentmethod_charge($entity_node, $amount, $account_nid, $paymentmethod_id) {
 		$stripe = $this->client();
 		if (!$stripe) { return array('success' => FALSE, 'msg' => 'client() failed.'); }
 
 		$customer_id = $entity_node->uuid;
 		if (!$customer_id) { return array('success' => FALSE, 'msg' => 'No customer_id (no uuid in the entity node).'); }
+
+		$currency = sirius_ledger_currency_from_account_nid($account_node->nid);
+
+		$result = $this->paymentmethod_json_fetch($customer_id, $paymentmethod_id);
+		if (!$result['success']) { return $result; }
+		$paymentmethod_json = $result['paymentmethod_json'];
+
+		// There may be a maximum for credit cards
+		if ($paymentmethod_json['type'] == 'card') {
+			$max = sirius_domain_variable_get('sirius_ledger_stripe_cc_max');
+			if ( ($max > 0) && ($amount > $max)) {
+				return array('success' => FALSE, 'msg' => "The maximum amount that can be paid on a credit card is " . $currency->render_amt($max));
+			}
+		}
+
+		// Employers can't use credit cards
+		if ($entity_node->type == 'grievance_shop') {
+			if ($paymentmethod_json['type'] == 'card') {
+				return array('success' => FALSE, 'msg' => 'Employers cannot make credit card payments.');
+			}
+		}
 
 		/*
 		// Here is how Stripe transaction fees will be calculated.
@@ -115,7 +152,6 @@ trait Sirius_Ledger_Service_Stripe_PaymentMethods {
 		if ($result['success']) { $paymentmethods_json = $result['paymentmethods']; }
 		$paymentmethods_options = $this->paymentmethods_options($entity_node, $paymentmethods_json);
 
-
 		$payment_params = array();
 		$payment_params['notes'] = $paymentmethods_options[$paymentmethod_id];
 		if ($entity_node->type == 'sirius_worker') {
@@ -139,7 +175,7 @@ trait Sirius_Ledger_Service_Stripe_PaymentMethods {
 		$paymentintent_json = $this->object_to_json($paymentintent);
 
 		$payment_params['ledger_account'] = $account_nid;
-		$payment_params['dollar_amt'] = $payment_params['ledger_am'] = -1 * $amount;
+		$payment_params['dollar_amt'] = $payment_params['ledger_amt'] = -1 * $amount;
 		$payment_params['payment_type'] = sirius_domain_variable_get('sirius_ledger_stripe_payment_type');
 		$payment_params['merchant_name'] = 'Stripe';
 		$payment_params['json'] = array(
@@ -154,6 +190,28 @@ trait Sirius_Ledger_Service_Stripe_PaymentMethods {
 		// $payment_params['notes'] = "Stripe payment to "
 		$result = sirius_ledger_payment_create($payment_params);
 		$result['paymentintent'] = $paymentintent;
+		$result['fee_id'] = $fee_id;
+		$payment_node = $result['payment_node'];
+
+		// Employers are charged $5 for all transactions
+		if ($entity_node->type == 'grievance_shop') {
+			$entry = array();
+			$entry['ledger_amount'] = 5;
+			$entry['ledger_account'] = $account_nid;
+			$entry['ledger_status'] = 'Cleared';
+			$entry['ledger_memo'] = 'Transaction fee on payment #' . $payment_node->nid . ': ' . $payment_node->title;
+			$entry['ledger_ts'] = time();
+
+			// We cannot set the ledger_reference, because allocating a payment clears the entire ledger
+			// with that reference. So if we want to charge here (rather than on allocation)
+			// we're stuck.
+			// $entry['ledger_reference'] = $payment_node->nid;
+			$entry['ledger_reference'] = $entity_node->nid;
+
+			$entry['ledger_participant'] = $entity_node->nid;
+			$last_id = sirius_ledger_ar_insert($entry);
+			$fee_id = $last_id;
+		}
 
 		return $result;
 	}
