@@ -17,6 +17,14 @@ function sirius_ledger_page_stripe_config_form($form, &$form_state) {
     '#description' => t('Should Stripe payments be accepted for this domain?')
   );
 
+  $form['sirius_ledger_stripe_cc_max'] = array(
+    '#title' => t('Credit Card Max'),
+    '#type' => 'textfield',
+    '#default_value' => sirius_domain_variable_get('sirius_ledger_stripe_cc_max'),
+    '#description' => t('Maximum value for credit card payments'),
+    '#size' => 6,
+  );
+
   $payment_types = sirius_taxonomy_load('sirius_payment_type', 'tid', 'name');
 	$form['sirius_ledger_stripe_payment_type'] = array(
     '#title' => t('Payment Type'),
@@ -126,7 +134,8 @@ function sirius_ledger_page_stripe_config_form_submit($form, &$form_state) {
 		'sirius_ledger_stripe_test_account_id', 
 		'sirius_ledger_stripe_test_account_secret',
 		'sirius_ledger_stripe_live_account_id', 
-		'sirius_ledger_stripe_live_account_secret') as $key) {
+		'sirius_ledger_stripe_live_account_secret',
+    'sirius_ledger_stripe_cc_max') as $key) {
 
 		if ($key == 'sirius_ledger_stripe_test_account_secret' && !$form_state['values'][$key]) { continue; }
 		if ($key == 'sirius_ledger_stripe_live_account_secret' && !$form_state['values'][$key]) { continue; }
