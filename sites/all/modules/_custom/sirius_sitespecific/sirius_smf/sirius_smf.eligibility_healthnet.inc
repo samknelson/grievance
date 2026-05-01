@@ -40,6 +40,9 @@ class Sirius_Smf_Eligibility_Plugin_Healthnet extends Sirius_Trust_Elgibility_Pl
 	}
 
 	public function check_linked_benefit($settings, $params) {
+		$subscriber_node = $params['subscriber_worker_node'];
+		if (!$subscriber_node) { return array('success' => FALSE, 'msg' => 'No subscriber specified.'); }
+
 		// Avoid time zone crap
 		$ts = $params['ts'];
 		if (!$ts) { $ts = time(); }
@@ -68,9 +71,6 @@ class Sirius_Smf_Eligibility_Plugin_Healthnet extends Sirius_Trust_Elgibility_Pl
 				}
 			}
 		}
-
-		$subscriber_node = $params['subscriber_worker_node'];
-		if (!$subscriber_node) { return array('success' => FALSE, 'msg' => 'No subscriber specified.'); }
 
 		// (2) Have EVER had HealthNet coverage, 
 		$healthnet_benefit_id = 'H';
