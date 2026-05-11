@@ -252,14 +252,14 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
 				if (in_array($disability_tid, $all_tids)) {
 					$row['disability_approved'] = array(
 						'approved' => TRUE,
-						'msg' => 'Emmployee was on disability in the preceding month.',
+						'msg' => 'Employee was on disability in the preceding month.',
 					);
 				}
 
 				if (in_array($fmla_tid, $all_tids)) {
 					$row['disability_approved'] = array(
 						'approved' => TRUE,
-						'msg' => 'Emmployee was on fmla in the preceding month.',
+						'msg' => 'Employee was on fmla in the preceding month.',
 					);
 				}
 			}
