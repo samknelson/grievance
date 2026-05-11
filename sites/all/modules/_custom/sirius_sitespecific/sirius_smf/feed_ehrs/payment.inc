@@ -15,6 +15,10 @@ function sirius_smf_feed_ehrs_payment_form($form, &$form_state, $info, $data, $w
 
 	sirius_require('sirius_ledger', 'sirius_ledger.page_ea_stripe_payment.inc');
 	$form = sirius_ledger_node_tab_ea_stripe_payment_form($form, $form_state, $ea_node);
+	$form['confirm']['#prefix'] = 
+		'<p><strong>Important:</strong> Payments made through Stripe include a $5 transaction fee. The fee will be added to your ledger after payment is processed and should be included with your next payment to avoid any outstanding balance, interest, or liquidated damages.</p><p>If you experience issues processing your payment through Stripe, please contact our office at (866) 345-5189.</p>';
+
+
 
 	return sirius_smf_feed_ehrs_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
 }
