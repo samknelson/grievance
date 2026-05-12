@@ -49,7 +49,7 @@ class Sirius_Trust_Elgibility_Plugin_Election extends Sirius_Trust_Elgibility_Pl
 			$result['msg'] = 'No elections were found by ' . $subscriber_worker_node->title . ' for ' . $benefit_node->title . ' that were active on ' . $date . '.';
 
 			$paths = array(
-				"node/" . $subscriber_worker_node->nid . '/sirius_trust_worker_elections' => 'Elections',
+				"node/" . $subscriber_worker_node->nid . '/sirius_trust_worker_election' => 'Election',
 			);
 			$tools = array();
 			foreach ($paths as $path => $label) {
@@ -62,6 +62,29 @@ class Sirius_Trust_Elgibility_Plugin_Election extends Sirius_Trust_Elgibility_Pl
 		}
 
 		$election_node = node_load($hr['nid']);
+
+		// Check that the dependent is still on the election
+		$relationship_node = $params['relationship_node'];
+		if ($relationship_node) {
+			$election_relationship_nids = sirius_fieldvals($election_node, 'field_sirius_contact_relations', 'target_id');
+			if (!in_array($relationship_node->nid, $election_relationship_nids)) {
+				$result = array();
+				$result['success'] = FALSE;
+				$result['msg'] = 'The election does not include the relationship ' . $relationship_node->title;
+
+				$paths = array(
+					"node/" . $election_node->nid => 'Election',
+				);
+				$tools = array();
+				foreach ($paths as $path => $label) {
+					if (drupal_valid_path($path)) {
+						$tools[] = l($label, $path, array('attributes' => array('class' => array('tool-button'))));
+					}
+				}
+				$result['tools'] = $tools;
+				return $result;
+			}
+		}
 
 		$result = array();
 		$result['success'] = TRUE;
