@@ -3,7 +3,7 @@
 class Sirius_Smf_Report_Edi_Progeny extends Sirius_Trust_Provider_Edi_Report_Generator {
   public $type = 'sirius-smf-edi-progeny';
 
-  public function benefit_nid() { return $this->benefit_nid_from_id('PROGENY'); }
+  public function benefit_nid() { return $this->benefit_nid_from_id('PROGYNY'); }
 
   public function info($result = array()) {
     $result = array(
