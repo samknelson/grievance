@@ -18,7 +18,8 @@ class Sirius_Smf_Report_Edi_Progeny extends Sirius_Trust_Provider_Edi_Report_Gen
       'edi_tiers' => array('blended'),
       'edi_group_number' => 'LB391A',
       'edi_output_format' => 'csv',
-      'edi_health_plan_id' => '10000',
+      'edi_health_plan_id' => 'MLK_EPO',
+      'edi_health_plan_election' => 'EPO',
     );
 
     return parent::info($result);
@@ -112,7 +113,7 @@ class Sirius_Smf_Report_Edi_Progeny extends Sirius_Trust_Provider_Edi_Report_Gen
       $row['employment_start_date'] = '';
       $row['employment_end_date'] = '';
       $row['carrier_name'] = 'MLK'; 
-      $row['health_plan_election'] = 'PPO Choice 1';
+      $row['health_plan_election'] = $this->info()['edi_health_plan_election'];
       $row['health_plan_tier'] = '';
       $row['full_part_time'] = '';
       $row['department'] = '';
