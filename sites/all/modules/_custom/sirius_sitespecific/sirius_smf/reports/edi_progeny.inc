@@ -98,8 +98,11 @@ class Sirius_Smf_Report_Edi_Progeny extends Sirius_Trust_Provider_Edi_Report_Gen
       $row['street_1'] = $context['worker_node']->field_sirius_address['und'][0]['thoroughfare'];
       $row['street_2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
       $row['city'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
-      $row['postal_code'] = $this->zip($context, 'worker_node');
-      $row['date_of_birth'] = $this->dob($context, 'worker_node');
+      $row['postal_code'] = $this->zip($context, 'subscriber_node');
+
+      $x = $this->dob($context, 'worker_node');
+      if ($x) { $x = date('Y-m-d', strtotime($x)); }
+      $row['date_of_birth'] = $x;
 
       $x = $this->coverage_start_date($context);
       if ($x) { $x = date('Y-m-d', strtotime($x)); }
@@ -116,7 +119,7 @@ class Sirius_Smf_Report_Edi_Progeny extends Sirius_Trust_Provider_Edi_Report_Gen
       $x = $context['worker_node']->field_sirius_address['und'][0]['country'];
       if (preg_match('/us/i', $x)) { $x = 'USA'; }
       $row['country'] = $x;
-      
+
       $row['email'] =  $this->email($context, 'worker_node');
       $row['phone'] = $this->phone($context, 'worker_node');
       $row['health_plan_id'] = $this->info()['edi_health_plan_id'];
