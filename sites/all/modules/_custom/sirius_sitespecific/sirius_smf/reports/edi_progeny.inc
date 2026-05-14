@@ -100,12 +100,23 @@ class Sirius_Smf_Report_Edi_Progeny extends Sirius_Trust_Provider_Edi_Report_Gen
       $row['city'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
       $row['postal_code'] = $this->zip($context, 'worker_node');
       $row['date_of_birth'] = $this->dob($context, 'worker_node');
-      $row['coverage_start_date'] = $this->coverage_start_date($context);
-      $row['coverage_end_date'] = $this->coverage_end_date($context);
+
+      $x = $this->coverage_start_date($context);
+      if ($x) { $x = date('Y-m-d', strtotime($x)); }
+      $row['coverage_start_date'] = $x;
+
+      $x = $this->coverage_end_date($context);
+      if ($x) { $x = date('Y-m-d', strtotime($x)); }
+      $row['coverage_end_date'] = $x;
+
       $row['gender'] = $this->gender($context);
       $row['relationship'] = $this->progeny_relationship_type($context);
       $row['state'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['country'] = $context['worker_node']->field_sirius_address['und'][0]['country'];
+
+      $x = $context['worker_node']->field_sirius_address['und'][0]['country'];
+      if (preg_match('/us/i', $x)) { $x = 'USA'; }
+      $row['country'] = $x;
+      
       $row['email'] =  $this->email($context, 'worker_node');
       $row['phone'] = $this->phone($context, 'worker_node');
       $row['health_plan_id'] = $this->info()['edi_health_plan_id'];
@@ -258,7 +269,7 @@ class Sirius_Smf_Report_Edi_Progeny extends Sirius_Trust_Provider_Edi_Report_Gen
     // foreach ($tss as $ts) { drupal_set_message(date('Ymd', $ts)); }
     // drupal_set_message("Min: " . date('Ymd', $ts));
 
-    return date('Ymd', $ts);
+    return date('Y-m-d', $ts);
   }
 
   public function progeny_cobra_status($context) {
