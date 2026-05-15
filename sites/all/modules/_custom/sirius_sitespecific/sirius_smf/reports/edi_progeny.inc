@@ -116,9 +116,9 @@ class Sirius_Smf_Report_Edi_Progeny extends Sirius_Trust_Provider_Edi_Report_Gen
       $row['relationship'] = $this->progeny_relationship_type($context);
       $row['state'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
 
-      $x = $context['worker_node']->field_sirius_address['und'][0]['country'];
-      if (preg_match('/us/i', $x)) { $x = 'USA'; }
-      $row['country'] = $x;
+      // $x = $context['worker_node']->field_sirius_address['und'][0]['country'];
+      // if (preg_match('/us/i', $x)) { $x = 'USA'; }
+      $row['country'] = 'USA';
 
       $row['email'] =  $this->email($context, 'worker_node');
       $row['phone'] = $this->phone($context, 'worker_node');
@@ -136,63 +136,6 @@ class Sirius_Smf_Report_Edi_Progeny extends Sirius_Trust_Provider_Edi_Report_Gen
       $row['other_principal subdivision'] = '';
       $row['EEID'] = '';
       $row['account_key'] = $this->info()['edi_account_key'];
-
-      /*
-      $row['Health Net Group Number'] = $this->info()['edi_group_number'];
-      $row['Reserved 1'] = '';
-      $row['File Date'] = date('Ymd');
-      $row['Transaction Type (Activity Flag)'] = '';
-      $row['Coverage Begin Date'] = $this->coverage_start_date($context);
-      $row['Subscriber SSN'] = $this->ssn($context, 'subscriber_node');
-      $row['Dependent SSN'] = $this->ssn($context, 'worker_node');
-      $row['Member Type'] = $this->member_type($context);
-      $row['Reserved 2'] = '';
-      $row['Last Name & Suffix'] = $context['worker_node']->field_sirius_name['und'][0]['family'];
-      $row['First Name'] = $context['worker_node']->field_sirius_name['und'][0]['given'];
-      $row['Middle Initial'] = substr($context['worker_node']->field_sirius_name['und'][0]['middle'], 0, 1);
-      $row['Gender'] = $this->gender($context);
-      $row['Date of Birth'] = $this->dob($context, 'worker_node');
-      $row['Address Line 1'] = $context['worker_node']->field_sirius_address['und'][0]['thoroughfare'];
-      $row['Address Line 2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
-      $row['City'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
-      $row['State'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['Zip Code'] = $this->zip($context, 'worker_node');
-      $row['Zip Code +4 Extension'] = '';
-      $row['Work Telephone'] = $this->phone($context, 'subscriber_node');
-      $row['Residence Telephone'] = '';
-      $row['Provider ID'] = '';
-      $row['Physician Last Name'] = '';
-      $row['Physician First Name'] = '';
-      $row['Physician Middle Initial'] = '';
-      $row['4-Digit PPG ID'] = '';
-      $row['6-Digit PCP ID'] = '';
-      $row['Current Patient Indicator'] = '';
-      $row['Hire Date'] = $this->hire_date($context);
-      $row['Employee Number'] = '';
-      $row['Department'] = '';
-      $row['COBRA End Date'] = '';
-      $row['Pay Status Code'] = $this->pay_status_code($context);
-      $row['Contract Type'] = $this->contract_type($context);
-      $row['Number Covered'] = $this->number_covered($context);
-      $row['Coverage End Date'] = $this->coverage_end_date($context);
-      $row['Foreign Address Flag'] = '';
-      $row['Correspondence Indicator'] = '';
-      $row['Ethnicity Indicator'] = '';
-      $row['Student Indicator'] = '';
-      $row['Medicare Part A Indicator'] = '';
-      $row['Medicare Part B Indicator'] = '';
-      $row['Medicare Parts A & B Indicator'] = '';
-      $row['Medicare Part D Indicator'] = '';
-      $row['Disabled Indicator'] = '';
-      $row['Filler 1'] = '';
-      $row['Health Insurance Claim Number (for Medicare COB)'] = '';
-      $row['Coordination of Benefits'] = '';
-      $row['Insurance Line Code'] = 'HMO';
-      $row['Current Premium Amount'] = '';
-      $row['Retroactive Debit Amount'] = '';
-      $row['Retroactive Credit Amount'] = '';
-      $row['Record End Designator'] = 'HNPES';
-      */
 
       $row = $this->edi_row($row, $context);
 
