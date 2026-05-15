@@ -134,7 +134,7 @@ class Sirius_Trust_Report_Worker_Benefit_Ending extends Report_Cache_Report_Gene
     $sql .= "where node.type = 'sirius_trust_worker_benefit' ";
     $sql .= "and field_sirius_date_end_value >= :start_date_format ";
     $sql .= "and field_sirius_date_end_value <= :end_date_format ";
-    $sql .= "and field_sirius_contact_relation_target_id is null ";
+    // $sql .= "and field_sirius_contact_relation_target_id is null ";
     $sql_args[':start_date_format'] = $start_date_format;
     $sql_args[':end_date_format'] = $end_date_format;
 
