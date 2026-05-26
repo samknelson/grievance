@@ -132,6 +132,10 @@ function sirius_trust_election_wizard_post_post($info, &$data, $wizard_node, $cu
 	  	$dependent_worker_node->field_sirius_phone['und'][0]['value'] = sirius_phone_format($dependent['phone']);
 	  }
 	  $dependent_worker_node->field_sirius_dob['und'][0]['value'] = $dependent['dob'] . ' 00:00:00';
+	  $dependent_worker_node->field_sirius_gender['und'][0]['tid'] = $dependent['gender'];
+	  if ($dependent['gender_nota_val']) {
+		  $dependent_worker_node->field_sirius_gender_nota_val['und'][0]['value'] = $dependent['gender_nota_val'];
+	  }
 
 		node_save($dependent_worker_node);
 	}
