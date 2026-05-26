@@ -65,6 +65,47 @@ function sirius_trust_election_wizard_dependent_new_form($form, &$form_state, $i
 	);
 
 
+
+
+
+
+
+
+
+
+	$gender_options = sirius_taxonomy_load('sirius_gender', 'tid', 'name');
+	$form['dependents']['new'][$which]['gender'] = array(
+		'#title' => t('Gender'),
+		'#type' => 'select',
+		'#default_value' => $data['dependents']['new'][$which]['gender'],
+		'#options' => $gender_options,
+		'#required' => TRUE,
+		'#id' => 'dependent_gender',
+	);
+
+	$form['dependents']['new'][$which]['gender_nota_val'] = array(
+		'#title' => t('Gender'),
+		'#type' => 'textfield',
+		'#default_value' => $data['dependents']['new'][$which]['gender_nota_val'],
+		'#size' => 16,
+	);
+
+	// From nota
+	$gender_terms = sirius_taxonomy_load('sirius_gender', 'tid', 'full');
+
+	// Figure out which tids are "none of the above"
+	$nota_tids = array();
+	foreach ($gender_terms as $tid => $term) { 
+		if ($term->field_sirius_nota['und'][0]['value'] == 'Yes') {
+			$nota_tids[] = $tid;
+		}
+	}
+	$tmp = array();
+	foreach ($nota_tids as $nota_tid) {
+		$tmp[] = array(":input[id=\"dependent_gender\"]" => array('value' => $nota_tid));
+	}
+	$form['dependents']['new'][$which]['gender_nota_val']['#states'] = array('visible' => $tmp);
+
 	$form['file_intro'] = array(
 		'#markup' => '<br /><br /><h2>' . t('Vital Document') . '</h2><p>' . t('Use the field below to upload documentation verifying the new dependent\'s status.') . '</p>',
 	);
@@ -142,6 +183,15 @@ function sirius_trust_election_wizard_dependent_new_form_validate($form, &$form_
 		form_set_error("dependents][new][$which][dob", 'Birth date must be in the past!');	
 	}
 
+
+	$gender_tid = $form_state['values']['dependents']['new'][$which]['gender'];
+	$gender_term = taxonomy_term_load($gender_tid);
+	$gender_nota_val = $form_state['values']['dependents']['new'][$which]['gender_nota_val'];
+
+	if (!$gender_nota_val && ($gender_term->field_sirius_nota['und'][0]['value'] == 'Yes')) {
+		form_set_error("dependents][new][$which][gender_nota_val", 'This field is required');	
+	}
+
 	$info = field_info_instance('node', 'field_sirius_attachments', 'sirius_log');
 	$extensions = $info['settings']['file_extensions'];
   $file = file_save_upload("file", array(
@@ -215,6 +265,24 @@ function sirius_trust_election_wizard_dependent_new_render($info, &$data, $wizar
 	$html .= sirius_fakerender_field('Relationship:', $reltype->field_sirius_name_alt['und'][0]['value']);
 	$html .= sirius_fakerender_field('SSN:', $dependent['ssn']);
 	$html .= sirius_fakerender_field('DoB:', $dependent['dob']);
+	$html .= sirius_fakerender_field('Phone:', $dependent['phone']);
+
+
+	$calc = '';
+
+	$term = taxonomy_term_load($dependent['gender']);
+	if (!$term) {
+		// No taxonomy term. Calculated value is empty.
+		$calc = ''; 
+	} else if ($term->field_sirius_nota['und'][0]['value'] == 'Yes') {
+		// Taxonomy term is a NOTA term. Use the NOTA value.
+		$calc = $dependent['gender_nota_val'];
+	} else {
+		// Taxonomy term is not a NOTA term. Use the term name.
+		$calc = $term->name;
+	}
+	$html .= sirius_fakerender_field('Gender:', $calc);
+
 	$html .= sirius_fakerender_field('Phone:', $dependent['phone']);
 
 	return $html;
