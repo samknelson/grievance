@@ -172,6 +172,18 @@ class Sirius_Trust_Report_Worker_Benefit_Ending extends Report_Cache_Report_Gene
       $wb_json = sirius_json_get($wb_node);
       $benefit_node = node_load($wb_node->field_sirius_trust_benefit['und'][0]['target_id']);
       $worker_node = node_load($wb_node->field_sirius_worker['und'][0]['target_id']);
+
+      $relationship_nid = $wb_node->field_sirius_contact_relation['und'][0]['target_id'];
+      if ($relationship_nid) {
+        $relationship_node = node_load($relationship_nid);
+        $subscriber_contact_nid = $relationship_node->field_sirius_contact['und'][0]['target_id'];
+        $subscriber_worker_node = sirius_worker_get_by_contact_nid($subscriber_contact_nid);
+      } else {
+        $subscriber_worker_node = $worker_node;
+      }
+
+
+
       $contact_nid = $worker_node->field_sirius_contact['und'][0]['target_id'];
 
       // Find out if they restart in the next month
@@ -196,13 +208,21 @@ class Sirius_Trust_Report_Worker_Benefit_Ending extends Report_Cache_Report_Gene
       $row['worker_name'] = $worker_node->title;
       $row['worker_phone'] = $worker_node->field_sirius_phone['und'][0]['value'];
       $row['worker_email'] = $worker_node->field_sirius_email['und'][0]['value'];
-      foreach (sirius_addr_cols() as $col => $name) {
-        $row["worker_address_$col"] = $worker_node->field_sirius_address['und'][0][$col];
+
+      if ($worker_node->field_sirius_address['und'][0]['thoroughfare']) {
+        foreach (sirius_addr_cols() as $col => $name) {
+          $row["worker_address_$col"] = $worker_node->field_sirius_address['und'][0][$col];
+        }
+      } else {
+        foreach (sirius_addr_cols() as $col => $name) {
+          $row["worker_address_$col"] = $subscriber_worker_node->field_sirius_address['und'][0][$col];
+        }
       }
       $row['benefit_type_tid'] = $benefit_node->field_sirius_trust_benefit_type['und'][0]['tid'];
       $row['benefit_type_name'] = sirius_term_title($row['benefit_type_tid']);
       $row['benefit_nid'] = $benefit_node->nid;
       $row['benefit_name'] = $benefit_node->title;
+
       if ($wb_node->field_sirius_date_end['und'][0]['value']) {
         $row['wb_end_date'] = date('Y-m-d', strtotime($wb_node->field_sirius_date_end['und'][0]['value']));
       }
