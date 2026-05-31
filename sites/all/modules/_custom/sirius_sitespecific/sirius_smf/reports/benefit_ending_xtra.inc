@@ -23,6 +23,7 @@ class Sirius_Smf_Report_Benefit_Ending_Xtra extends Sirius_Trust_Report_Worker_B
     $fields['election_employer'] = 'Employer';
     $fields['cobra_rate'] = 'COBRA Rate';
     $fields['cobra_deps'] = 'COBRA Dependents';
+    $fields['wb_scan_msg_type'] = 'Scan Message';
     return $fields;
   }
 
@@ -47,6 +48,35 @@ class Sirius_Smf_Report_Benefit_Ending_Xtra extends Sirius_Trust_Report_Worker_B
       if ($election_node) {
         $result['rows'][$pk]['election_employer'] = sirius_node_title($election_node->field_grievance_shop['und'][0]['target_id']);
       }
+
+
+
+      $msg = $result['rows'][$pk]['wb_scan_msg'];
+      $msg_type = '';
+      if (preg_match('/Hours worked in/i', $msg)) {
+        $sql = "select sirius_hours_cache.* ";
+        $sql .= "from sirius_hours_cache ";
+        $sql .= "where worker_nid = :worker_nid ";
+        $sql .= "order by year desc, month desc, day desc, hours_type_name, department_name ";
+        $sql .= "limit 1 ";
+        $stmt = db_query($sql, array(':worker_nid' => $row['worker_nid']));
+        $hr = $stmt->fetchAssoc();
+
+        if (preg_match('/terminated/i', $hr['hours_type_name'])) {
+          $msg_type = 'Job Loss';
+        } else {
+          $msg_type = 'Reduction in Work Hours';
+        }
+      } else if (preg_match('/has an age of/i', $msg)) {
+        $msg_type = 'Loss of Dependent Child Status';
+      } else if (preg_match('/The amount due as of the end of/i', $msg)) {
+        $msg_type = 'SPECIAL CASE: No COBRA Letter — Arrears / Nonpayment';
+      } else if (preg_match('/The relationship ended/i', $msg) || preg_match('/The election does not include the relationship/i', $msg)) {
+        $msg_type = 'SPECIAL CASE: Manual Review — Possible Divorce or Death';
+      } else {
+        $msg_type = 'SPECIAL CASE: Manual Review — Unknown Cause of Benefit Loss';
+      }
+      $result['rows'][$pk]['wb_scan_msg_type'] = $msg_type;
     }
     return $result;
   }
