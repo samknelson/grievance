@@ -107,6 +107,17 @@ function sirius_dashboard_page_items_form($form, &$form_state, $rid) {
     );
     */
   
+		$form['item_list'][$delta]['classes'] = array(
+    	'#type' => 'checkboxes',
+    	'#title' => t('Display'),
+    	'#default_value' => sirius_form_array_default_value($item['classes']),
+    	'#options' => array(
+    		'sirius_dashboard_item_xwide' => 'Extra Wide',
+    		'sirius_dashboard_item_wide' => 'Wide',
+    		'sirius_dashboard_item_tall' => 'Tall',
+    	),
+    );
+
     $form['item_list'][$delta]['weight'] = array(
       '#title' => t('Sort Order'),
       '#type' => 'textfield',
