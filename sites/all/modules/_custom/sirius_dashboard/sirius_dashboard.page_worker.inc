@@ -12,10 +12,14 @@ function sirius_dashboard_node_tab_worker($worker_node) {
 	$user_orig = $user;
 	$user = sirius_worker_get_user($worker_node->nid);
 
-	$html .= '<div class="sirius_dashboard_wrapper" id="sirius_dashboard_content">';
-	$items = sirius_dashboard_content();
-	$html = sirius_dashboard_render($items);
-	$html .= '</div>';
+	try {
+		$html .= '<div class="sirius_dashboard_wrapper" id="sirius_dashboard_content">';
+		$items = sirius_dashboard_content();
+		$html = sirius_dashboard_render($items);
+		$html .= '</div>';
+	} catch (exception $e) {
+		drupal_set_message($e->getMessage(), 'error');
+	}
 
 	$user = $user_orig;
 
