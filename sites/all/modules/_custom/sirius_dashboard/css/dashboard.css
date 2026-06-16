@@ -16,6 +16,18 @@
 	border-radius: 10px;
 }
 
+.sirius_dashboard_item_wide {
+	width: 442px;
+}
+
+.sirius_dashboard_item_xwide {
+	width: 642px;
+}
+
+.sirius_dashboard_item_tall {
+	min-height: 542px;
+}
+
 .sirius_dashboard_item:hover {
 	border: 1px solid #e89a00;
 	background-color: #fadca2;
