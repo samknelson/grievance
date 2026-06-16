@@ -90,8 +90,13 @@ function sirius_dashboard_render_item($item) {
 		$title = $item['title'];
 		if (isset($record['title'])) { $title = $record['title']; }
 
-		$class = 'sirius_dashboard_item';
-		$class .= " sirius_dashboard_priority_$priority";
+		$classes = array();
+		$classes[] = 'sirius_dashboard_item';
+		$classes[] = "sirius_dashboard_priority_$priority";
+		if ($item['classes']) {
+			$classes = array_merge($classes, array_filter(array_values($item['classes'])));
+		}
+		$class = join(' ', $classes);
 
 		$html .= "<div class=\"$class\">";
 
@@ -123,3 +128,54 @@ function sirius_dashboard_render_item($item) {
 
 	return $html;
 }
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Implements hook_node_view
+ * 
+ * The "View" page for workers should be replaced by the "dashboard" (if they're looking at their own page)
+ */
+
+/*
+function sirius_dashboard_node_view($node, $view_mode, $langcode) {
+	if ($view_mode != 'full') { return; }
+	if ($node->type != 'sirius_worker') { return; }
+	if (!sirius_domain_component_enabled('dashboard:worker')) { return; }
+	if (user_access('sirius worker admin')) { return; }
+
+	sirius_require('sirius_dashboard', 'sirius_dashboard.page_worker.inc');
+	$node->content = array('dashboard' => array('#markup' => sirius_dashboard_node_tab_worker($node)));
+}
+*/
+
+/**
+ * Implements hook_menu_local_tasks_alter
+ * 
+ * The "View" page for workers should be renamed to "Dashboard" (if they're looking at their own page)
+ */
+
+/*
+function sirius_dashboard_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+	if (!isset($data['tabs'][0]['output'])) { return; }
+
+	$worker_node = menu_get_object();
+	if (!$worker_node) { return; }
+	if ($worker_node->type != 'sirius_worker') { return; }
+	if (user_access('sirius worker admin')) { return; }
+
+	foreach ($data['tabs'][0]['output'] as $delta => $link) {
+		if ($link['#link']['path'] == 'node/%/view') {
+			$data['tabs'][0]['output'][$delta]['#link']['title'] = 'Dashboard';
+		}
+	}
+}
+*/
