@@ -87,6 +87,19 @@ function sirius_smf_sirius_dashboard_plugin_info() {
     ),
   );
 
+
+  $plugins['smf_member_overview'] = array(
+    'title' => 'SMF: Member Overview',
+    'description' => '',
+    'file' => 'sirius_smf.dashboard_member_overview.inc',
+    'module' => 'sirius_smf',
+    'callbacks' => array(
+      'data' => 'sirius_smf_dashboard_member_overview_data',
+      // 'config' => 'sirius_trust_dashboard_plugin_elections_config',
+      // 'prefs' => 'sirius_trust_dashboard_plugin_elections_prefs',
+    ),
+  );
+
   return $plugins;
 }
 
