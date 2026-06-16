@@ -70,7 +70,7 @@ function sirius_dashboard_plugin_report_data($prefs, $options = array()) {
 			array(
 				'count' => 0, 
 				'tools' => l('Generate', "sirius/reports/$report_type/form", array('attributes' => array('class' => array('tool-button')))),
-				'details' => 'Report has never been run',
+				'details' => 'This report has never been run.',
 			)
 		);
 	}
@@ -90,7 +90,6 @@ function sirius_dashboard_plugin_report_data($prefs, $options = array()) {
 	$count = $parameters['meta']['dashboard']['count'];
 	$result['count'] = $count;
 	$ts = $parameters['meta']['ts']['completed'];
-	drupal_set_message("Here with $ts");
 	if (!$ts) {
 		$result['details'] = 'This report has never been run.';
 	} elseif (isset($count)) {
