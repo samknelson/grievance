@@ -1,5 +1,7 @@
 <?php
 
+// drush --user=1 php-eval "sirius_require('report_cache', 'report_cache.cl.inc'); report_cache_cl_run(2457501, 'sirius-smf-employer-tier', array('year' => 2025, 'month' => 05));"
+
 function report_cache_cl_run($domain_nid, $report_type, $paramters) {
 	sirius_domain($domain_nid);
 	sirius_minilog_echo_active(TRUE);
