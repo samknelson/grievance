@@ -10,11 +10,27 @@ function sirius_smf_page_ehrs_status_data() {
 
 	$status_options = $ehrs_monthly->status_options();
 
+	$accounts = array();
+	$accounts['EMPLOYER_CONTRIBUTIONS'] = array();
+	$accounts['HWP'] = array();
+
+	foreach ($accounts as $id => $record) {
+		$nid = sirius_find_nid_by_id($id, 'sirius_ledger_account');
+		if (!$nid) {
+			drupal_set_message("Unable to find account with ID $id", 'error');
+			return array();
+		}
+		$accounts[$id]['nid'] = $nid;
+		$accounts[$id]['node'] = node_load($nid);
+		$accounts[$id]['title'] = $accounts[$id]['node']->field_sirius_name_short['und'][0]['value'];
+		if (!$accounts[$id]['title']) {
+			$accounts[$id]['title'] = $accounts[$id]['node']->title;
+		}
+	}
+
 	$csv = FALSE;
 
 	$ea = Sirius_Ledger_EA::getInstance();
-	$access = Sirius_Ledger_Access::getInstance();
-	$accounts = sirius_ledger_account_list();
 	$currency = sirius_ledger_currency_from_account_nid(NULL);
 
 	$ts = time();
@@ -33,7 +49,9 @@ function sirius_smf_page_ehrs_status_data() {
 	$header = array();
 	$header[] = t('Employer');
 	foreach ($months as $month) { $header[] = $month['name']; }
-	$header[] = t('Balance');
+	foreach ($accounts as $account_id => $account_record) {
+		$header[] = $account_record['title'];
+	}
 
 	$rows = array();
 	foreach ($employers as $employer_nid => $employer_name) {
@@ -66,13 +84,12 @@ function sirius_smf_page_ehrs_status_data() {
 
 		$context = array();
 		$context['entity_node'] = $employer_node;
-		foreach ($accounts as $account_nid => $account_title) {
-			$context['account_node'] = node_load($account_nid);
-			$ea_node = $ea->fetch($employer_nid, $account_nid, TRUE);
-			if (!$access->access('ea_view', array('ea_node' => $ea_node))) { continue; }
-			$balance += $ea->balance($ea_node);
+		foreach ($accounts as $account_id => $account_record) {
+			$context['account_node'] = $account_record['node'];
+			$ea_node = $ea->fetch($employer_nid, $account_record['nid'], TRUE);
+			$balance = $ea->balance($ea_node);
+			$row[] = l($currency->render_amt(-1 * $balance), "node/$employer_nid/grievance_shop_ledger", array('html' => TRUE));
 		}
-		$row[] = l($currency->render_amt(-1 * $balance), "node/$employer_nid/grievance_shop_ledger", array('html' => TRUE));
 
 		$rows[] = $row;
 	}
