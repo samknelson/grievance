@@ -5,7 +5,7 @@ class Sirius_Ledger_Report_Fourmonth extends Report_Cache_Report_Generator {
 
   public function info($result = array()) {
     $result = array(
-      'name' => t('Four Month'),
+      'name' => t('Six Month'),
       'description' => '',
       'access' => 'sirius ledger admin',
       'preview' => array(
@@ -21,6 +21,14 @@ class Sirius_Ledger_Report_Fourmonth extends Report_Cache_Report_Generator {
   }
 
   public function fields() {
+
+    // Sometimes we pass in parameters in a "secret" argument
+    $args = func_get_args();
+    $parameters = $args[0];
+    if (!$parameters) { $parameters = array(); }
+    $parameters = $parameters['parameters'];
+    if (!$parameters) { $parameters = array(); }
+
     $fields['participant_nid'] = 'Participant NID';
     $fields['participant_name'] = 'Participant Name';
 
@@ -45,8 +53,36 @@ class Sirius_Ledger_Report_Fourmonth extends Report_Cache_Report_Generator {
     $fields['charges_4'] = 'Charges 4 Month Prev';
 
     $fields['balance_5'] = 'Balance 5 Month Prev';
+    $fields['payments_5'] = 'Payments 5 Month Prev';
+    $fields['charges_5'] = 'Charges 5 Month Prev';
+
+    $fields['balance_6'] = 'Balance 6 Month Prev';
+    $fields['payments_6'] = 'Payments 6 Month Prev';
+    $fields['charges_6'] = 'Charges 6 Month Prev';
+
+    $fields['balance_7'] = 'Balance 7 Month Prev';
 
     $fields['last_payment_date'] = 'Last Payment Date';
+
+    // Sometimes we pass in parameters in a "secret" argument
+    $args = func_get_args();
+    $parameters = $args[0];
+    if (!$parameters) { $parameters = array(); }
+    $parameters = $parameters['parameters'];
+    if ($parameters) {
+      $ts = strtotime($parameters['year'] . '-' . $parameters['month'] . '-15');
+      for ($i=0; $i<=6; ++$i) {
+        $m = date('M', $ts);
+        $fields["balance_$i"] = "Balance $m";
+        $fields["payments_$i"] = "Payments $m";
+        $fields["charges_$i"] = "Charges $m";
+        $ts = strtotime('-1 month', $ts);
+      }
+
+      $m = date('M', $ts);
+      $fields['balance_7'] = "Balance $m";
+    }
+
 
     return $fields;
   }
@@ -164,7 +200,7 @@ class Sirius_Ledger_Report_Fourmonth extends Report_Cache_Report_Generator {
 
     $intervals = array();
     $interval = $invoice_instance->interval_from_ts(strtotime("$year-$month-15"));
-    for ($i=0; $i<6; ++$i) {
+    for ($i=0; $i<8; ++$i) {
       $intervals[] = $interval;
       $interval = $invoice_instance->prev_interval($interval);
     }
@@ -175,7 +211,7 @@ class Sirius_Ledger_Report_Fourmonth extends Report_Cache_Report_Generator {
       $row['participant_nid'] = $participant_nid;
       $row['participant_name'] = sirius_node_title($participant_nid);
 
-      for ($i=0; $i<6; ++$i) {
+      for ($i=0; $i<8; ++$i) {
         $invoice = $invoice_instance->invoice_load($participant_nid, $account_nid, $intervals[$i]);
         $row["balance_$i"] = $invoice['balances']['balance_out'];
         $row["payments_$i"] = $invoice['balances']['payments'];
