@@ -72,14 +72,14 @@ class Sirius_Ledger_Report_Fourmonth extends Report_Cache_Report_Generator {
     if ($parameters) {
       $ts = strtotime($parameters['year'] . '-' . $parameters['month'] . '-15');
       for ($i=0; $i<=6; ++$i) {
-        $m = date('M', $ts);
+        $m = date('M Y', $ts);
         $fields["balance_$i"] = "Balance $m";
         $fields["payments_$i"] = "Payments $m";
         $fields["charges_$i"] = "Charges $m";
         $ts = strtotime('-1 month', $ts);
       }
 
-      $m = date('M', $ts);
+      $m = date('M Y', $ts);
       $fields['balance_7'] = "Balance $m";
     }
 
