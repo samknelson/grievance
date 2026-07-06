@@ -35,7 +35,7 @@ function report_cache_page_report($report_type) {
 		drupal_set_message(t('Purged report [@report_id]; @count records deleted.', array('@report_id' => $report_id, '@count' => $count)));
 		$render = report_cache_page_report_list($report_type, $info);
 	} elseif ($action == 'download') {
-		report_cache_download($report_type, $report_id, $info);
+		return report_cache_download($report_type, $report_id, $info);
 	} elseif ($action == 'preview') {
 		$render = report_cache_preview($report_type, $report_id, $info);
 	} elseif ($action == 'preview_modal') {
@@ -92,6 +92,10 @@ function report_cache_download($report_type, $report_id, $info) {
 	}
 
 	$fields = $info['fields'];
+	$parameters = report_cache_parameters($report_type, $report_id);
+	if ($info['generator']) {
+		$fields = $info['generator']->fields($parameters);
+	}
 
 	$filename = $report_type . '_' . $report_id;
 	$filename = preg_replace('/[^a-zA-Z0-9_]/', '_', $filename);
