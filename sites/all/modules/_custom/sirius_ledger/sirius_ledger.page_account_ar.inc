@@ -57,6 +57,8 @@ function sirius_ledger_node_tab_account_ar_export_form_submit($form, &$form_stat
 		'participant' => 'Participant',
 		'reference' => 'Reference',
 		'memo' => 'Memo',
+		'payment_received' => 'Payment Received',
+		'payment_posted' => 'Payment Posted',
 	);
 	$keys = array_keys($header);
 
@@ -77,9 +79,19 @@ function sirius_ledger_node_tab_account_ar_export_form_submit($form, &$form_stat
 		if ($header['reference']) { $row[] = $entry['reference_title']; }
 		if ($header['memo']) { $row[] = $entry['ledger_memo']; }
 
+		$node = node_load($entry['ledger_reference']);
+		if ($node && ($node->type == 'sirius_payment')) { 
+			$row[] = $node->field_sirius_datetime_created['und'][0]['value'];
+			$row[] = $node->field_sirius_datetime['und'][0]['value'];
+		} else {
+			$row[] = '';
+			$row[] = '';
+		}
+
 		fputcsv($fp, $row);
 	}
 
 	fclose($fp);
 	exit();
+	return 'Boo';
 }
