@@ -100,6 +100,14 @@ function sirius_smf_emphist_from_hours($worker_nid) {
       }
     }
 
+    // Never touch H40
+    if ($industry_id == 'H') {
+      if (in_array($ms_map['H40'], sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid'))) {
+        sirius_minilog("For industry $industry_id, the member already has member status H40. Skipping.");
+        continue; 
+      }
+    }
+
     if ($first_hours_by_industry[$industry_tid]) {
       // We have hours in this industry. Add an appropriate member status
 
