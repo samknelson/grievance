@@ -40,7 +40,7 @@ function sirius_smf_emphist_from_hours($worker_nid) {
   // Get the member status TID for each special member status
   if (!isset($lookups['ms_map'])) {
     $ms_map = array();
-    foreach (array('H60', 'P100', 'E60', 'E80', 'E100', 'R60') as $id) {
+    foreach (array('H40', 'H60', 'P100', 'E60', 'E80', 'E100', 'R60') as $id) {
       $ms_map[$id] = sirius_taxonomy_lookup_by_anything('sirius_member_status', $id);
       if (!$ms_map[$id]) {
         sirius_minilog("No member status found with ID $id.", 'error');
