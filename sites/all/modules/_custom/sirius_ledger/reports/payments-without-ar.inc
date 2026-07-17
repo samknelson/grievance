@@ -27,6 +27,10 @@ class Sirius_Ledger_Report_Payments_Without_AR extends Report_Cache_Report_Gener
     $fields['payment_from'] = 'From';
     $fields['payment_to'] = 'To';
     $fields['payment_created'] = 'Date';
+    $fields['payment_type'] = 'Type';
+    $fields['payment_status'] = 'Status';
+    $fields['payment_amount'] = 'Amount';
+    $fields['payment_allocated'] = 'Allocated';
 
     return $fields;
   }
@@ -96,6 +100,10 @@ class Sirius_Ledger_Report_Payments_Without_AR extends Report_Cache_Report_Gener
       $row['payment_from'] = sirius_node_title($payment_node->field_sirius_payer['und'][0]['target_id']);
       $row['payment_to'] = sirius_node_title($payment_node->field_sirius_ledger_account['und'][0]['target_id']);
       $row['payment_created'] = date('Y-m-d h:i a', $payment_node->created);
+      $row['payment_type'] = sirius_term_title($payment_node->field_sirius_payment_type['und'][0]['tid']);
+      $row['payment_status'] = $payment_node->field_sirius_payment_status['und'][0]['value'];
+      $row['payment_allocated'] = $payment_node->field_sirius_ledger_allocated['und'][0]['value'];
+      $row['payment_amount'] = $payment_node->field_sirius_dollar_amt['und'][0]['value'];
 
       $rows[$payment_nid] = $row;
     }
