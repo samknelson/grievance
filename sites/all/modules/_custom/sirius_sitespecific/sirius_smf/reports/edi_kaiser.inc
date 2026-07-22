@@ -15,10 +15,90 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       'row_encoding' => 'json',
       'edi_tiers' => array('single', 'single+1', 'family', 'no_coverage'),
       'edi_output_format' => 'fixed',
+      'edi_kaiser_region_code' => 'SCR',
+      'edi_kaiser_group_number' => '226111',
     );
 
     return parent::info($result);
   }
+
+
+
+
+/**
+   * Override the default edi_render_premium, Kaiser has their own
+   */
+
+  public function edi_render_premium($report_id, $output = 'page') { 
+    $info = $this->info();
+    $parameters = $this->parameters($report_id);
+    $parameters = $parameters['parameters'];
+
+    $fields = array();
+    $fields['edi_kaiser_region_code'] = 'KP REGION CODE';
+    $fields['edi_kaiser_group_number'] = 'KP REGIONAL CUSTOMER ID';
+    $fields['edi_kaiser_enrollment_subgroup'] = 'KP ENROLLMENT SUBGROUP ID';
+    $fields['edi_kaiser_subscriber_identifier'] = 'SUBSCRIBER INDENTIFIER';
+    $fields['edi_ssn'] = 'SSN';
+    $fields['edi_lastname'] = 'LAST NAME';
+    $fields['edi_firstname'] = 'FIRST NAME';
+    $fields['edi_payment_month'] = 'PAYMENT MONTH';
+    $fields['edi_kaiser_coverage_start'] = 'COVERAGE START';
+    $fields['edi_kaiser_coverage_end'] = 'COVERAGE END';
+    $fields['edi_premium_amt'] = 'AMOUNT';
+    $fields['edi_premium_tier'] = 'COVERAGE TIER';
+
+    $header = $fields;
+    $data = $this->load($report_id);
+
+    $rows = array();
+
+    $edi_asof_month = date('Y-m', strtotime($parameters['asof_date']));
+    $edi_payment_month = date('Y-m', strtotime('+1 month', strtotime($parameters['asof_date'])));
+
+    $total = 0;
+    foreach ($data as $hr) {
+      if (!$hr['edi_is_subscriber']) { continue; }
+      $row = array();
+      $row['edi_kaiser_region_code'] = $info['edi_kaiser_region_code'];
+      $row['edi_kaiser_group_number'] = $info['edi_kaiser_group_number'];
+      $row['edi_kaiser_enrollment_subgroup'] = $hr['Enrollment Unit'];
+      $row['edi_kaiser_subscriber_identifier'] = 'ssn';
+      $row['edi_ssn'] = $hr['edi_ssn'];
+      $row['edi_lastname'] = strtoupper($hr['edi_lastname']);
+      $row['edi_firstname'] = strtoupper($hr['edi_firstname']);
+      // $row['edi_asof_month'] = $edi_asof_month;
+      $row['edi_payment_month'] = $edi_payment_month;
+      $row['edi_kaiser_coverage_start'] = date('m/d/Y', strtotime($hr['Effective Date']));
+      $row['edi_kaiser_coverage_end'] = '';
+      $row['edi_premium_amt'] = '$' . number_format(round($hr['edi_premium_amt'], 2), 2);
+      $row['edi_premium_tier'] = $hr['edi_premium_tier'];
+      $rows[] = $row;
+
+      if ($hr['edi_premium_amt']) { $total += $hr['edi_premium_amt']; }
+    }
+    $total = round($total, 2);
+
+
+    $row = array();
+    $row['edi_kaiser_region_code'] = '';
+    $row['edi_kaiser_group_number'] = '';
+    $row['edi_kaiser_enrollment_subgroup'] = '';
+    $row['edi_kaiser_subscriber_identifier'] = '';
+    $row['edi_ssn'] = '';
+    $row['edi_lastname'] = '';
+    $row['edi_firstname'] = '';
+    $row['edi_payment_month'] = '';
+    $row['edi_kaiser_coverage_start'] = '';
+    $row['edi_kaiser_coverage_end'] = 'TOTAL';
+    $row['edi_premium_amt'] = '$' . number_format($total, 2);
+    $row['edi_premium_tier'] = '';
+    $rows[] = $row;
+
+    return array('header' => $header, 'rows' => $rows);
+  }
+
+
 
   public function form() {
     $form = parent::form();
