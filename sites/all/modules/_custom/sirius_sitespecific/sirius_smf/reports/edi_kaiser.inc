@@ -69,7 +69,7 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
       $row['edi_firstname'] = strtoupper($hr['edi_firstname']);
       // $row['edi_asof_month'] = $edi_asof_month;
       $row['edi_payment_month'] = $edi_payment_month;
-      $row['edi_kaiser_coverage_start'] = date('m/d/Y', strtotime($hr['Effective Date']));
+      $row['edi_kaiser_coverage_start'] = date('m/01/Y', strtotime($parameters['asof_date']));
       $row['edi_kaiser_coverage_end'] = '';
       $row['edi_premium_amt'] = '$' . number_format(round($hr['edi_premium_amt'], 2), 2);
       $row['edi_premium_tier'] = $hr['edi_premium_tier'];
