@@ -94,7 +94,8 @@ function report_cache_download($report_type, $report_id, $info) {
 	$fields = $info['fields'];
 	$parameters = report_cache_parameters($report_type, $report_id);
 	if ($info['generator']) {
-		$fields = $info['generator']->fields($parameters);
+		$tmp = $info['generator']->fields($parameters);
+		if ($tmp) { $fields = $tmp; }
 	}
 
 	$filename = $report_type . '_' . $report_id;

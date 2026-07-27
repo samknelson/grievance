@@ -15,7 +15,8 @@ function report_cache_preview_form($form, &$form_state, $report_type, $report_id
 
 	$parameters = report_cache_parameters($report_type, $report_id);
 	if ($info['generator']) {
-		$fields = $info['generator']->fields($parameters);
+		$tmp = $info['generator']->fields($parameters);
+		if ($tmp) { $fields = $tmp; }
 	}
 
 	// @todo
