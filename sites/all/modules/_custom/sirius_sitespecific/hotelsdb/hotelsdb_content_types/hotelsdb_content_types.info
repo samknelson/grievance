@@ -1,6 +1,8 @@
 name = hotelsdb_content_types
 core = 7.x
 package = Features
+dependencies[] = ctools
+dependencies[] = ds
 dependencies[] = field_group
 dependencies[] = grievance_content_types
 dependencies[] = link
@@ -12,6 +14,7 @@ features[ctools][] = field_group:field_group:1
 features[ctools][] = strongarm:strongarm:1
 features[ctools][] = views:views_default:3.0
 features[ds_field_settings][] = node|property|default
+features[ds_fields][] = union_information
 features[ds_layout_settings][] = node|actor|default
 features[ds_layout_settings][] = node|actor|teaser
 features[ds_layout_settings][] = node|hdb_airport|default
