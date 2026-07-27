@@ -96,6 +96,16 @@ function mightysearch_mschema() {
 		'type' => 'text',
 	);
 
+	$schema['property']['fields']['notes'] = array(
+		'prompt' => 'Notes',
+		'type' => 'text',
+	);
+
+	$schema['property']['fields']['legacy_id'] = array(
+		'prompt' => 'Employer ID',
+		'type' => 'text',
+	);
+
 	$schema['property']['fields']['pin'] = array(
 		'prompt' => 'PIN',
 		'type' => 'text',
@@ -229,15 +239,11 @@ function mightysearch_mschema() {
 		'type' => 'text',
 	);
 
-	$schema['property']['fields']['legacy_id'] = array(
-		'prompt' => 'Employer ID',
-		'type' => 'text',
-	);
-
 
 	$relationship_types = array(
 		'owner' => 'Owner',
 		'operator' => 'Operator',
+		'union' => 'Local',
 		'actor_a' => 'Actor A',
 		'actor_b' => 'Actor B',
 		'actor_c' => 'Actor C',

@@ -43,7 +43,7 @@ function mightysearch_search_form($form, &$form_state) {
 	}
 	
 	// Re-order our options
-	$highlights = array('', 'property.title', 'property.address.locality', 'owner.title', 'operator.title');
+	$highlights = array('', 'property.title', 'property.address.locality', 'owner.title', 'operator.title', 'union.title');
 	$new_field_options = array();
 	foreach ($field_options as $key => $value) {
 		if (in_array($key, $highlights)) {

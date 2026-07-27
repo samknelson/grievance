@@ -1,0 +1,17 @@
+#sirius_modal_messages {
+  /* display: inline-block; */
+}
+
+#sirius_modal_messages div.messages {
+  display: inline-block;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: none;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+#sirius_modal_messages h2 {
+  /* display: inline-block; */
+}

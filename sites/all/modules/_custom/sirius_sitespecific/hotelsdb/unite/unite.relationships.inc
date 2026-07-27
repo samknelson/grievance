@@ -17,6 +17,81 @@ function unite_relationships_type_order($type_name) {
 	return $order[$type_name];
 }
 
+function unite_actor_iu_nid() {
+	$nid = &drupal_static(__FUNCTION__);
+	if (!isset($nid)) {
+		$sql = "select entity_id from field_data_field_title_canon where entity_type = 'node' and bundle = 'actor' and field_title_canon_value = 'UNITEHEREIU' ";
+		$stmt = sirius_sql_query($sql, array());
+		$hr = $stmt->fetchAssoc();
+		$nid = $hr['entity_id'];
+	}
+
+	return $nid;
+}
+
+
+function unite_relationships_render_union_information($property_node) {
+	if (!$property_node->content['union_information']) { return; }
+
+	$html = '';
+
+	$iu_nid = unite_actor_iu_nid();
+	if (!$iu_nid) {
+		drupal_set_message("IU NID not found.", 'error');
+		return;
+	}
+
+	// Find "Local with jurisdiction"
+	$pa_nodes = array();
+	$query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'property_actor');
+  $query->fieldCondition('field_property', 'target_id', $property_node->nid);
+  $query->fieldCondition('field_relationship_type', 'value', 'Union');
+  $query->fieldCondition('field_ur_juris', 'value', 'Y');
+  $query->range(0,100);
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+  	$pa_nodes = node_load_multiple(array_keys($stmt['node']));
+  	foreach ($pa_nodes as $pa_nid => $pa_node) {
+  		$actor_node = node_load($pa_node->field_actor['und'][0]['target_id']);
+  		$parent_nids = sirius_fieldvals($actor_node, 'field_actors', 'target_id');
+  		if (!in_array($iu_nid, $parent_nids)) { continue; }
+
+			$html .= sirius_fakerender_field('Local with Jurisdiction:', $actor_node->title);
+  	}
+	}
+
+
+	// Find "Union Representation" (can be non-UH)
+	$pa_nodes = array();
+	$query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'property_actor');
+  $query->fieldCondition('field_property', 'target_id', $property_node->nid);
+  $query->fieldCondition('field_relationship_type', 'value', 'Union');
+  $query->fieldCondition('field_ur_rep', 'value', 'Y');
+  $query->range(0,100);
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+  	$pa_nodes = node_load_multiple(array_keys($stmt['node']));
+  	foreach ($pa_nodes as $pa_nid => $pa_node) {
+  		$actor_node = node_load($pa_node->field_actor['und'][0]['target_id']);
+			$html .= sirius_fakerender_field('Union Representation:', $actor_node->title);
+  	}
+	}
+
+
+	$property_node->content['union_information'][0]['#markup'] = $html;
+}
+
+
+
+
+
+
+
+
 function unite_relationships_render($node, $options = array()) {
 	drupal_add_css(drupal_get_path('module', 'unite') . '/css/unite.css', 'file');
 	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/sirius.modal.css', 'file');

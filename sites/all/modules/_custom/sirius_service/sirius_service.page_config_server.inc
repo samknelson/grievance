@@ -35,7 +35,7 @@ function sirius_service_page_config_server_form($form, &$form_state) {
   $form[$name_restrict] = array(
   	'#title' => t('Restrict Access by IP?'),
   	'#type' => 'select',
-    '#default_value' => sirius_domain_variable_get($name_restrict, 'No'),
+    '#default_value' => sirius_domain_variable_get($name_restrict, NULL),
     '#options' => array(
     	NULL => t('-- Select --'),
     	'Yes' => t('Yes'),

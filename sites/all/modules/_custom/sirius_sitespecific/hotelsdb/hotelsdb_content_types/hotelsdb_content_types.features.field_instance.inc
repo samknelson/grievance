@@ -1128,7 +1128,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'use_widget_handlers' => 1,
         ),
         'type' => 'addressfield_default',
-        'weight' => 16,
+        'weight' => 18,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1183,7 +1183,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 17,
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1223,7 +1223,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 18,
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1288,7 +1288,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'geofield_map_zoom' => 12,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 15,
+        'weight' => 17,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1431,7 +1431,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'file',
         'settings' => array(),
         'type' => 'file_default',
-        'weight' => 31,
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1532,7 +1532,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1716,7 +1716,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 30,
+        'weight' => 32,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1772,7 +1772,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 29,
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1902,7 +1902,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 21,
+        'weight' => 23,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2745,7 +2745,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 26,
+        'weight' => 28,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3529,7 +3529,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => ',',
         ),
         'type' => 'number_integer',
-        'weight' => 6,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3570,7 +3570,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3609,7 +3609,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3725,7 +3725,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 57,
+        'weight' => 60,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3765,7 +3765,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 20,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3804,7 +3804,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 19,
+        'weight' => 21,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3843,7 +3843,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 22,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3929,7 +3929,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 9,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3969,7 +3969,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 24,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -4008,7 +4008,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 6,
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -4048,7 +4048,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 25,
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -4088,7 +4088,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 23,
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -4173,7 +4173,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 59,
+        'weight' => 62,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -4210,7 +4210,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 6,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -4249,7 +4249,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'link',
         'settings' => array(),
         'type' => 'link_url',
-        'weight' => 27,
+        'weight' => 29,
       ),
       'teaser' => array(
         'label' => 'above',

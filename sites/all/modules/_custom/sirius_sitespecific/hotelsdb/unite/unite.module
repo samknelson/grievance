@@ -308,6 +308,12 @@ function unite_node_view($node, $view_mode, $langcode) {
   	$node->content['unite_relationships'][0]['#markup'] = unite_relationships_render($node);
   }
 
+  // Render the "Relationships" field
+  if ($node->type == 'property') {
+  	unite_relationships_render_union_information($node);
+  }
+
+
   // Render the "Brand" field
   if ($node->type == 'property' && $node->content['field_brand']) {
   	$weight = $node->content['field_brand']['#weight'];

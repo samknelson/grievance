@@ -64,6 +64,7 @@ function mightysearch_join(&$query, &$already_joined, $schema, $table, $field) {
 	$relationship_types = array(
 		'owner' => 'Owner',
 		'operator' => 'Operator',
+		'union' => 'Union',
 		'actor_a' => 'Actor A',
 		'actor_b' => 'Actor B',
 		'actor_c' => 'Actor C',
@@ -71,6 +72,7 @@ function mightysearch_join(&$query, &$already_joined, $schema, $table, $field) {
 		'actor_e' => 'Actor E',
 	);
 	
+
 	foreach ($relationship_types as $relationship_type => $relationship_prompt) {
 		if ($table == $relationship_type || $table == $relationship_type . '_pa' || $table == $relationship_type . '_node_parent') {
 
@@ -123,6 +125,10 @@ function mightysearch_join(&$query, &$already_joined, $schema, $table, $field) {
 				"${relationship_type}_node_parent_node",
 				"${relationship_type}_node_parent_node.nid = ${relationship_type}_field_data_field_actors.field_actors_target_id"
 			);
+
+			if ($relationship_type == 'union') {
+				$query->condition("${relationship_type}_node_parent_node.nid", unite_actor_iu_nid());
+			}
 
 			/*
 				$condition = db_or();

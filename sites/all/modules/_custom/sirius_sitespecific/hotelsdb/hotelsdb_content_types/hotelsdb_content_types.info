@@ -162,6 +162,7 @@ features[field_group][] = group_restaurant|node|property|form
 features[field_group][] = group_tabs|node|property|form
 features[field_group][] = group_union|node|property_actor|default
 features[field_group][] = group_union|node|property_actor|form
+features[field_group][] = group_union|node|property|default
 features[field_instance][] = node-actor-field_actor_type
 features[field_instance][] = node-actor-field_actors
 features[field_instance][] = node-actor-field_address

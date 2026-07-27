@@ -22,7 +22,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Airports',
-    'weight' => '10',
+    'weight' => '30',
     'children' => array(
       0 => 'field_airport',
       1 => 'field_airport_alt',
@@ -53,7 +53,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Hotel Amenities',
-    'weight' => '9',
+    'weight' => '20',
     'children' => array(
       0 => 'field_rooms',
       1 => 'field_fh_meeting_room_count',
@@ -138,7 +138,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Casino',
-    'weight' => '12',
+    'weight' => '50',
     'children' => array(
       0 => 'field_csno_slots_count',
       1 => 'field_csno_slots_date',
@@ -259,7 +259,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Contract',
-    'weight' => '8',
+    'weight' => '59',
     'children' => array(),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -285,7 +285,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Convention Center',
-    'weight' => '11',
+    'weight' => '40',
     'children' => array(
       0 => 'field_convention_center',
       1 => 'field_calc_convention_dist',
@@ -315,7 +315,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'FairHotels',
-    'weight' => '13',
+    'weight' => '60',
     'children' => array(
       0 => 'field_boycott_url',
       1 => 'field_labor_activity_index',
@@ -645,7 +645,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Food Service',
-    'weight' => '14',
+    'weight' => '70',
     'children' => array(
       0 => 'field_fs_segment',
       1 => 'field_fs_dbe',
@@ -794,6 +794,36 @@ function hotelsdb_content_types_field_group_info() {
   );
   $field_groups['group_union|node|property_actor|form'] = $field_group;
 
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_union|node|property|default';
+  $field_group->group_name = 'group_union';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'property';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Union Information',
+    'weight' => '10',
+    'children' => array(
+      0 => 'field_union_status',
+      1 => 'field_hotel_contract_covered',
+      2 => 'union_information',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Union Information',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-union field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_union|node|property|default'] = $field_group;
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Airports');
@@ -812,6 +842,7 @@ function hotelsdb_content_types_field_group_info() {
   t('Restaurant');
   t('Tabs');
   t('Union');
+  t('Union Information');
 
   return $field_groups;
 }
