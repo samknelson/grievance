@@ -236,6 +236,7 @@ function sirius_smf_sirius_trust_eligibility_plugin_info() {
   sirius_require('sirius_smf', 'sirius_smf.eligibility_linked.inc');
   sirius_require('sirius_smf', 'sirius_smf.eligibility_kaiser.inc');
   sirius_require('sirius_smf', 'sirius_smf.eligibility_healthnet.inc');
+  sirius_require('sirius_smf', 'sirius_smf.eligibility_delta.inc');
 
   $items = array();
   Sirius_Smf_Eligibility_Plugin_Buildup::getInstance()->setInfo($items);
@@ -244,6 +245,7 @@ function sirius_smf_sirius_trust_eligibility_plugin_info() {
   Sirius_Smf_Eligibility_Plugin_Linked::getInstance()->setInfo($items);
   Sirius_Smf_Eligibility_Plugin_Kaiser::getInstance()->setInfo($items);
   Sirius_Smf_Eligibility_Plugin_Healthnet::getInstance()->setInfo($items);
+  Sirius_Smf_Eligibility_Plugin_Delta::getInstance()->setInfo($items);
   return $items;
 }
 
@@ -422,11 +424,13 @@ function sirius_smf_sirius_plugin_info($class) {
   if ($class == 'ledger_charge') {
     sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.hourly.inc');
     sirius_require('sirius_smf', 'sirius_smf.charge_plugin_interest.inc');
+    // sirius_require('sirius_smf', 'sirius_smf.charge_plugin_ld.inc');
     sirius_require('sirius_smf', 'sirius_smf.charge_plugin_echp.inc');
 
     $items = array();
     Sirius_Smf_Charge_Plugin_Interest::getInstance()->setInfo($items);
     Sirius_Smf_Charge_Plugin_Echp::getInstance()->setInfo($items);
+    // Sirius_Smf_Charge_Plugin_LD::getInstance()->setInfo($items);
     return $items;
   }
 }
