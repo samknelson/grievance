@@ -56,6 +56,16 @@ class Sirius_Trust_Elgibility_Plugin_Geog extends Sirius_Trust_Elgibility_Plugin
 			),
 		);
 
+		$form['metric'] = array(
+			'#type' => 'select',
+			'#title' => 'Metric',
+			'#options' => array(
+				NULL => t('-- Select --'),
+				'latlon' => t('Straight-line distance'),
+				'driving' => t('Driving distance'),
+			),
+		);
+
 		sirius_jsonfield_util_set_defaults($form, $json);
 
 		return $form;
@@ -110,7 +120,16 @@ class Sirius_Trust_Elgibility_Plugin_Geog extends Sirius_Trust_Elgibility_Plugin
 		foreach ($settings['addresses'] as $delta => $record) {
 			$addr = $record['address'];
 			if (!$record['lat'] && !$record['lon']) { continue; }
-			$distance = round(sirius_addr_latlon_distance($worker_lat, $worker_lon, $record['lat'], $record['lon']), 4);
+
+			if ($settings['metric'] == 'driving') {
+				$res = sirius_addr_driving_distance($record['address'], $contact_node->field_sirius_address['und'][0], array());
+				if (!$res['success']) { return $res; }
+				$distance = $res['distance'];
+			} else {
+				$distance = sirius_addr_latlon_distance($worker_lat, $worker_lon, $record['lat'], $record['lon']);
+			}
+			$distance = round($distance, 4);
+
 			$radius = $record['radius'];
 			if ($distance <= $radius) {
 				$success = TRUE;
