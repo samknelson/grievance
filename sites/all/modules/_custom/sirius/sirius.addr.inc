@@ -122,6 +122,7 @@ function sirius_addr_validate($addr) {
 }
 
 function sirius_addr_format_oneline($addr) {
+	if (!is_array($addr)) { return $addr; }
 	// 123 Fake St., Apt 11, Beacon, NY 12508	
 	if (!$addr) { return ''; }
 	$txt = $addr['thoroughfare'] . ', ';
@@ -267,6 +268,24 @@ function sirius_addr_latlon_distance($lat1, $lon1, $lat2, $lon2, $unit = 'M') {
 }
 
 function sirius_addr_driving_distance($addr1, $addr2, $options = array()) {
+	$addr1_oneline = sirius_addr_format_oneline($addr1);
+	$addr2_oneline = sirius_addr_format_oneline($addr2);
+
+	// Check the cache
+	$sql = "select * from sirius_driving_distance ";
+	$sql .= "where dist_addr1 = :addr1_oneline ";
+	$sql .= "and dist_addr2 = :addr2_oneline ";
+	$stmt = sirius_sql_query($sql, array(':addr1_oneline' => $addr1_oneline, ':addr2_oneline' => $addr2_oneline));
+	$hr = $stmt->fetchAssoc();
+	if ($hr) {
+		return array(
+			'success' => TRUE,
+			'cache' => TRUE,
+			'record' => $hr,
+			'distance' => $hr['dist_miles'],
+		);
+	}
+
   // Get a Google API key
   $geocoder_settings = variable_get('geocoder_settings', array());
   $google_api_key = $geocoder_settings['geocoder_apikey_google'];
@@ -283,8 +302,8 @@ function sirius_addr_driving_distance($addr1, $addr2, $options = array()) {
   $url = 'https://maps.googleapis.com/maps/api/distancematrix/json';
   $options = array(
     'query' => array(
-      'origins' => sirius_addr_format_oneline($addr1),
-      'destinations' => sirius_addr_format_oneline($addr2),
+      'origins' => $addr1_oneline,
+      'destinations' => $addr2_oneline,
       // 'waypoints' => implode('|', $waypoints),
       'units' => $units,
       'key' => $google_api_key
@@ -309,6 +328,23 @@ function sirius_addr_driving_distance($addr1, $addr2, $options = array()) {
   }
   $meters = $result->rows[0]->elements[0]->distance->value;
   $miles = $meters / 1609.34;
+
+  // Write the cache
+	$sql = "insert into sirius_driving_distance ";
+	$sql .= "(dist_ts, dist_addr1, dist_addr2, dist_miles, dist_result) ";
+	$sql .= "values ";
+	$sql .= "(:dist_ts, :dist_addr1, :dist_addr2, :dist_miles, :dist_result) ";
+
+	$stmt = db_query(
+		$sql, array(
+			':dist_ts' => time(), 
+			':dist_addr1' => $addr1_oneline, 
+			':dist_addr2' => $addr2_oneline, 
+			':dist_miles' => $miles, 
+			':dist_result' => json_encode($result),
+		)
+	);
+
   return array('success' => TRUE, 'distance' => $miles);
 }
 

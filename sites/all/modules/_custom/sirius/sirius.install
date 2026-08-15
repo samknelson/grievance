@@ -510,10 +510,6 @@ function sirius_update_7031() {
 }
 
 /**
- * Grant 
- */
-
-/**
  * Grant "sirius worker" to anybody with "sirius dispatch worker"
  */
 
@@ -529,6 +525,54 @@ function sirius_update_7032() {
         print "... granting [$then_you_get] to [$name]\n";
         user_role_grant_permissions($rid, array($then_you_get));
       }
+    }
+  }
+}
+
+/**
+ * Grant "view own landing" to all workers
+ */
+
+/*
+function sirius_update_7033() {
+  $if_you_have = 'sirius worker';
+  $then_you_gets = array('sirius worker view own landing');
+
+  foreach ($then_you_gets as $then_you_get) {
+    print "Granting new permission [$then_you_get] to anybody with permission [$if_you_have] ...\n";
+    $roles = user_roles(FALSE, $if_you_have);
+    foreach ($roles as $rid => $name) {
+      print "... granting [$then_you_get] to [$name]\n";
+      user_role_grant_permissions($rid, array($then_you_get));
+    }
+  }
+}
+*/
+
+
+/**
+ * Create the driving distance cache table
+ */
+
+function sirius_update_7033() {
+  $sqls = array(
+'create table sirius_driving_distance (
+  dist_id integer primary key auto_increment,
+  dist_ts integer,
+  dist_addr1 varchar(255) not null,
+  dist_addr2 varchar(255) not null,
+  unique(dist_addr1, dist_addr2),
+  dist_miles numeric(10,2),
+  dist_result json
+);',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      drupal_set_message("Executing: $sql");
+      $stmt = db_query($sql, array());
+    } catch (exception $ignore) {
+      drupal_set_message("Error: " . $ignore->getMessage(), 'warning');
     }
   }
 }
