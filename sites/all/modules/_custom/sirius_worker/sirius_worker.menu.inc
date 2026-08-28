@@ -237,7 +237,7 @@ function sirius_worker_node_tabs() {
     'title' => 'Merge',
     'description' => '',
     'callback' => 'sirius_node_tab_worker_merge',
-    'permissions' => array('sirius worker admin'),
+    'permissions' => array('sirius admin'),
     'weight' => 8,
   );
 
