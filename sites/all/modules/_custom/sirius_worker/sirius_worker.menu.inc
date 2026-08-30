@@ -232,7 +232,7 @@ function sirius_worker_node_tabs() {
     'weight' => 7,
   );
 
-
+  /*
   $node_tabs['sirius_worker']['sirius_worker_contact/merge'] = array(
     'title' => 'Merge',
     'description' => '',
@@ -240,6 +240,7 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius admin'),
     'weight' => 8,
   );
+  */
 
   $node_tabs['sirius_worker']['sirius_worker_password'] = array(
     'title' => 'Password',
