@@ -295,6 +295,7 @@ function sirius_smf_report_cache_info() {
   sirius_require('sirius_smf', 'reports/edi_liberty.inc');
   sirius_require('sirius_smf', 'reports/edi_mlk.inc');
   sirius_require('sirius_smf', 'reports/edi_progeny.inc');
+  sirius_require('sirius_smf', 'reports/edi_omada.inc');
 
   Sirius_Smf_Report_Empstatus::getInstance()->setInfo($items);
   Sirius_Smf_Report_Emppop::getInstance()->setInfo($items);
@@ -319,6 +320,7 @@ function sirius_smf_report_cache_info() {
   Sirius_Smf_Report_Edi_Liberty::getInstance()->setInfo($items);
   Sirius_Smf_Report_Edi_MLK::getInstance()->setInfo($items);
   Sirius_Smf_Report_Edi_Progeny::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Edi_Omada::getInstance()->setInfo($items);
 
   return $items;
 }
