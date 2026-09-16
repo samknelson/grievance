@@ -103,11 +103,11 @@ class Sirius_Smf_Report_Edi_Omada extends Sirius_Trust_Provider_Edi_Report_Gener
       $row['gender'] = $this->gender($context, 'worker_node');
       $row['primary_phone'] = $this->phone($context, 'worker_node');
       $row['mobile_phone'] = '';
-      $row['address_1'] = $context['worker_node']->field_sirius_address['und'][0]['thoroughfare'];
-      $row['address_2'] = $context['worker_node']->field_sirius_address['und'][0]['premise'];
-      $row['city'] = $context['worker_node']->field_sirius_address['und'][0]['locality'];
-      $row['state'] = $context['worker_node']->field_sirius_address['und'][0]['administrative_area'];
-      $row['zip'] = $context['worker_node']->field_sirius_address['und'][0]['postal_code'];
+      $row['address_1'] = $this->omada_address_column($context, 'thoroughfare');
+      $row['address_2'] = $this->omada_address_column($context, 'premise');
+      $row['city'] = $this->omada_address_column($context, 'locality');
+      $row['state'] = $this->omada_address_column($context, 'administrative_area');
+      $row['zip'] = $this->omada_address_column($context, 'zip');
       $row['email'] = $this->email($context, 'worker_node');
       $row['at_risk_htn'] = '';
       $row['at_risk_t1d'] = '';
@@ -121,6 +121,29 @@ class Sirius_Smf_Report_Edi_Omada extends Sirius_Trust_Provider_Edi_Report_Gener
     }
 
     return array('is_multiple' => TRUE, 'rows' => $rows);
+  }
+
+  /**
+    Address fallback (mirrors hinge_column() in edi_hinge.inc).
+    1. Use the worker's own value if present.
+    2. QMSCO dependents never receive the subscriber's address; return blank.
+    3. Otherwise, copy the value from the subscriber.
+    Applied per field, not per address.
+  */
+
+  public function omada_address_column($context, $column) {
+    // First try to fetch the data directly from the worker.
+    if ($column == 'zip') { $result = $this->zip($context, 'worker_node'); }
+    else                  { $result = $context['worker_node']->field_sirius_address['und'][0][$column]; }
+    if ($result) { return $result; }
+
+    // If the worker is QMSCO, we're done now.
+    if ($this->is_qmsco($context)) { return ''; }
+
+    // Otherwise, copy the data from the subscriber.
+    if ($column == 'zip') { $result = $this->zip($context, 'subscriber_node'); }
+    else                  { $result = $context['subscriber_node']->field_sirius_address['und'][0][$column]; }
+    return $result;
   }
 
   public function cobrastatus($context) {
