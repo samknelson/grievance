@@ -298,6 +298,9 @@ function sirius_smf_report_cache_info() {
   sirius_require('sirius_smf', 'reports/edi_omada.inc');
   sirius_require('sirius_smf', 'reports/ledger_month_discrepancy.inc');
   sirius_require('sirius_smf', 'reports/new_to_benefit.inc');
+  sirius_require('sirius_smf', 'reports/ledger_qa.inc');
+  sirius_require('sirius_smf', 'reports/dual_coverage.inc');
+
 
 
   Sirius_Smf_Report_Empstatus::getInstance()->setInfo($items);
@@ -326,6 +329,8 @@ function sirius_smf_report_cache_info() {
   Sirius_Smf_Report_Edi_Omada::getInstance()->setInfo($items);
   Sirius_Smf_Report_Ledger_Month_Discrepancy::getInstance()->setInfo($items);
   Sirius_Smf_Report_New_To_Benefit::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Ledger_Qa::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Dual_Coverage::getInstance()->setInfo($items);
 
   return $items;
 }
