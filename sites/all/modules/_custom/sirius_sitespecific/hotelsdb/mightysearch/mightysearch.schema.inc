@@ -40,6 +40,10 @@ function mightysearch_mschema() {
 		'prompt' => 'Covered Workers',
 		'type' => 'integer',
 	);
+	$schema['property']['fields']['hotel_contract_covered_by'] = array(
+		'prompt' => 'Covered By',
+		'type' => 'text',
+	);
 	$schema['property']['fields']['development_status'] = array(
 		'prompt' => 'Development Status',
 		'type' => 'text',
@@ -307,6 +311,12 @@ function mightysearch_mschema() {
 			'prompt' => 'Relationship Type',
 			'type' => 'text',
 		);
+
+		$schema[$relationship_type . '_pa']['fields']['sublocation'] = array(
+			'prompt' => 'Terminal / Floor',
+			'type' => 'text',
+		);
+
 		$schema[$relationship_type . '_pa']['fields']['verified_date'] = array(
 			'prompt' => 'Verified Date',
 			'type' => 'text',
@@ -363,6 +373,11 @@ function mightysearch_mschema() {
 			$schema[$relationship_type . '_pa']['fields']['ur_contract_end'] = array(
 				'prompt' => 'Union Contract End',
 				'type' => 'date',
+			);
+
+			$schema[$relationship_type . '_pa']['fields']['ur_unknown'] = array(
+				'prompt' => 'Unknown?',
+				'type' => 'text',
 			);
 		}
 

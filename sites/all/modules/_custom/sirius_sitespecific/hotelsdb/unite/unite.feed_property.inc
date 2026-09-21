@@ -41,6 +41,7 @@ function unite_feed_property_info() {
         'legacy_id' => array('group' => 'core', 'type' => 'text'),
         'union_status' => array('group' => 'core', 'type' => 'list'),
         'hotel_contract_covered' => array('group' => 'core', 'type' => 'integer'),
+        'hotel_contract_covered_by' => array('group' => 'core', 'type' => 'list'),
 
         'address_thoroughfare' => array('group' => 'location', 'title' => 'Address 1',),
         'address_premise' => array('group' => 'location', 'title' => 'Address 2',),

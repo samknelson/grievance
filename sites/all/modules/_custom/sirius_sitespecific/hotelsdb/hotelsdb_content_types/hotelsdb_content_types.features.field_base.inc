@@ -1466,6 +1466,32 @@ function hotelsdb_content_types_field_default_field_bases() {
     'type' => 'number_integer',
   );
 
+  // Exported field_base: 'field_hotel_contract_covered_by'.
+  $field_bases['field_hotel_contract_covered_by'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_hotel_contract_covered_by',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'Employer at this property' => 'Employer at this property',
+        'Employer at multiple outlets/locations' => 'Employer at multiple outlets/locations',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_is_casino'.
   $field_bases['field_is_casino'] = array(
     'active' => 1,
@@ -2441,6 +2467,7 @@ function hotelsdb_content_types_field_default_field_bases() {
     'module' => 'list',
     'settings' => array(
       'allowed_values' => array(
+        'Union' => 'Union',
         'Owner' => 'Owner',
         'Operator' => 'Operator',
         'Leaseholder' => 'Leaseholder',
@@ -2450,11 +2477,13 @@ function hotelsdb_content_types_field_default_field_bases() {
         'Loan Servicer' => 'Loan Servicer',
         'Previous Operator' => 'Previous Operator',
         'Previous Owner' => 'Previous Owner',
+        'Previous Union' => 'Previous Union',
         'Lender' => 'Lender',
         'CMBS Trust' => 'CMBS Trust',
         'Colocated' => 'Colocated',
         'Colocation Host' => 'Colocation Host',
-        'Union' => 'Union',
+        'Manager' => 'Manager',
+        'Client' => 'Client',
       ),
       'allowed_values_function' => '',
     ),
@@ -2956,6 +2985,32 @@ function hotelsdb_content_types_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'datetime',
+  );
+
+  // Exported field_base: 'field_ur_unknown'.
+  $field_bases['field_ur_unknown'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_ur_unknown',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'Y' => 'Y',
+        'N' => 'N',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
   );
 
   // Exported field_base: 'field_url'.

@@ -31,12 +31,13 @@ function unite_feed_relationship_info() {
 
         'replace' => array(
           'group' => 'pk', 
-          'title' => 'Replace Existing Owner / Operator?',
-          'description' => 'If this value is set to "Yes", and if this is an Owner or Operator relationship, and if there is an existing relationship of that type to a different actor, then that relationship whill be changed to "Previous Owner" or "Previous Operator", as appropriate.'
+          'title' => 'Replace Existing Owner / Operator / Union?',
+          'description' => 'If this value is set to "Yes", and if this is an Owner or Operator or Union relationship, and if there is an existing relationship of that type to a different actor, then that relationship will be changed to "Previous Owner" or "Previous Operator", as appropriate.'
         ),
 
         'relationship_type' => array('group' => 'core', 'title' => 'New Relationship Type', 'type' => 'list'),
         'notes' => array('group' => 'core', 'type' => 'long'),
+        'sublocation' => array('group' => 'core', 'type' => 'text'),
 
         'start_date' => array('group' => 'core', 'type' => 'date', 'title'),
         'end_date' => array('group' => 'core', 'type' => 'date'),
@@ -76,6 +77,7 @@ function unite_feed_relationship_info() {
         'ur_contract' => array('group' => 'union', 'type' => 'list'),
         'ur_contract_start' => array('group' => 'union', 'type' => 'date'),
         'ur_contract_end' => array('group' => 'union', 'type' => 'date'),
+        'ur_unkown' => array('group' => 'union', 'type' => 'list'),
 
         'verified_date' => array('group' => 'verified', 'type' => 'date'),
         'verified_user' => array('group' => 'verified', 'type' => 'entity_reference', 'entity_type' => 'user'),
@@ -198,7 +200,7 @@ function unite_feed_relationship_row_verify($feed_node, $info, $data, &$row, $pr
       return array('success' => FALSE, 'msg' => '"Replace" must contain the value "Yes" or "No".');
     }
     if ($replace == 'y') {
-      if (!in_array($row['pk_relationship_type'], array('Owner', 'Operator'))) {
+      if (!in_array($row['pk_relationship_type'], array('Owner', 'Operator', 'Union'))) {
         return array('success' => FALSE, 'msg' => 'Replace is only available if relationship type is "Owner" or "Operator"');
       }
     }

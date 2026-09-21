@@ -13,6 +13,9 @@ function unite_relationships_type_order($type_name) {
 	$order['Loan Servicer'] 		= 6;
 	$order['Previous Operator'] = 7;
 	$order['Previous Owner'] 		= 8;
+	$order['Previous Union'] 		= 9;
+	$order['Manager'] 					= 10;
+	$order['Client'] 						= 11;
 
 	return $order[$type_name];
 }
@@ -477,6 +480,20 @@ function unite_relationships_render_actor($actor_node, $options = array()) {
  */
 
 function unite_relationship_node_presave($relationship_node) {
+	////////////////////////////////
+	// COMPUTE UNION STATUS
+	////////////////////////////////
+
+	if (in_array($relationship_node->field_relationship_type['und'][0]['value'], array('Colocated', 'Colocation Host'))) {
+		$property_node = node_load($relationship_node->field_property['und'][0]['target_id']);
+		$actor_node = node_load($relationship_node->field_actor['und'][0]['target_id']);
+		if ($actor_node->field_address['und'][0]['thoroughfare'] && !$property_node->field_address['und'][0]['thoroughfare']) {
+			$property_node->field_address = $actor_node->field_address;
+			node_save($property_node);
+		}
+	}
+
+
 	////////////////////////////////
 	// Handle address updates
 	////////////////////////////////

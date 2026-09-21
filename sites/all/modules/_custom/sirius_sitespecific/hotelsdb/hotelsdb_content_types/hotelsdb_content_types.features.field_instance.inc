@@ -3558,6 +3558,45 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-property-field_hotel_contract_covered_by'.
+  $field_instances['node-property-field_hotel_contract_covered_by'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_hotel_contract_covered_by',
+    'label' => 'Covered Workers Employed By?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 101,
+    ),
+  );
+
   // Exported field_instance: 'node-property-field_is_casino'.
   $field_instances['node-property-field_is_casino'] = array(
     'bundle' => 'property',
@@ -6233,6 +6272,45 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-property_actor-field_ur_unknown'.
+  $field_instances['node-property_actor-field_ur_unknown'] = array(
+    'bundle' => 'property_actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 46,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_ur_unknown',
+    'label' => 'Unknown?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 90,
+    ),
+  );
+
   // Exported field_instance: 'node-property_actor-field_verified_date'.
   $field_instances['node-property_actor-field_verified_date'] = array(
     'bundle' => 'property_actor',
@@ -6541,6 +6619,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Convention Center Distance');
   t('County');
   t('Covered Workers');
+  t('Covered Workers Employed By?');
   t('DBE');
   t('Development Status');
   t('Employees Claimed');
@@ -6635,6 +6714,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Type');
   t('URL');
   t('Union Status');
+  t('Unknown?');
   t('Use control- or shift-click to select multiple files.');
   t('Verified By');
   t('Verified Date');

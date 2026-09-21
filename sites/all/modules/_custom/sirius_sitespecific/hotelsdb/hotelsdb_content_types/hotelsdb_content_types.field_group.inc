@@ -620,6 +620,7 @@ function hotelsdb_content_types_field_group_info() {
       8 => 'field_is_fs',
       9 => 'field_is_hotel',
       10 => 'title',
+      11 => 'field_hotel_contract_covered_by',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -742,6 +743,7 @@ function hotelsdb_content_types_field_group_info() {
       7 => 'field_ur_contract',
       8 => 'field_ur_contract_start',
       9 => 'field_ur_contract_end',
+      10 => 'field_ur_unknown',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -779,6 +781,7 @@ function hotelsdb_content_types_field_group_info() {
       7 => 'field_ur_contract',
       8 => 'field_ur_contract_start',
       9 => 'field_ur_contract_end',
+      10 => 'field_ur_unknown',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -809,7 +812,8 @@ function hotelsdb_content_types_field_group_info() {
     'children' => array(
       0 => 'field_union_status',
       1 => 'field_hotel_contract_covered',
-      2 => 'union_information',
+      2 => 'field_hotel_contract_covered_by',
+      3 => 'union_information',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

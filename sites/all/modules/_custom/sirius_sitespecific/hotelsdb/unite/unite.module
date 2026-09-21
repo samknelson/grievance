@@ -225,6 +225,7 @@ function unite_form_alter(&$form, &$form_state, $form_id) {
 		$form['field_calc_owner_last_updated']['#access'] = FALSE;
 		$form['field_calc_operator_last_updated']['#access'] = FALSE;
  		$form['field_calc_convention_dist']['#access'] = FALSE;
+ 		$form['field_union_status']['#access'] = FALSE;
 	}
 
   // Hide fields from special groups
@@ -268,6 +269,7 @@ function unite_field_group_build_pre_render_alter(&$element) {
 		'visible' => array(
   		':input[id="edit-field-relationship-type-und"]' => array(
   			array('value' => 'Union'),
+  			array('value' => 'Previous Union'),
   		),
 		),
 	);
@@ -559,3 +561,129 @@ function unite_addr_node_presave_county($node) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+/**
+ * Implements hook_node_update
+ */
+
+function unite_node_update($node) {
+  return unite_denormalize_queue($node);
+}
+
+/**
+ * Implements hook_node_insert
+ */
+
+function unite_node_insert($node) {
+  return unite_denormalize_queue($node);
+}
+
+/**
+ * Implements hook_node_delete
+ */
+
+function unite_node_delete($node) {
+	return unite_denormalize_queue($node);
+}
+
+/**
+ * React to node save: anything that might impact our autotags should trigger a re-autotag.
+ */
+
+function unite_denormalize_queue($node) {
+	if ($node->type == 'property_actor') {
+    sirius_denorm_queue_add($node->nid, $node->field_property['und'][0]['target_id'], 'unite_denorm_union_status');
+  }
+
+  if ($node->type == 'property') {
+    sirius_denorm_queue_add($node->nid, $node->nid, 'unite_denorm_union_status');
+  }
+}
+
+/**
+ * Implements hook_sirius_denorm
+ */
+
+function unite_sirius_denorm($item) {
+  if ($item['denorm_trigger'] == 'unite_denorm_union_status') {
+    unite_denorm_union_status($item);
+  }
+}
+
+/**
+ * Compute union_status as: 
+ * - U: Represented=Y (where parent is UNITE HERE IU)
+ * - CCNA: Organizing Agreement=Y (where parent is UNITE HERE IU)
+ * - NUH: Represented=Y (where parent IS NOT UNITE HERE IU).
+ * - Unkown: There is a union relationship flagged as "Unknown"
+ * - N: There is a union relationship
+ * - [blank]: There is no union relationship
+ */
+
+function unite_denorm_union_status($item) {
+	$property_node = node_load($item['denorm_target_nid']);
+
+	// Need the "UNITE HERE" actor nid.
+	$iu_nid = unite_actor_iu_nid();
+	if (!$iu_nid) {
+		watchdog('unite', "IU NID not found.");
+		return;
+	}
+
+	// Fetch all the relationships
+	$query = new EntityFieldQuery();
+	$query->entityCondition('entity_type', 'node');
+	$query->entityCondition('bundle', 'property_actor');
+	$query->fieldCondition('field_property', 'target_id', $property_node->nid);
+	$query->fieldCondition('field_relationship_type', 'value', 'Union');
+	$query->range(0,100);
+	$stmt = $query->execute();
+	$pa_nids = $stmt['node'];
+	if (!$pa_nids) { $pa_nids = array(); }
+	$pa_nodes = node_load_multiple(array_keys($stmt['node']));
+
+	$value = NULL;
+	foreach ($pa_nodes as $pa_nid => $pa_node) {
+		$actor_node = node_load($pa_node->field_actor['und'][0]['target_id']);
+		$parent_nids = sirius_fieldvals($actor_node, 'field_actors', 'target_id');
+
+		$is_uh = in_array($iu_nid, $parent_nids);
+		$is_oa = ($pa_node->field_ur_orgag['und'][0]['value'] == 'Y');
+		$is_rep = ($pa_node->field_ur_rep['und'][0]['value'] == 'Y');
+		$is_uk = ($pa_node->field_ur_unknown['und'][0]['value'] == 'Y');
+
+		// U: Represented=Y (where parent is UNITE HERE IU)
+		// CCNA: Organizing Agreement=Y (where parent is UNITE HERE IU)
+		// NUH: Represented=Y (where parent IS NOT UNITE HERE IU).
+		// Unkown: There is a union relationship flagged as "Unknown"
+		// N: There is a union relationship
+		// [blank]: There is no union relationship
+
+		if ($is_uh && $is_rep) { $value = 'U'; }
+		if ($is_uh && $is_oa && (!in_array($value, array('U')))) { $value = 'CCNA'; }
+		if (!$is_uh && $is_rep && (!in_array($value, array('U', 'CCNA')))) { $value = 'NUH'; }
+		if ($is_uk && (!in_array($value, array('U', 'CCNA', 'NUH')))) { $value = 'Unknown'; }
+		if (!in_array($value, array('U', 'CCNA', 'NUH', 'Unknown'))) { $value = 'N'; }
+	}
+
+	watchdog('debug', 'Computed union status for ' . $property_node->title . " as [$value]");
+	if ($value != $property_node->field_union_status['und'][0]['value']) {
+		if ($value) {
+			$property_node->field_union_status['und'][0]['value'] = $value;
+		} else {
+			unset($property_node->field_union_status['und']);
+		}
+		watchdog('debug', 'Saving ' . $property_node->title . " as [$value]");
+		node_save($property_node);
+	}
+
+}
