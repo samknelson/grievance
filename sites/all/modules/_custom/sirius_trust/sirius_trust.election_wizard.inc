@@ -327,3 +327,35 @@ function sirius_trust_election_wizard_form_prep(&$form, &$form_state, $info, $da
 function sirius_trust_election_wizard_get_status($wizard_node) {
 	return $wizard_node->field_sirius_type['und'][0]['value'];
 }
+
+/**
+ * The months (as "Y-m") that staff may select as the effective month when posting an election.
+ * Elections always take effect on the first of the month.
+ */
+
+function sirius_trust_election_wizard_effective_ym_options() {
+	$months_back = 12;
+	$months_ahead = 3;
+
+	$options = array();
+	$this_month_ts = strtotime(date('Y-m-01'));
+	for ($i = -$months_back; $i <= $months_ahead; ++$i) {
+		$ts = strtotime("$i months", $this_month_ts);
+		$options[date('Y-m', $ts)] = date('F Y', $ts);
+	}
+	return $options;
+}
+
+/**
+ * The timestamp on which a posted election takes effect (the first of the selected month).
+ * Defaults to the first of the current month, which is the historical behavior.
+ */
+
+function sirius_trust_election_wizard_effective_ts($data) {
+	$ym = $data['post']['effective_ym'];
+	if ($ym) {
+		$ts = strtotime("$ym-01");
+		if ($ts) { return $ts; }
+	}
+	return strtotime(date('Y-m-01'));
+}
