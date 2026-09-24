@@ -152,7 +152,70 @@ function sirius_trust_worker_election_cleanup_multiple_active($mode, $worker_nid
   return array('success' => TRUE, 'count_expired' => $count_expired);
 }
 
+/**
+ * The "active" flag on an election is computed when the election is saved. Elections that are posted with a
+ * future effective date (or that have been given a future end date) will therefore have a stale flag once
+ * that date passes. Find any election whose flag disagrees with its dates, and re-save it to recompute.
+ */
+
+function sirius_trust_worker_election_refresh_active($mode) {
+	$now = date('Y-m-d H:i:s');
+
+	$sql_args = array();
+	$sql = "select node.nid, field_sirius_active_value as active ";
+	$sql .= "from node ";
+	$sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_date_end on field_data_field_sirius_date_end.entity_type = 'node' and field_data_field_sirius_date_end.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "where node.type = 'sirius_trust_worker_election' ";
+	$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+	$sql_args[':domain_nid'] = sirius_domain_nid();
+	$sql .= "and ( ";
+	// Flagged active, but the end date has passed
+	$sql .= "  (field_sirius_active_value = 'Yes' and field_sirius_date_end_value is not null and field_sirius_date_end_value < :now1) ";
+	$sql .= "  or ";
+	// Not flagged active, but the start date has arrived and the end date (if any) has not passed
+	$sql .= "  ((field_sirius_active_value is null or field_sirius_active_value != 'Yes') and field_sirius_date_start_value <= :now2 and (field_sirius_date_end_value is null or field_sirius_date_end_value >= :now3)) ";
+	$sql .= ") ";
+	$sql .= "order by node.nid ";
+	$sql_args[':now1'] = $now;
+	$sql_args[':now2'] = $now;
+	$sql_args[':now3'] = $now;
+
+	$stmt = sirius_sql_query($sql, $sql_args);
+	$rows = array();
+	while ($hr = $stmt->fetchAssoc()) { $rows[] = $hr; }
+
+	if (!$rows) {
+		sirius_minilog('-- No elections with a stale active flag.');
+		return array('success' => TRUE, 'count_refreshed' => 0);
+	}
+
+	$count_refreshed = 0;
+	foreach ($rows as $hr) {
+		$election_node = node_load($hr['nid']);
+		if (!$election_node) { continue; }
+		$was = $hr['active'] ? $hr['active'] : 'No';
+		$will_be = ($was == 'Yes') ? 'No' : 'Yes';
+		sirius_minilog("-- Election " . $election_node->title . " (" . $election_node->nid . "): active flag is $was, but the dates say $will_be. Re-saving.");
+		if ($mode == 'live') {
+			node_save($election_node);
+		} else {
+			sirius_minilog("(Skipping save because mode = $mode.)");
+		}
+		++$count_refreshed;
+	}
+
+	return array('success' => TRUE, 'count_refreshed' => $count_refreshed);
+}
+
 function sirius_trust_worker_election_scan($mode = 'test') {
+	sirius_minilog("Refreshing the active flag on elections whose start or end date has passed (mode = $mode)");
+	$refresh_result = sirius_trust_worker_election_refresh_active($mode);
+	$count_refreshed = $refresh_result['count_refreshed'];
+	sirius_minilog("Refreshed $count_refreshed elections.");
+
 	sirius_minilog("Scanning for workers with multiple active elections (mode = $mode)");
 
 	// Get all workers with multiple active elections.
@@ -178,7 +241,7 @@ function sirius_trust_worker_election_scan($mode = 'test') {
 
 	if (!$worker_nids) {
 		sirius_minilog('-- No workers found.');
-		return array('success' => TRUE);
+		return array('success' => TRUE, 'msg' => "Refreshed the active flag on $count_refreshed elections. No workers with multiple active elections.");
 	}
 
 	$count_scan = $count_success = $count_failure = $count_expired = 0;
@@ -197,7 +260,7 @@ function sirius_trust_worker_election_scan($mode = 'test') {
 		}
 	}
 
-	return array('success' => TRUE, 'msg' => "Scanned $count_scan workes with multiple active eletions. Cleaned up $count_success, expiring $count_expired expired records with $count_failure failures.");
+	return array('success' => TRUE, 'msg' => "Refreshed the active flag on $count_refreshed elections. Scanned $count_scan workers with multiple active elections. Cleaned up $count_success, expiring $count_expired expired records with $count_failure failures.");
 }
 
 function sirius_trust_election_wizard_search($params) {
@@ -270,7 +333,7 @@ function sirius_trust_election_wizard_status_options() {
 	);
 }
 
-function sirius_trust_election_wizard_status_render($status) {
+function sirius_trust_election_wizard_status_render($status, $data = NULL) {
 	$html .= '<div class="sirius_wizard_render_section sirius_callout_basic">';
 	$html .= '<strong>';
 	if ($status == 'draft') {
@@ -279,6 +342,9 @@ function sirius_trust_election_wizard_status_render($status) {
 		$html .= 'This is a SUBMITTED election. It is locked and can only be edited by staff. It has not yet been posted.';
 	} else if ($status == 'posted') {
 		$html .= 'This is a POSTED election. It has been posted to the member\'s record, and cannot be changed. To make any changes, a new election must be created.';
+		if ($data['post']['effective_ym']) {
+			$html .= ' Effective ' . date('F Y', strtotime($data['post']['effective_ym'] . '-01')) . '.';
+		}
 	} else if ($status == 'approved') {
 		$html .= 'This is a APPROVED election. It is locked and can only be edited by staff. It has not yet been posted.';
 	}
