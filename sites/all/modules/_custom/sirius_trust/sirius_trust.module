@@ -204,7 +204,7 @@ function sirius_trust_sirius_cron_scan_info() {
 
   $items['trust_election'] = array(
     'title' => 'Trust Worker Election Scan',
-    'description' => 'Check elections for all workers, and make sure that only one is active at a time.',
+    'description' => 'Check elections for all workers: activate any scheduled (future-dated) elections whose effective date has arrived, deactivate any that have ended, and make sure that only one is active at a time.',
     'schedule' => 'daily',
     'callback' => 'sirius_trust_worker_election_scan',
     'multidomain' => TRUE,
