@@ -3,15 +3,34 @@
 /**
  * New To Benefit
  *
- * Workers whose first-ever coverage under a selected benefit begins on or
- * after a cutoff date. "First-ever" means: no prior election carrying that
- * benefit, and no prior worker-month-benefit (WMB) for that benefit where
- * the worker was the subscriber. Coverage as someone else's dependent does
- * not count as prior history.
+ * Subscribers whose FIRST-EVER actual coverage under a selected benefit
+ * begins within a selected range of months (inclusive). Each subscriber
+ * has exactly one first month, so a multi-month range is the disjoint
+ * union of the single-month results.
  *
- * pks():   one query returning worker_nid : first_start : election_nids,
- *          chunked. All the "never had it before" logic lives here.
- * batch(): node_load per worker for name, member ID, and mailing address.
+ * Source of truth is the worker-month-benefit record (WMB): the record of
+ * coverage actually granted. Elections are NOT used. An election's start
+ * date is the enrollment date, which routinely precedes coverage by one or
+ * more months under hours-based eligibility, so an election-based test
+ * both mislabels start dates and drops people who enrolled early.
+ *
+ * Rules
+ *   - Subscribers only: the WMB's covered person must be its subscriber.
+ *     Prior coverage as someone else's dependent is not prior history.
+ *   - "First-ever" = the MIN start date across all of the subscriber's own
+ *     WMBs for the benefit. If that falls in the selected month, they are
+ *     new that month. No separate "never before" test is needed.
+ *   - One-day stub WMBs (start = end) are ignored. The election save writes
+ *     these, backdated to the 1st of the current month, in the same second
+ *     as the election; they are not real coverage and would otherwise make
+ *     a genuinely new subscriber look like they had prior history.
+ *   - Unpublished WMBs are ignored.
+ *
+ * Horizon: WMBs exist only as far ahead as the benefit scan has run
+ * (about one month). A month beyond that returns nothing yet.
+ *
+ * pks():   one grouped query, HAVING on the first start date.
+ * batch(): node_load per worker for name, member ID, contact, address.
  */
 
 class Sirius_Smf_Report_New_To_Benefit extends Report_Cache_Report_Generator {
@@ -20,7 +39,7 @@ class Sirius_Smf_Report_New_To_Benefit extends Report_Cache_Report_Generator {
   public function info($result = array()) {
     $result = array(
       'name' => t('New To Benefit'),
-      'description' => t('Workers with a first-ever election for a given benefit on or after a cutoff date.'),
+      'description' => t('Subscribers whose first-ever coverage under a benefit begins in a selected month.'),
       'access' => 'sirius trust staff',
       'preview' => array(
         'default_display_fields' => array(
@@ -28,6 +47,7 @@ class Sirius_Smf_Report_New_To_Benefit extends Report_Cache_Report_Generator {
           'member_id',
           'worker_name',
           'benefit_title',
+          'coverage_month',
           'first_start',
           'address_street',
           'address_city',
@@ -47,23 +67,23 @@ class Sirius_Smf_Report_New_To_Benefit extends Report_Cache_Report_Generator {
 
   public function fields() {
     $fields = array();
-    $fields['worker_nid']     = 'Worker NID';
-    $fields['member_id']      = 'Member ID';
-    $fields['worker_name']    = 'Worker';
-    $fields['benefit_nid']    = 'Benefit NID';
-    $fields['benefit_title']  = 'Benefit';
-    $fields['first_start']    = 'Coverage Start';
-    $fields['election_nids']  = 'Election NIDs';
-    $fields['address_name']   = 'Address Name';
-    $fields['address_street'] = 'Street';
+    $fields['worker_nid']      = 'Worker NID';
+    $fields['member_id']       = 'Member ID';
+    $fields['worker_name']     = 'Worker';
+    $fields['benefit_nid']     = 'Benefit NID';
+    $fields['benefit_title']   = 'Benefit';
+    $fields['first_start']     = 'Coverage Start';
+    $fields['coverage_month']  = 'Coverage Month';
+    $fields['address_name']    = 'Address Name';
+    $fields['address_street']  = 'Street';
     $fields['address_street2'] = 'Street 2';
-    $fields['address_city']   = 'City';
-    $fields['address_state']  = 'State';
-    $fields['address_zip']    = 'ZIP';
+    $fields['address_city']    = 'City';
+    $fields['address_state']   = 'State';
+    $fields['address_zip']     = 'ZIP';
     $fields['address_country'] = 'Country';
-    $fields['address_source'] = 'Address Source';
-    $fields['phone']          = 'Phone';
-    $fields['email']          = 'Email';
+    $fields['address_source']  = 'Address Source';
+    $fields['phone']           = 'Phone';
+    $fields['email']           = 'Email';
     return $fields;
   }
 
@@ -74,6 +94,9 @@ class Sirius_Smf_Report_New_To_Benefit extends Report_Cache_Report_Generator {
   }
 
   public function form() {
+    $options = $this->month_options();
+    $next = date('Y-m', strtotime('first day of next month'));
+
     $form['benefit_nid'] = array(
       '#type' => 'select',
       '#title' => t('Benefit'),
@@ -82,22 +105,60 @@ class Sirius_Smf_Report_New_To_Benefit extends Report_Cache_Report_Generator {
       '#empty_option' => t('- Select -'),
     );
 
-    $form['cutoff'] = array(
-      '#type' => 'date_popup',
-      '#title' => t('Cutoff Date'),
-      '#description' => t('Include workers whose coverage under this benefit starts on or after this date, and who have no coverage history for it before this date.'),
-      '#attributes' => array('autocomplete' => 'off'),
-      '#date_format' => 'Y-m-d',
+    $form['start_month'] = array(
+      '#type' => 'select',
+      '#title' => t('Start Month'),
+      '#options' => $options,
+      '#default_value' => $next,
       '#required' => TRUE,
-      '#default_value' => date('Y-m-d'),
+    );
+
+    $form['end_month'] = array(
+      '#type' => 'select',
+      '#title' => t('End Month'),
+      '#description' => t('Reports subscribers whose first-ever coverage under this benefit begins in any month from Start through End, inclusive. Coverage is only on file about one month ahead.'),
+      '#options' => $options,
+      '#default_value' => $next,
+      '#required' => TRUE,
     );
 
     return $form;
   }
 
   /**
-   * Benefit nid => title, for the selector. Built from the benefit nodes
-   * themselves so the list never goes stale.
+   * 'YYYY-MM' => 'Month YYYY', January five years back through two months
+   * ahead. UI range only; widen if older history is ever needed.
+   */
+  public function month_options() {
+    $options = array();
+    $ts = mktime(0, 0, 0, 1, 1, date('Y') - 5);
+    $last = strtotime('+2 months', strtotime(date('Y-m-01')));
+    while ($ts <= $last) {
+      $options[date('Y-m', $ts)] = date('F Y', $ts);
+      $ts = strtotime('+1 month', $ts);
+    }
+    return $options;
+  }
+
+  public function form_validate($form, &$form_state) {
+    $parameters = $form_state['values']['parameters'];
+
+    $start = $parameters['start_month'];
+    $end = $parameters['end_month'];
+
+    if (!preg_match('/^\d{4}-\d{2}$/', $start)) {
+      form_set_error("parameters][start_month", 'Please select a start month.');
+    }
+    if (!preg_match('/^\d{4}-\d{2}$/', $end)) {
+      form_set_error("parameters][end_month", 'Please select an end month.');
+    }
+    if ($start && $end && strcmp($end, $start) < 0) {
+      form_set_error("parameters][end_month", 'End month cannot be before start month.');
+    }
+  }
+
+  /**
+   * Benefit nid => title, built from the benefit nodes so it never goes stale.
    */
   public function benefit_options() {
     $sql = "select n.nid, n.title from node n ";
@@ -131,86 +192,57 @@ class Sirius_Smf_Report_New_To_Benefit extends Report_Cache_Report_Generator {
   public function pks(&$form_state) {
     $parameters = $form_state['values']['parameters'];
 
-    $benefit_nid = $parameters['benefit_nid'] + 0;
-    $cutoff = date('Y-m-d', strtotime($parameters['cutoff'])) . ' 00:00:00';
+    $benefit_nid = intval($parameters['benefit_nid']);
+    // Snap to whole months: 1st at 00:00:00 through last day at 23:59:59.
+    $start_ts = strtotime($parameters['start_month'] . '-01');
+    $end_ts = strtotime($parameters['end_month'] . '-01');
+    $month_start = date('Y-m-d 00:00:00', $start_ts);
+    $month_end = date('Y-m-t 23:59:59', $end_ts);
 
-    $sql = "select w.nid as worker_nid, ";
-    $sql .= "min(ds.field_sirius_date_start_value) as first_start, ";
-    $sql .= "group_concat(distinct e.nid order by e.nid separator ',') as election_nids ";
-    $sql .= "from node e ";
+    $sql = "select sub.field_sirius_trust_subscriber_target_id as worker_nid, ";
+    $sql .= "min(ds.field_sirius_date_start_value) as first_start ";
+    $sql .= "from field_data_field_sirius_trust_benefit fb ";
+    $sql .= "join node m ";
+    $sql .= "  on m.nid = fb.entity_id and m.type = 'sirius_trust_worker_benefit' and m.status = 1 ";
+    $sql .= "join field_data_field_sirius_trust_subscriber sub ";
+    $sql .= "  on sub.entity_type = 'node' and sub.entity_id = fb.entity_id ";
+    $sql .= "  and sub.bundle = 'sirius_trust_worker_benefit' and sub.deleted = 0 ";
+
+    // Subscribers only: the covered person must be the subscriber.
     $sql .= "join field_data_field_sirius_worker fw ";
-    $sql .= "  on fw.entity_type = 'node' and fw.entity_id = e.nid ";
-    $sql .= "  and fw.bundle = 'sirius_trust_worker_election' and fw.deleted = 0 ";
-    $sql .= "join node w ";
-    $sql .= "  on w.nid = fw.field_sirius_worker_target_id and w.type = 'sirius_worker' ";
-    $sql .= "join field_data_field_sirius_trust_benefits fb ";
-    $sql .= "  on fb.entity_type = 'node' and fb.entity_id = e.nid ";
-    $sql .= "  and fb.bundle = 'sirius_trust_worker_election' and fb.deleted = 0 ";
-    $sql .= "join field_data_field_sirius_active fa ";
-    $sql .= "  on fa.entity_type = 'node' and fa.entity_id = e.nid ";
-    $sql .= "  and fa.bundle = 'sirius_trust_worker_election' and fa.deleted = 0 ";
+    $sql .= "  on fw.entity_type = 'node' and fw.entity_id = fb.entity_id ";
+    $sql .= "  and fw.bundle = 'sirius_trust_worker_benefit' and fw.deleted = 0 ";
+    $sql .= "  and fw.field_sirius_worker_target_id = sub.field_sirius_trust_subscriber_target_id ";
+
     $sql .= "join field_data_field_sirius_date_start ds ";
-    $sql .= "  on ds.entity_type = 'node' and ds.entity_id = e.nid ";
-    $sql .= "  and ds.bundle = 'sirius_trust_worker_election' and ds.deleted = 0 ";
-    $sql .= "where e.type = 'sirius_trust_worker_election' ";
-    $sql .= "and e.status = 1 ";
-    $sql .= "and fb.field_sirius_trust_benefits_target_id = :benefit_nid ";
-    $sql .= "and fa.field_sirius_active_value = 'Yes' ";
-    $sql .= "and ds.field_sirius_date_start_value >= :cutoff ";
+    $sql .= "  on ds.entity_type = 'node' and ds.entity_id = fb.entity_id ";
+    $sql .= "  and ds.bundle = 'sirius_trust_worker_benefit' and ds.deleted = 0 ";
+    $sql .= "left join field_data_field_sirius_date_end de ";
+    $sql .= "  on de.entity_type = 'node' and de.entity_id = fb.entity_id ";
+    $sql .= "  and de.bundle = 'sirius_trust_worker_benefit' and de.deleted = 0 ";
 
-    // No earlier election carrying this benefit, any status.
-    $sql .= "and not exists ( ";
-    $sql .= "  select 1 ";
-    $sql .= "  from field_data_field_sirius_worker fw2 ";
-    $sql .= "  join field_data_field_sirius_trust_benefits fb2 ";
-    $sql .= "    on fb2.entity_type = 'node' and fb2.entity_id = fw2.entity_id ";
-    $sql .= "    and fb2.bundle = 'sirius_trust_worker_election' and fb2.deleted = 0 ";
-    $sql .= "  left join field_data_field_sirius_date_start ds2 ";
-    $sql .= "    on ds2.entity_type = 'node' and ds2.entity_id = fw2.entity_id ";
-    $sql .= "    and ds2.bundle = 'sirius_trust_worker_election' and ds2.deleted = 0 ";
-    $sql .= "  where fw2.entity_type = 'node' ";
-    $sql .= "  and fw2.bundle = 'sirius_trust_worker_election' and fw2.deleted = 0 ";
-    $sql .= "  and fw2.field_sirius_worker_target_id = w.nid ";
-    $sql .= "  and fb2.field_sirius_trust_benefits_target_id = :benefit_nid ";
-    $sql .= "  and (ds2.field_sirius_date_start_value < :cutoff ";
-    $sql .= "    or ds2.field_sirius_date_start_value is null) ";
-    $sql .= ") ";
+    $sql .= "where fb.entity_type = 'node' ";
+    $sql .= "and fb.bundle = 'sirius_trust_worker_benefit' ";
+    $sql .= "and fb.deleted = 0 ";
+    $sql .= "and fb.field_sirius_trust_benefit_target_id = :benefit_nid ";
 
-    // No earlier WMB for this benefit where the worker was the subscriber.
-    $sql .= "and not exists ( ";
-    $sql .= "  select 1 ";
-    $sql .= "  from field_data_field_sirius_trust_subscriber sub3 ";
-    $sql .= "  join field_data_field_sirius_worker fw3 ";
-    $sql .= "    on fw3.entity_type = 'node' and fw3.entity_id = sub3.entity_id ";
-    $sql .= "    and fw3.bundle = 'sirius_trust_worker_benefit' and fw3.deleted = 0 ";
-    $sql .= "  join field_data_field_sirius_trust_benefit fb3 ";
-    $sql .= "    on fb3.entity_type = 'node' and fb3.entity_id = sub3.entity_id ";
-    $sql .= "    and fb3.bundle = 'sirius_trust_worker_benefit' and fb3.deleted = 0 ";
-    $sql .= "  left join field_data_field_sirius_date_start ds3 ";
-    $sql .= "    on ds3.entity_type = 'node' and ds3.entity_id = sub3.entity_id ";
-    $sql .= "    and ds3.bundle = 'sirius_trust_worker_benefit' and ds3.deleted = 0 ";
-    $sql .= "  where sub3.entity_type = 'node' ";
-    $sql .= "  and sub3.bundle = 'sirius_trust_worker_benefit' and sub3.deleted = 0 ";
-    $sql .= "  and sub3.field_sirius_trust_subscriber_target_id = w.nid ";
-    $sql .= "  and fw3.field_sirius_worker_target_id = w.nid ";
-    $sql .= "  and fb3.field_sirius_trust_benefit_target_id = :benefit_nid ";
-    $sql .= "  and (ds3.field_sirius_date_start_value < :cutoff ";
-    $sql .= "    or ds3.field_sirius_date_start_value is null) ";
-    $sql .= ") ";
+    // Ignore the one-day stubs written by the election save.
+    $sql .= "and (de.field_sirius_date_end_value is null ";
+    $sql .= "  or de.field_sirius_date_end_value <> ds.field_sirius_date_start_value) ";
 
-    $sql .= "group by w.nid ";
-    $sql .= "order by first_start, w.nid ";
+    $sql .= "group by sub.field_sirius_trust_subscriber_target_id ";
+    $sql .= "having first_start between :month_start and :month_end ";
+    $sql .= "order by first_start, worker_nid ";
 
     $stmt = sirius_sql_query($sql, array(
       ':benefit_nid' => $benefit_nid,
-      ':cutoff' => $cutoff,
+      ':month_start' => $month_start,
+      ':month_end' => $month_end,
     ));
 
-    // Carry first_start and election_nids through the pk so batch() doesn't
-    // have to re-derive them. Fixed-width worker nid keeps the sort stable.
     $pks = array();
     while ($hr = $stmt->fetchAssoc()) {
-      $pks[] = $hr['worker_nid'] . '|' . $hr['first_start'] . '|' . $hr['election_nids'];
+      $pks[] = $hr['worker_nid'] . '|' . $hr['first_start'];
     }
 
     return array_chunk($pks, 100);
@@ -218,15 +250,15 @@ class Sirius_Smf_Report_New_To_Benefit extends Report_Cache_Report_Generator {
 
   public function batch($pks, $values, &$context) {
     $parameters = $values['parameters'];
-    $benefit_nid = $parameters['benefit_nid'] + 0;
+    $benefit_nid = intval($parameters['benefit_nid']);
 
     $benefit_node = node_load($benefit_nid);
     $benefit_title = $benefit_node ? $benefit_node->title : '';
 
     $rows = array();
     foreach ($pks as $pk) {
-      list ($worker_nid, $first_start, $election_nids) = explode('|', $pk, 3);
-      $worker_nid += 0;
+      list ($worker_nid, $first_start) = explode('|', $pk, 2);
+      $worker_nid = intval($worker_nid);
 
       $worker_node = node_load($worker_nid);
       if (!$worker_node) { continue; }
@@ -238,7 +270,7 @@ class Sirius_Smf_Report_New_To_Benefit extends Report_Cache_Report_Generator {
       $row['benefit_nid'] = $benefit_nid;
       $row['benefit_title'] = $benefit_title;
       $row['first_start'] = $first_start;
-      $row['election_nids'] = $election_nids;
+      $row['coverage_month'] = substr($first_start, 0, 7);
 
       $row['phone'] = $worker_node->field_sirius_phone['und'][0]['value'];
       $row['email'] = $worker_node->field_sirius_email['und'][0]['email'];
