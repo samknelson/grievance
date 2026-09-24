@@ -11,8 +11,8 @@ function sirius_trust_election_wizard_post_form($form, &$form_state, $info, $dat
 	$form['#tree'] = TRUE;
 
 	$status = sirius_trust_election_wizard_get_status($wizard_node);
-	$form['status'] = array('#markup' => sirius_trust_election_wizard_status_render($status));
-	
+	$form['status'] = array('#markup' => sirius_trust_election_wizard_status_render($status, $data));
+
 	$steps = sirius_trust_election_wizard_steps($data, $wizard_node);
 	foreach ($steps as $step_id => $step) {
 		if ($step['file']) { sirius_require($step['module'], $step['file']); }
@@ -38,6 +38,19 @@ function sirius_trust_election_wizard_post_form($form, &$form_state, $info, $dat
 	$access_context = array('election_wizard_node' => $wizard_node, 'current_step' => $current_step);
 
 	if ($access->access('election_wizard_edit', $access_context)) {
+		$effective_ym_options = sirius_trust_election_wizard_effective_ym_options();
+		$effective_ym_default = $data['post']['effective_ym'];
+		if (!$effective_ym_default || !isset($effective_ym_options[$effective_ym_default])) { $effective_ym_default = date('Y-m'); }
+
+		$form['effective_ym'] = array(
+			'#type' => 'select',
+			'#title' => t('Effective Month'),
+			'#options' => $effective_ym_options,
+			'#default_value' => $effective_ym_default,
+			'#required' => TRUE,
+			'#description' => t('The election will take effect on the first day of this month, and any prior election will end on the last day of the preceding month. If you select a future month, the election will be created now but will not become active until that date.'),
+		);
+
 		$form['action'] = array(
 			'#type' => 'select',
 			'#title' => t('Action'),
@@ -47,11 +60,21 @@ function sirius_trust_election_wizard_post_form($form, &$form_state, $info, $dat
 				'post' => t('Post the election'),
 			),
 			'#required' => TRUE,
-			'#suffix' => '<p><strong>Posting will create or update any dependent and relationship records, and will create an active election for the worker</strong></p>',
+			'#suffix' => '<p><strong>Posting will create or update any dependent and relationship records, and will create an election for the worker as of the effective month selected above.</strong></p>',
 		);
 	}
 
 	return sirius_trust_election_wizard_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
+}
+
+function sirius_trust_election_wizard_post_form_validate($form, &$form_state) {
+	if ($form_state['values']['action'] != 'post') { return; }
+
+	$effective_ym = $form_state['values']['effective_ym'];
+	$effective_ym_options = sirius_trust_election_wizard_effective_ym_options();
+	if (!$effective_ym || !isset($effective_ym_options[$effective_ym]) || !strtotime("$effective_ym-01")) {
+		form_set_error('effective_ym', t('Please select a valid effective month.'));
+	}
 }
 
 function sirius_trust_election_wizard_post_form_submit($form, &$form_state) {
@@ -64,6 +87,10 @@ function sirius_trust_election_wizard_post_form_submit($form, &$form_state) {
 	if ($action == 'approve') {
 		$wizard_node->field_sirius_type['und'][0]['value'] = 'approved';
 	} else if ($action == 'post') {
+		// Record the effective month so that the post callbacks (and the saved wizard data) can see it.
+		$data['post']['effective_ym'] = $form_state['values']['effective_ym'];
+		drupal_set_message("Effective date: " . date('m/d/Y', sirius_trust_election_wizard_effective_ts($data)));
+
 		// Post all steps
 		$steps = sirius_trust_election_wizard_steps($data, $wizard_node);
 		foreach ($steps as $step_id => $step) {
@@ -87,6 +114,16 @@ function sirius_trust_election_wizard_post_form_submit($form, &$form_state) {
 function sirius_trust_election_wizard_post_post($info, &$data, $wizard_node, $current_step) {
 	$worker_node = sirius_trust_election_wizard_get_worker($wizard_node);
 	$policy_node = sirius_trust_election_wizard_get_policy($data);
+
+	// The election takes effect on the first of the selected month (default: the current month).
+	$effective_ts = sirius_trust_election_wizard_effective_ts($data);
+	$effective_date = date('Y-m-d 00:00:00', $effective_ts);
+	$prior_end_date = date('Y-m-d 00:00:00', strtotime('-1 day', $effective_ts));
+
+	// New relationships start no later than this month, so that they are visible as active relationships right away
+	// even if the election itself is future-dated. A backdated election backdates the relationship along with it.
+	$this_month_ts = strtotime(date('Y-m-01'));
+	$relationship_start_date = date('Y-m-d 00:00:00', min($effective_ts, $this_month_ts));
 
 	// 
 	// Create any new workers
@@ -181,7 +218,7 @@ function sirius_trust_election_wizard_post_post($info, &$data, $wizard_node, $cu
 		  $relationship_node->field_sirius_contact['und'][0]['target_id'] = $worker_contact_nid;
 		  $relationship_node->field_sirius_contact_alt['und'][0]['target_id'] = $dependent_contact_nid;
 		  $relationship_node->field_sirius_contact_reltype['und'][0]['tid'] = $reltype_tid;
-		  $relationship_node->field_sirius_date_start['und'][0]['value'] = date('Y-m-1 00:00:00');
+		  $relationship_node->field_sirius_date_start['und'][0]['value'] = $relationship_start_date;
 		} else {
 			drupal_set_message("... Relationship #$which: Updating existing relationship to $ssn.");
 		}
@@ -200,13 +237,16 @@ function sirius_trust_election_wizard_post_post($info, &$data, $wizard_node, $cu
   	);
 	}
 
-	// Cancel any existing election (as of the beginning of the preceding month)
-	$no_infinite_loop = 0;
-	while ($election_node = sirius_trust_worker_election($worker_node)) {
-		++$no_infinite_loop; if ($no_infinite_loop > 10) { break; }
-		$election_node->field_sirius_date_end['und'][0]['value'] = date('Y-m-t 00:00:00', strtotime('-1 month'));
+	// Cancel any existing election that is still in effect on the effective date. That includes the currently
+	// active election, any previously posted future election (which this one supersedes), and, if we are
+	// backdating, any past election that overlaps the effective date. They all end the day before we start.
+	$prior_election_nodes = sirius_trust_worker_elections_search(array('worker_nid' => $worker_node->nid, 'limit' => 1000));
+	foreach ($prior_election_nodes as $election_node) {
+		$prior_end_value = $election_node->field_sirius_date_end['und'][0]['value'];
+		if ($prior_end_value && strtotime($prior_end_value) < $effective_ts) { continue; }
+		$election_node->field_sirius_date_end['und'][0]['value'] = $prior_end_date;
 		node_save($election_node);
-		drupal_set_message("Canceling prior election: " . $election_node->title);
+		drupal_set_message("Canceling prior election: " . $election_node->title . " as of " . date('m/d/Y', strtotime($prior_end_date)));
 	}
 
 	// Create a new election
@@ -237,7 +277,7 @@ function sirius_trust_election_wizard_post_post($info, &$data, $wizard_node, $cu
 
   $election_node->field_sirius_trust_policy['und'][0]['target_id'] = $policy_node->nid;
 
-	$election_node->field_sirius_date_start['und'][0]['value'] = date('Y-m-1 00:00:00');
+	$election_node->field_sirius_date_start['und'][0]['value'] = $effective_date;
 
 	$relationship_nids = array();
 	if ($data['dependents']['existing']) {
@@ -256,6 +296,12 @@ function sirius_trust_election_wizard_post_post($info, &$data, $wizard_node, $cu
 	$election_node->field_grievance_shop['und'][0]['target_id'] = $data['employer']['employer_nid'];
 
 	node_save($election_node);
+
+	if ($effective_ts > time()) {
+		drupal_set_message("The election is scheduled to take effect on " . date('m/d/Y', $effective_ts) . ". It will become the active election on that date.");
+	} else {
+		drupal_set_message("The election is effective as of " . date('m/d/Y', $effective_ts) . ".");
+	}
 
 	sirius_log_handler_set($wizard_node, $election_node->nid);
 
