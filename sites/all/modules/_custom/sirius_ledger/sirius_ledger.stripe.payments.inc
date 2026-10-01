@@ -176,12 +176,20 @@ trait Sirius_Ledger_Service_Stripe_Payments {
 			$params['payment_status'] = $event_types[$event_type]['status'];
 			$params['allocate'] = 'Yes';
 			if ($params['payment_status'] == 'Cleared' && !$payment_node->field_sirius_datetime['und'][0]['value']) {
-				$params['datetime'] = date('c');
+				// Stripe payments post at the original received date, not the date Stripe reports the clear (ACH can take days).
+				// field_sirius_datetime_created is always written with gmdate(), so parse it explicitly as UTC.
+				// Fallbacks: PaymentIntent creation time, then now.
+				$created = $payment_node->field_sirius_datetime_created['und'][0]['value'];
+				$post_ts = $created ? strtotime($created . ' UTC') : FALSE;
+				if (!($post_ts > 1)) { $post_ts = (int) $event_json['data']['object']['created']; }
+				if (!($post_ts > 1)) { $post_ts = time(); }
+				$params['datetime'] = date('c', $post_ts);
 			}
 			$result = sirius_ledger_payment_update($payment_node, $params);
 		}
 
 		$notes = $result['msg'];
+
 
 
 		// Log the request
