@@ -222,6 +222,29 @@ function sirius_worker_cron() {
 }
 
 /**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_worker_sirius_cron_scan_info() {
+  $items = array();
+
+  $items['worker_duplicate_sirius_id'] = array(
+    'title' => 'Worker: Fix Duplicate Sirius IDs',
+    'description' => 'Finds workers sharing a sirius_id, keeps the oldest, and re-saves the newer ones so they receive a new unique ID.',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_worker_cron_duplicate_sirius_id',
+    'multidomain' => FALSE,
+  );
+
+  return $items;
+}
+
+function sirius_worker_cron_duplicate_sirius_id($mode = 'test', $force = FALSE, $options = array()) {
+  sirius_require('sirius_worker', 'oneoff_duplicate_cleanup.php');
+  return oneoff_duplicate_cleanup($mode, FALSE);
+}
+
+/**
  * Implements hook_views_pre_render
  */
 
