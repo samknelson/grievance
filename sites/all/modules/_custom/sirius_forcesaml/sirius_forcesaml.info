@@ -1,0 +1,4 @@
+name = Sirius Force SAML
+description = Disables username/password login and redirects all login paths and access-denied pages to the SAML login.
+package = Sirius
+core = 7.x

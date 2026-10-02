@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * @file
+ * Forces SAML login: no username/password form, all login paths redirect.
+ *
+ * Optional settings.php overrides:
+ *   $conf['sirius_forcesaml_login_path'] = 'saml/login';
+ *   $conf['sirius_forcesaml_block_password_reset'] = TRUE;
+ *
+ * Emergency access: "drush uli" one-time links (user/reset/...) still work.
+ */
+
+/**
+ * Implements hook_menu_alter().
+ */
+function sirius_forcesaml_menu_alter(&$items) {
+  // user/login -> SAML.
+  $items['user/login']['page callback'] = 'sirius_forcesaml_login_page';
+  $items['user/login']['page arguments'] = array();
+
+  // The bare "user" page shows the login form to anonymous users.
+  $items['user']['page callback'] = 'sirius_forcesaml_user_page';
+  $items['user']['page arguments'] = array();
+
+  // Password reset requests would otherwise be a back door to local login.
+  if (variable_get('sirius_forcesaml_block_password_reset', TRUE)) {
+    $items['user/password']['page callback'] = 'sirius_forcesaml_login_page';
+    $items['user/password']['page arguments'] = array();
+  }
+}
+
+/**
+ * Page callback: redirect to the SAML login, preserving the destination.
+ */
+function sirius_forcesaml_login_page() {
+  $is_403 = (strpos((string) drupal_get_http_header('status'), '403') === 0);
+
+  if (user_is_logged_in()) {
+    if ($is_403) {
+      drupal_set_title(t('Access denied'));
+      return t('You are not authorized to access this page.');
+    }
+    drupal_goto('user');
+  }
+
+  // Work out where to send the person afterwards.
+  $destination = NULL;
+  if (!empty($_GET['destination']) && !url_is_external($_GET['destination'])) {
+    $destination = $_GET['destination'];
+  }
+  elseif ($is_403) {
+    // Serving an "access denied" page: $_GET['q'] is still the original path.
+    $destination = $_GET['q'];
+    $query = drupal_get_query_parameters();
+    if ($query) {
+      $destination .= '?' . drupal_http_build_query($query);
+    }
+  }
+
+  // drupal_goto() lets $_GET['destination'] override the target; clear it.
+  unset($_GET['destination']);
+
+  $options = array();
+  if ($destination) {
+    $options['query'] = array('destination' => $destination);
+  }
+  drupal_goto(variable_get('sirius_forcesaml_login_path', 'saml/login'), $options);
+}
+
+/**
+ * Page callback for "user": redirect anonymous users, default otherwise.
+ */
+function sirius_forcesaml_user_page() {
+  if (user_is_anonymous()) {
+    return sirius_forcesaml_login_page();
+  }
+  return user_page();
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Hides the login forms and rejects any attempt to submit them.
+ */
+function sirius_forcesaml_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'user_login' || $form_id == 'user_login_block') {
+    $form['#access'] = FALSE;
+    $form['#validate'] = isset($form['#validate']) ? $form['#validate'] : array();
+    array_unshift($form['#validate'], 'sirius_forcesaml_login_validate');
+  }
+}
+
+/**
+ * Validation handler: local username/password login is disabled.
+ */
+function sirius_forcesaml_login_validate($form, &$form_state) {
+  form_set_error('name', t('Username/password login is disabled. Please sign in with SAML.'));
+}
