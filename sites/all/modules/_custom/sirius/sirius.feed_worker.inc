@@ -109,6 +109,9 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
   if ($row['dob']) {
     $dob_ts = strtotime($row['dob']);
     if ($dob_ts === FALSE) { return array('success' => FALSE, 'msg' => 'Invalid date of birth'); }
+    if (date('Y-m-d', $dob_ts) > date('Y-m-d')) {
+      return array('success' => FALSE, 'msg' => 'Date of birth ' . date('m/d/Y', $dob_ts) . ' is in the future. Please check the year (e.g. 2067 instead of 1967).');
+    }
   }
 
   $domain_nid = $feed_node->field_sirius_domain['und'][0]['target_id'];
