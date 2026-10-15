@@ -170,8 +170,19 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
   // Validate fields
 	$fields = $info['feed']['callback_fields']($info, $info, $data, $feed_node, $current_step);
 
+  // Reject a DOB later than today (e.g. Excel reading a two-digit year of 67 as 2067 instead of 1967).
+  $dob_in_future = FALSE;
+  if ($row['dob']) {
+    $dob_ts = strtotime($row['dob']);
+    if ($dob_ts !== FALSE && date('Y-m-d', $dob_ts) > date('Y-m-d')) {
+      $dob_in_future = TRUE;
+      $errors[] = 'Date of birth ' . date('m/d/Y', $dob_ts) . ' is in the future. Please check the year (e.g. 2067 instead of 1967).';
+    }
+  }
+
   foreach ($fields as $field_name => $field_info) {
     if (!$row[$field_name]) { continue; }
+    if ($field_name == 'dob' && $dob_in_future) { continue; }
    	$result = sirius_feed_handle_field($field_name, $field_info, $row[$field_name], $precompute, $employer_node->nid);
     if (!$result['success']) { $errors[] = $result['msg']; }
   }
