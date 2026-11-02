@@ -72,6 +72,7 @@ function sirius_smf_node_tab_worker_autotag_history($worker_node) {
 
 	// Generate our table
 	$rows = array();
+	$medical_by_ym = array();
 	$policy_lookup = $employer_lookup = $benefit_lookup = array();
 	foreach ($months as $col1_ym => $col1_record) {
 		$col1_ts = strtotime("$col1_ym-15");
@@ -128,6 +129,8 @@ function sirius_smf_node_tab_worker_autotag_history($worker_node) {
 		$search_params['benefit_types'] = array($life_type_tid);
 		$search_params['ts'] = $col1_ts;
 		$add_wb_nodes = sirius_trust_worker_benefits_search($search_params);
+
+		$medical_by_ym[$col1_ym] = $medical_wb_nodes ? TRUE : FALSE;
 
 		if ($medical_wb_nodes || $dental_wb_nodes) {
 			// Receiving medical or dental
@@ -215,5 +218,31 @@ function sirius_smf_node_tab_worker_autotag_history($worker_node) {
 	$header = array();
 	$header[] = array('data' => 'Coverage Month', 'style' => 'width: 50%;');
 	$header[] = array('data' => 'Work Month', 'style' => 'width: 50%;');
-	return sirius_table_render($header, $rows);
+
+	// Continuous medical coverage counters. $months is ordered newest first.
+	$ym_list = array_keys($months);
+	$count_streak = function($start) use ($ym_list, $medical_by_ym) {
+		$count = 0;
+		for ($i = $start; $i < count($ym_list); ++$i) {
+			if (!$medical_by_ym[$ym_list[$i]]) { return array($count, FALSE); }
+			++$count;
+		}
+		// Never found a gap; the real streak may be longer than our lookback.
+		return array($count, TRUE);
+	};
+
+	$this_month = $count_streak(0);
+	$last_month = $count_streak(1);
+	$lookback = count($ym_list);
+	$cap_msg = ' <em>(There may be more; this page only looks back ' . $lookback . ' months.)</em>';
+
+	$lines = array();
+	if ($medical_by_ym[$ym_list[0]]) {
+		$lines[] = '<strong>Months of Continuous Medical Coverage:</strong> ' . $this_month[0] . ($this_month[1] ? '+' . $cap_msg : '');
+	} else {
+		$lines[] = '<strong>Months of Continuous Medical Coverage as of Last Month:</strong> ' . $last_month[0] . ($last_month[1] ? '+' . $cap_msg : '');
+		$lines[] = '<strong>Months of Continuous Medical Coverage as of This Month:</strong> ' . $this_month[0] . '';
+	}
+
+	return '<div class="sirius_smf_continuous_coverage" style="margin-bottom: 15px; font-size: 1.1em;">' . join('<br>', $lines) . '</div>' . sirius_table_render($header, $rows);
 }
