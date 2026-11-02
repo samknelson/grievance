@@ -277,6 +277,24 @@ class Sirius_Smf_Report_Edi_Kaiser extends Sirius_Trust_Provider_Edi_Report_Gene
     return $date;
   }
 
+  /**
+   * Kaiser treats the termination date as the first day WITHOUT coverage, so send
+   * the benefit end date + 1 day. If the end date is already the first of a month,
+   * send it as-is.
+   */
+  public function coverage_end_date($context) {
+    if (!$context['wb_node']) { return ''; }
+    if (!$context['wb_node']->field_sirius_date_end['und'][0]['value']) { return ''; }
+
+    // Don't send end dates after the asof date
+    $end_ts = strtotime($context['wb_node']->field_sirius_date_end['und'][0]['value']);
+    $asof_ts = strtotime($context['asof_date']);
+    if ($end_ts > $asof_ts) { return ''; }
+
+    if (date('j', $end_ts) != 1) { $end_ts = strtotime('+1 day', $end_ts); }
+    return date('Ymd', $end_ts);
+  }
+
   public function ssn($context, $which) {
     $str = parent::ssn($context, $which);
     while (strlen($str) < 9) { $str = "0$str"; }
