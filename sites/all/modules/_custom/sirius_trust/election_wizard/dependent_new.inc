@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Relationship types that members may NOT pick for themselves in the election wizard.
+ * Staff can still assign these when creating relationships elsewhere.
+ * Matched by term name so it works across environments.
+ */
+function sirius_trust_election_wizard_dependent_new_blocked_reltype_names() {
+	return array('Responsible Party');
+}
+
 function sirius_trust_election_wizard_dependent_new_form($form, &$form_state, $info, $data, $wizard_node, $current_step) {
 	$access = Sirius_Trust_Access::getInstance();
 	$access_context = array('election_wizard_node' => $wizard_node, 'current_step' => $current_step);
@@ -14,6 +23,9 @@ function sirius_trust_election_wizard_dependent_new_form($form, &$form_state, $i
 
 	// $relationship_type_lookup = sirius_taxonomy_load('sirius_contact_relationship_types', 'tid', 'full');
 	$relationship_type_options = sirius_taxonomy_load('sirius_contact_relationship_types', 'tid', 'name');
+	foreach ($relationship_type_options as $tid => $name) {
+		if (in_array($name, sirius_trust_election_wizard_dependent_new_blocked_reltype_names())) { unset($relationship_type_options[$tid]); }
+	}
 
 	$form['dependents']['new'][$which]['reltype'] = array(
 		'#title' => t('Your Relationship to the Dependent'),
@@ -151,7 +163,16 @@ function sirius_trust_election_wizard_dependent_new_form_validate($form, &$form_
 
 	unset($form_state['storage']["file"]);
 
-	$ssn = $form_state['values']['dependents']['new'][$which]['ssn'];
+	// Server-side backstop: the blocked types are removed from the dropdown, but don't trust the POST.
+	$reltype_tid = $form_state['values']['dependents']['new'][$which]['reltype'];
+	if ($reltype_tid) {
+		$reltype_term = taxonomy_term_load($reltype_tid);
+		if ($reltype_term && in_array($reltype_term->name, sirius_trust_election_wizard_dependent_new_blocked_reltype_names())) {
+			form_set_error("dependents][new][$which][reltype", 'Please select a valid relationship type.');
+		}
+	}
+
+	$ssn =$form_state['values']['dependents']['new'][$which]['ssn'];
 	if (!sirius_ssn_validate($ssn)) {
 		form_set_error("dependents][new][$which][ssn", 'Please enter a valid SSN.');
 	}
