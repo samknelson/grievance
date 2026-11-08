@@ -243,7 +243,16 @@ function sirius_trust_election_wizard_benefits_form_submit($form, &$form_state) 
 
 	$automatic_benefit_nids = array_keys(sirius_trust_policy_benefits_offered($policy_node, array('electable' => FALSE, 'worker_node' => $worker_node)));
 
+	$unconditional_benefit_nids = sirius_trust_election_wizard_unconditional_benefit_nids();
+
 	foreach ($automatic_benefit_nids as $benefit_nid) {
+		// AD&D and Life are not waivable and must never be dropped by a failed eligibility check (fund ruling, 2026-11-06).
+		// COBRA is handled by policy: the COBRA policy does not enable them, so they are not in the automatic list.
+		if (in_array($benefit_nid, $unconditional_benefit_nids)) {
+			$benefit_nids[] = $benefit_nid;
+			continue;
+		}
+
 		$benefit_node = node_load($benefit_nid);
 
 		$params = array();
@@ -313,6 +322,22 @@ function sirius_trust_election_wizard_benefits_form_submit($form, &$form_state) 
 
 	sirius_trust_election_set_title($wizard_node);
 	sirius_wizard_submit($info, $data, $wizard_node, $current_step, "Response saved.", array('nonsequential' => FALSE));
+}
+
+/**
+ * NIDs of automatic benefits that are granted without an eligibility check: AD&D (id 'ADD') and Life (id '2').
+ * They are not waivable. Only applied if the policy enables them as non-electable benefits.
+ */
+function sirius_trust_election_wizard_unconditional_benefit_nids() {
+	$nids = &drupal_static(__FUNCTION__);
+	if (!isset($nids)) {
+		$nids = array();
+		foreach (array('ADD', '2') as $sirius_id) {
+			$nid = sirius_find_nid_by_id($sirius_id, 'sirius_trust_benefit');
+			if ($nid) { $nids[] = $nid; }
+		}
+	}
+	return $nids;
 }
 
 function sirius_trust_election_wizard_benefits_render($info, $data, $wizard_node, $current_step) {
