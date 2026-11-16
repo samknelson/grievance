@@ -46,33 +46,19 @@ function sirius_smf_dashboard_member_overview_data($prefs, $options = array()) {
 
 	$dates = array();
 
-	// I fucking hate dates and timezones.
-	// We want date[0] to be four months ago.
-	$y = date('Y');
-	$m = date('n');
-	for ($i=0; $i<3; ++$i) {
-		--$m;
-		if ($m < 0) { $m += 12; --$y; }
-	}
-
-	$dates[0] = array(
-		'y' => $y,
-		'm' => $m,
-		'ts' => strtotime("$y-$m-15"),
-	);
-
-	$dates[0]['ts'] = strtotime($dates[0]['y'] . '-' . $dates[0]['m'] . '-15');
-	$dates[0]['render'] = date('M Y', $dates[0]['ts']);
-
-	for ($i=1; $i<12; ++$i) {
-		$dates[$i] = $dates[0];
-		$dates[$i]['m'] += $i;
-		if ($dates[$i]['m'] < 1) {
-			$dates[$i]['m'] += 12;
-			$dates[$i]['y']--;
-		}
-		$dates[$i]['ts'] = strtotime($dates[$i]['y'] . '-' . $dates[$i]['m'] . '-15');
-		$dates[$i]['render'] = date('M Y', $dates[$i]['ts']);
+	// date[0] is three months ago; date[i] is i months after that.
+	// mktime() normalizes month overflow/underflow (month 13 => Jan next year, month 0 => Dec last year),
+	// which strtotime("Y-13-15") does not (it returns FALSE, rendering as 1969).
+	$base_y = (int) date('Y');
+	$base_m = (int) date('n') - 3;
+	for ($i=0; $i<12; ++$i) {
+		$ts = mktime(12, 0, 0, $base_m + $i, 15, $base_y);
+		$dates[$i] = array(
+			'y' => (int) date('Y', $ts),
+			'm' => (int) date('n', $ts),
+			'ts' => $ts,
+			'render' => date('M Y', $ts),
+		);
 	}
 
 	// 
