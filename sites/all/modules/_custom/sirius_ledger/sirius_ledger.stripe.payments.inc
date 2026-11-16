@@ -161,8 +161,23 @@ trait Sirius_Ledger_Service_Stripe_Payments {
   	$paymentintent_id = $event_json['data']['object']['id'];
   	if (!$paymentintent_id) { return $this->webhook_error($orig_domain_nid, "No paymentintent_id found in the webhook."); }
 
-  	$payment_node = $this->paymentintent_fetch_by_id($paymentintent_id);
-  	if (!$payment_node) { return array('success' => FALSE, 'msg' => 'Payment not found: ' . $paymentintent_id); }
+  	$payment_nid = $this->paymentintent_fetch_by_id($paymentintent_id, TRUE);
+  	if (!$payment_nid) { return array('success' => FALSE, 'msg' => 'Payment not found: ' . $paymentintent_id); }
+
+  	// Stripe sends e.g. "created" and "succeeded" within the same second, and they are handled by concurrent requests.
+  	// Without serialization, a stale "created" handler clears the ledger entries the "succeeded" handler just allocated.
+  	// (The lock is also released at shutdown, so early returns below are safe.)
+  	$lock_name = 'sirius_stripe_pi_' . $payment_nid;
+  	if (!lock_acquire($lock_name, 60)) {
+  		lock_wait($lock_name, 30);
+  		if (!lock_acquire($lock_name, 60)) {
+  			// Non-2xx, so that Stripe re-delivers the event later.
+  			return $this->webhook_error(sirius_domain_nid(), "Could not acquire lock for payment $payment_nid.");
+  		}
+  	}
+
+  	// Reload inside the lock, bypassing the static cache, so we see whatever the other request saved.
+  	$payment_node = node_load($payment_nid, NULL, TRUE);
 
 	  list ($event_category, $event_type) = explode('.', $event_json['type']);
 
@@ -170,10 +185,14 @@ trait Sirius_Ledger_Service_Stripe_Payments {
 
 		if (!$event_types[$event_type]) { return array('success' => FALSE, 'msg' => "Don't know how to handle payment_intent.$event_type"); }
 
-		// Never update payments which are "Cleared"
-		if ($payment_node->field_sirius_payment_status['und'][0]['value'] != 'Cleared') {
+		// Never update payments which are "Cleared".
+		// Also skip events which don't change the status (e.g. "created" on a Pending payment): updating always
+		// clears the ledger entries, so a no-op event must not trigger an update.
+		$old_status = $payment_node->field_sirius_payment_status['und'][0]['value'];
+		$new_status = $event_types[$event_type]['status'];
+		if ($old_status != 'Cleared' && $old_status != $new_status) {
 			$params = array();
-			$params['payment_status'] = $event_types[$event_type]['status'];
+			$params['payment_status'] = $new_status;
 			$params['allocate'] = 'Yes';
 			if ($params['payment_status'] == 'Cleared' && !$payment_node->field_sirius_datetime['und'][0]['value']) {
 				// Stripe payments post at the original received date, not the date Stripe reports the clear (ACH can take days).
@@ -204,6 +223,7 @@ trait Sirius_Ledger_Service_Stripe_Payments {
       $event_json
 	  );
 		watchdog('sirius_ledger_stripe_webhook', "Logged " . $log_node->nid . " to " . $payment_node->nid);
+		lock_release($lock_name);
 
   	$result = array('success' => FALSE, 'msg' => 'Payment intent webhooks not implemented yet.');
 	}
