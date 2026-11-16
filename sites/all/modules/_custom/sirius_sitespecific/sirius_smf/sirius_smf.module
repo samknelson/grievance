@@ -301,6 +301,8 @@ function sirius_smf_report_cache_info() {
   sirius_require('sirius_smf', 'reports/ledger_qa.inc');
   sirius_require('sirius_smf', 'reports/dual_coverage.inc');
   sirius_require('sirius_smf', 'reports/ee_contrib_missing_charges.inc');
+  sirius_require('sirius_smf', 'reports/oe_transition.inc');
+  sirius_require('sirius_smf', 'reports/elections_missing_addlife.inc');
 
 
   Sirius_Smf_Report_Empstatus::getInstance()->setInfo($items);
@@ -332,7 +334,8 @@ function sirius_smf_report_cache_info() {
   Sirius_Smf_Report_Ledger_Qa::getInstance()->setInfo($items);
   Sirius_Smf_Report_Dual_Coverage::getInstance()->setInfo($items);
   Sirius_Smf_Report_Ee_Contrib_Missing_Charges::getInstance()->setInfo($items);
-
+  Sirius_Smf_Report_Oe_Transition::getInstance()->setInfo($items);
+  Sirius_Smf_Report_Elections_Missing_Addlife::getInstance()->setInfo($items);
 
   return $items;
 }
