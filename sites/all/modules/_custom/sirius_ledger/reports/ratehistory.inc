@@ -23,6 +23,7 @@ class Sirius_Ledger_Report_Ratehistory extends Report_Cache_Report_Generator {
   public function fields() {
     $fields['employer_nid'] = 'Employer NID';
     $fields['employer_id'] = 'Employer ID';
+    $fields['employer_industry'] = 'Employer Industry';
     $fields['employer_name'] = 'Employer Name';
     $fields['rate_date'] = 'Date';
     $fields['rate'] = 'Rate';
@@ -122,6 +123,18 @@ class Sirius_Ledger_Report_Ratehistory extends Report_Cache_Report_Generator {
         $row['employer_nid'] = $employer_nid;
         $row['employer_name'] = $employer_node->title;
         $row['employer_id'] = $employer_node->field_sirius_id['und'][0]['value'];
+        $industry_names = array();
+        $industry_items = $employer_node->field_sirius_industry['und'];
+        if (!$industry_items) { $industry_items = array(); }
+        foreach ($industry_items as $industry_item) { $industry_names[] = sirius_term_title($industry_item['tid']); }
+        $industry_names = array_values(array_filter($industry_names));
+        if (count($industry_names) == 0) {
+          $row['employer_industry'] = 'NONE';
+        } else if (count($industry_names) > 1) {
+          $row['employer_industry'] = 'MULTIPLE';
+        } else {
+          $row['employer_industry'] = $industry_names[0];
+        }
         $row['rate_date'] = $rate['date'];
         $row['rate'] = $rate['rate'];
         $rows[$pk] = $row;
