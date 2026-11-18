@@ -79,6 +79,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
     $fields[] = 'worker_name';
     $fields[] = 'employer_name';
     $fields[] = 'employer_id';
+    $fields[] = 'employer_industry';
     $fields[] = 'WORK MONTH';
     $fields[] = 'HN';
     $fields[] = 'HN T1';
@@ -266,6 +267,18 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
       $row['worker_name'] = $worker_node->title;
       $row['employer_name'] = $employer_lookup[$employer_nid]->title;
       $row['employer_id'] = $employer_lookup[$employer_nid]->field_sirius_id['und'][0]['value'];
+      $industry_names = array();
+      $industry_items = $employer_lookup[$employer_nid]->field_sirius_industry['und'];
+      if (!$industry_items) { $industry_items = array(); }
+      foreach ($industry_items as $industry_item) { $industry_names[] = sirius_term_title($industry_item['tid']); }
+      $industry_names = array_values(array_filter($industry_names));
+      if (count($industry_names) == 0) {
+        $row['employer_industry'] = 'NONE';
+      } else if (count($industry_names) > 1) {
+        $row['employer_industry'] = 'MULTIPLE';
+      } else {
+        $row['employer_industry'] = $industry_names[0];
+      }
 
       $row['WORK MONTH'] = $work_display;
 
@@ -395,7 +408,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
       $employer_name = $row['employer_name'];
       if (!$employer_name) { continue; }
 
-      if (!$data[$employer_name]) { $data[$employer_name] = array('employer_id' => $row['employer_id']); }
+      if (!$data[$employer_name]) { $data[$employer_name] = array('employer_id' => $row['employer_id'], 'employer_industry' => $row['employer_industry']); }
 
       foreach ($summary_fields as $field_name) {
         $val = $row[$field_name];
@@ -418,6 +431,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
       $row = array();
       $row[] = $employer_name;
       $row[] = $employer_data['employer_id'];
+      $row[] = $employer_data['employer_industry'];
       $row[] = $month;
       foreach ($summary_fields as $field_name) {
         $val = $employer_data[$field_name];
@@ -430,6 +444,7 @@ class Sirius_Smf_Report_Emptier extends Report_Cache_Report_Generator {
     $header = array();
     $header[] = 'Employer';
     $header[] = 'Employer ID';
+    $header[] = 'Employer Industry';
     $header[] = 'WORK MONTH';
     foreach ($summary_fields as $field_name) { $header[] = $field_name; }
 
